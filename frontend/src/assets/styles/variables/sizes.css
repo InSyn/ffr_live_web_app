@@ -1,0 +1,10 @@
+:root {
+    --desktop-2k: 2560px;
+    --desktop-big: 1980px;
+    --desktop-medium: 1440px;
+    --desktop-small: 1280px;
+    --tablet-default: 920px;
+    --tablet-small: 720px;
+    --mobile-default: 640px;
+    --mobile-small: 480px;
+}

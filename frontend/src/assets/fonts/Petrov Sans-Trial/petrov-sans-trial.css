@@ -1,0 +1,162 @@
+@font-face {
+    font-family: 'Petrov Sans-Trial';
+    src: url('PetrovSans-Trial-Black.woff2') format('woff2'),
+        url('PetrovSans-Trial-Black.woff') format('woff');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Petrov Sans-Trial Book';
+    src: url('PetrovSans-Trial-Book.woff2') format('woff2'),
+        url('PetrovSans-Trial-Book.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Petrov Sans-Trial';
+    src: url('PetrovSans-Trial-BlackItalic.woff2') format('woff2'),
+        url('PetrovSans-Trial-BlackItalic.woff') format('woff');
+    font-weight: 900;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Petrov Sans-Trial';
+    src: url('PetrovSans-Trial-ExtraBold.woff2') format('woff2'),
+        url('PetrovSans-Trial-ExtraBold.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Petrov Sans-Trial';
+    src: url('PetrovSans-Trial-Bold.woff2') format('woff2'),
+        url('PetrovSans-Trial-Bold.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Petrov Sans-Trial Book';
+    src: url('PetrovSans-Trial-BookItalic.woff2') format('woff2'),
+        url('PetrovSans-Trial-BookItalic.woff') format('woff');
+    font-weight: 300;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Petrov Sans-Trial';
+    src: url('PetrovSans-Trial-BoldItalic.woff2') format('woff2'),
+        url('PetrovSans-Trial-BoldItalic.woff') format('woff');
+    font-weight: bold;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Petrov Sans-Trial';
+    src: url('PetrovSans-Trial-LightItalic.woff2') format('woff2'),
+        url('PetrovSans-Trial-LightItalic.woff') format('woff');
+    font-weight: 200;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Petrov Sans-Trial ExLight It';
+    src: url('PetrovSans-Trial-ExtraLightItalic.woff2') format('woff2'),
+        url('PetrovSans-Trial-ExtraLightItalic.woff') format('woff');
+    font-weight: 200;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Petrov Sans-Trial ExBold';
+    src: url('PetrovSans-Trial-ExtraBoldItalic.woff2') format('woff2'),
+        url('PetrovSans-Trial-ExtraBoldItalic.woff') format('woff');
+    font-weight: bold;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Petrov Sans-Trial';
+    src: url('PetrovSans-Trial-Light.woff2') format('woff2'),
+        url('PetrovSans-Trial-Light.woff') format('woff');
+    font-weight: 200;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Petrov Sans-Trial';
+    src: url('PetrovSans-Trial-Regular.woff2') format('woff2'),
+        url('PetrovSans-Trial-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Petrov Sans-Trial';
+    src: url('PetrovSans-Trial-ExtraLight.woff2') format('woff2'),
+        url('PetrovSans-Trial-ExtraLight.woff') format('woff');
+    font-weight: 200;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Petrov Sans-Trial';
+    src: url('PetrovSans-Trial-SemiBold.woff2') format('woff2'),
+        url('PetrovSans-Trial-SemiBold.woff') format('woff');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Petrov Sans-Trial';
+    src: url('PetrovSans-Trial-RegularItalic.woff2') format('woff2'),
+        url('PetrovSans-Trial-RegularItalic.woff') format('woff');
+    font-weight: normal;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Petrov Sans-Trial';
+    src: url('PetrovSans-Trial-Thin.woff2') format('woff2'),
+        url('PetrovSans-Trial-Thin.woff') format('woff');
+    font-weight: 100;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Petrov Sans-Trial';
+    src: url('PetrovSans-Trial-ThinItalic.woff2') format('woff2'),
+        url('PetrovSans-Trial-ThinItalic.woff') format('woff');
+    font-weight: 100;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Petrov Sans-Trial SmBold';
+    src: url('PetrovSans-Trial-SemiBoldItalic.woff2') format('woff2'),
+        url('PetrovSans-Trial-SemiBoldItalic.woff') format('woff');
+    font-weight: 600;
+    font-style: italic;
+    font-display: swap;
+}
+

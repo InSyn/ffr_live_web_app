@@ -1,0 +1,67 @@
+:root {
+    --app-height: 100vh;
+}
+
+html {
+    height: var(--app-height);
+    overflow-y: auto !important;
+}
+
+body {
+    height: inherit;
+    background-color: inherit;
+}
+body * {
+    transition: background-color 192ms;
+}
+
+h3 {
+    font-size: 1.2rem;
+    margin: 0 .75rem .5rem;
+}
+h4 {
+    font-size: 1.05rem;
+    margin: 0 .5rem .25rem;
+}
+
+a {
+    text-decoration: none;
+    color: var(--text-default)
+}
+
+a:visited {
+}
+
+select {
+    line-height: 1.375 !important;
+}
+
+@media screen and (max-width: 1440px) {
+    html {
+        font-size: 14px !important;
+    }
+}
+
+@media screen and (max-width: 1024px) {
+    html {
+        font-size: 12px !important;
+    }
+}
+
+@media screen and (max-width: 720px) {
+    html {
+        font-size: 10px !important;
+    }
+}
+
+@media screen and (max-width: 400px) {
+    html {
+        font-size: 8px !important;
+    }
+}
+
+@media screen and (orientation: landscape) {
+    :root {
+        --app-height: auto;
+    }
+}

@@ -1,0 +1,78 @@
+version: '3'
+
+services:
+  ffr_live_back:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ffr_live_back
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - DB_USER=$DB_USER
+      - DB_PWD=$DB_PWD
+      - DB_HOSTNAME=$DB_HOSTNAME
+      - DB_PORT=$DB_PORT
+      - DB=$DB
+    ports:
+      - "8081:8080"
+      - "8082:443"
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+      - ./backend/uploads:/home/ffr_live_back/uploads
+    links:
+      - live_db
+    networks:
+      - app-network
+    depends_on:
+      - live_db
+
+#  certbot:
+#    image: certbot/certbot
+#    container_name: certbot
+#    volumes:
+#      - /etc/letsencrypt:/etc/letsencrypt
+#      - /var/lib/letsencrypt:/var/lib/letsencrypt
+#      - /var/log/letsencrypt:/var/log/letsencrypt
+#    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+#    networks:
+#      - app-network
+
+#  tw_live_frontend:
+#    build:
+#      context: ./frontend
+#      dockerfile: Dockerfile
+#      args:
+#        - VUE_APP_BASE_URL=$API_URL
+#        - VUE_APP_UPLOADS_URL=$SERVER_URL
+#        - VUE_APP_PROJECT_MODE=$PROJECT_MODE
+#    container_name: ffr_live_front
+#    restart: unless-stopped
+#    ports:
+#      - "8083:80"
+#    networks:
+#      - app-network
+
+  live_db:
+    image: mongo:5.0-focal
+    container_name: ffr_live_db
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=$DB_USER
+      - MONGO_INITDB_ROOT_PASSWORD=$DB_PWD
+      - MONGO_INITDB_DATABASE=$DB
+    volumes:
+      - dbdata:/data/db
+      - ./backend/db/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js
+    networks:
+      - app-network
+    ports:
+      - "27017:27017"
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  dbdata:

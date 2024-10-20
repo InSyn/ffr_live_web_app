@@ -1,0 +1,29 @@
+.searchInput__control {
+  position: relative;
+  flex: 2 1 0;
+  min-width: 0;
+  width: 100%;
+
+  padding: 4px 8px;
+  color: var(--text-default);
+  background-color: var(--background--card-secondary);
+  border-radius: 2px;
+
+  outline: transparent;
+
+  transition: background-color 92ms;
+
+  &.empty {
+    color: var(--text-depressed);
+    & option {
+      color: var(--text-default);
+    }
+  }
+  &:focus {
+    background-color: var(--background--card-hover);
+  }
+
+  & option[data-cancel-option="true"] {
+    color: var(--message-error);
+  }
+}
