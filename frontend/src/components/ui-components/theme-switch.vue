@@ -14,11 +14,11 @@
 </template>
 
 <script>
-import { mdiBrightness2, mdiBrightness7 } from "@mdi/js";
-import { checkUserTheme } from "@/utils/check-theme";
+import { mdiBrightness2, mdiBrightness7 } from '@mdi/js';
+import { checkUserTheme } from '@/utils/check-theme';
 
 export default {
-  name: "theme-switch",
+  name: 'theme-switch',
   mounted() {
     this.$nextTick(() => {
       this.appTheme = checkUserTheme();
@@ -26,20 +26,20 @@ export default {
   },
   methods: {
     toggleTheme() {
-      if (this.appTheme === "dark") {
-        document.getElementById("app").classList.remove("theme-dark");
-        localStorage.setItem("app-theme", "light");
-        this.appTheme = "light";
+      if (this.appTheme === 'dark') {
+        document.getElementById('app').classList.remove('theme-dark');
+        localStorage.setItem('app-theme', 'light');
+        this.appTheme = 'light';
       } else {
-        document.getElementById("app").classList.add("theme-dark");
-        localStorage.setItem("app-theme", "dark");
-        this.appTheme = "dark";
+        document.getElementById('app').classList.add('theme-dark');
+        localStorage.setItem('app-theme', 'dark');
+        this.appTheme = 'dark';
       }
     },
   },
   data() {
     return {
-      appTheme: "",
+      appTheme: '',
       themeDarkIcon: mdiBrightness2,
       themeLightIcon: mdiBrightness7,
     };
@@ -62,8 +62,7 @@ export default {
     background: #ffffff;
     border: 2px solid rgba(130, 156, 153, 0.6);
     border-radius: 16px;
-    box-shadow: 4px 2px 8px rgba(0, 0, 0, 0.45) inset,
-      -2px -1px 3px rgba(255, 255, 255, 0.3) inset;
+    box-shadow: 4px 2px 8px rgba(0, 0, 0, 0.45) inset, -2px -1px 3px rgba(255, 255, 255, 0.3) inset;
     transition: background-color 296ms;
 
     .toggle__thumb {
@@ -76,15 +75,15 @@ export default {
       margin-left: 0;
       background: #ffffff;
       border-radius: 50%;
-      box-shadow: 2px 2px 4px rgba(255, 255, 255, 0.3) inset,
-        -1px -1px 4px rgba(0, 0, 0, 0.4) inset;
+      box-shadow: 2px 2px 4px rgba(255, 255, 255, 0.3) inset, -1px -1px 4px rgba(0, 0, 0, 0.4) inset;
       transform: translateY(-50%);
       transition: left 192ms ease-in-out, box-shadow 128ms;
 
       &:hover {
-        box-shadow: 3px 3px 6px rgba(255, 255, 255, 0.3) inset,
-          -2px -2px 6px rgba(0, 0, 0, 0.4) inset;
+        background: #f1f1f4;
+        box-shadow: 3px 3px 6px rgba(255, 255, 255, 0.3) inset, -2px -2px 6px rgba(0, 0, 0, 0.4) inset;
       }
+
       .theme__icon {
         position: absolute;
         top: 50%;
@@ -98,6 +97,7 @@ export default {
         &.light {
           opacity: 1;
         }
+
         &.dark {
           opacity: 0;
         }
@@ -114,6 +114,7 @@ export default {
       &.light {
         opacity: 0;
       }
+
       &.dark {
         opacity: 1;
       }

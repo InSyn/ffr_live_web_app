@@ -11,139 +11,64 @@
           <img :src="imagePreview['photo_url']" alt="Selected Image" />
         </div>
         <div v-else class="imageFiller">
-          <athlete-photo-filler-icon
-            class="athletePhotoFiller__icon"
-            :gender="jury.gender"
-          ></athlete-photo-filler-icon>
+          <athlete-photo-filler-icon class="athletePhotoFiller__icon" :gender="jury.gender"></athlete-photo-filler-icon>
         </div>
 
         <div class="imageInput__wrapper">
           <div class="imageInput__title">Фото</div>
-          <input
-            @change="onFileChange($event, 'photo_url')"
-            type="file"
-            class="formControl-image"
-            id="photo_url"
-            name="photo_url"
-          />
+          <input @change="onFileChange($event, 'photo_url')" type="file" class="formControl-image" id="photo_url" name="photo_url" />
         </div>
       </div>
 
-      <div
-        v-for="(_, key) in jury"
-        v-show="key !== 'country_code' && key !== 'region_code'"
-        :key="key"
-        class="formGroup"
-      >
+      <div v-for="(_, key) in jury" v-show="key !== 'country_code' && key !== 'region_code'" :key="key" class="formGroup">
         <label :for="key" class="formLabel">{{ translateField(key) }}</label>
 
-        <select
-          v-if="key === 'gender'"
-          :id="key"
-          class="formControl"
-          v-model="jury[key]"
-        >
+        <select v-if="key === 'gender'" :id="key" class="formControl" v-model="jury[key]">
           <option selected disabled value="">Выберите пол</option>
           <option v-for="option in ['М', 'Ж']" :key="option">
             {{ capitalizeString(option) }}
           </option>
         </select>
 
-        <select
-          v-else-if="key === 'sport'"
-          :id="key"
-          class="formControl"
-          v-model="jury[key]"
-        >
+        <select v-else-if="key === 'sport'" :id="key" class="formControl" v-model="jury[key]">
           <option selected disabled value="">Выберите вид спорта</option>
-          <option
-            v-for="sport in sports"
-            :key="sport.code"
-            class="formControl-option"
-          >
+          <option v-for="sport in sports" :key="sport.code" class="formControl-option">
             {{ capitalizeString(sport.name_rus) }}
           </option>
         </select>
-        <div
-          class="select__wrapper"
-          v-else-if="key === 'disciplines' && jury['sport']"
-        >
-          <div
-            class="formControl__wrapper"
-            v-for="(_, dsc_idx) in jury[key]"
-            :key="dsc_idx"
-          >
+        <div class="select__wrapper" v-else-if="key === 'disciplines' && jury['sport']">
+          <div class="formControl__wrapper" v-for="(_, dsc_idx) in jury[key]" :key="dsc_idx">
             <select
-              @change="
-                setFieldValue(jury, 'disciplines', $event.target.value, dsc_idx)
-              "
+              @change="setFieldValue(jury, 'disciplines', $event.target.value, dsc_idx)"
               :id="key"
               data-new-region="false"
               class="formControl"
               :value="jury[key][dsc_idx]"
             >
-              <option
-                v-for="discipline in getDisciplines(jury['sport'])"
-                :key="discipline.code"
-              >
+              <option v-for="discipline in getDisciplines(jury['sport'])" :key="discipline.code">
                 {{ discipline.name_rus }}
               </option>
             </select>
-            <span
-              @click="removeFieldValue(jury, 'disciplines', dsc_idx)"
-              class="removeOption__button"
-            >
-            </span>
+            <span @click="removeFieldValue(jury, 'disciplines', dsc_idx)" class="removeOption__button"> </span>
           </div>
-          <select
-            @change="addFieldValue(jury, 'disciplines', $event)"
-            :id="key"
-            data-new-region="true"
-            class="formControl"
-          >
+          <select @change="addFieldValue(jury, 'disciplines', $event)" :id="key" data-new-region="true" class="formControl">
             <option selected disabled value="">Выберите дисциплину</option>
-            <option
-              v-for="discipline in getDisciplines(jury['sport'])"
-              :key="discipline.code"
-            >
+            <option v-for="discipline in getDisciplines(jury['sport'])" :key="discipline.code">
               {{ discipline.name_rus }}
             </option>
           </select>
         </div>
 
-        <select
-          v-else-if="key === 'country'"
-          :id="key"
-          class="formControl"
-          :value="jury[key]"
-          @change="setFieldValue(jury, 'country', $event.target.value)"
-        >
+        <select v-else-if="key === 'country'" :id="key" class="formControl" :value="jury[key]" @change="setFieldValue(jury, 'country', $event.target.value)">
           <option selected disabled value="">Выберите страну</option>
-          <option
-            v-for="country in countries"
-            :key="country.country_code"
-            class="formControl-option"
-          >
+          <option v-for="country in countries" :key="country.country_code" class="formControl-option">
             {{ country.country_name }}
           </option>
         </select>
         <div class="select__wrapper" v-else-if="key === 'region'">
-          <input
-            v-if="getCountryCode(jury['country']) !== 'RU'"
-            v-model="jury[key]"
-            :id="key"
-            :name="key"
-            :type="getInputType(key)"
-            class="formControl"
-          />
+          <input v-if="getCountryCode(jury['country']) !== 'RU'" v-model="jury[key]" :id="key" :name="key" :type="getInputType(key)" class="formControl" />
           <div v-else class="formControl__wrapper">
-            <select
-              @change="setFieldValue(jury, 'region', $event.target.value)"
-              :id="key"
-              data-new-region="false"
-              class="formControl"
-              :value="jury[key]"
-            >
+            <select @change="setFieldValue(jury, 'region', $event.target.value)" :id="key" data-new-region="false" class="formControl" :value="jury[key]">
               <option selected disabled value="">Выберите регион</option>
               <option v-for="region in russiaRegions" :key="region.code">
                 {{ region.fullname }}
@@ -159,11 +84,7 @@
           @change="setFieldValue(jury, 'jury_category', $event.target.value)"
         >
           <option selected disabled value="">Выберите категорию судьи</option>
-          <option
-            v-for="category in getJuryCategoriesList()"
-            :key="category"
-            class="formControl-option"
-          >
+          <option v-for="category in getJuryCategoriesList()" :key="category" class="formControl-option">
             {{ category }}
           </option>
         </select>
@@ -171,75 +92,41 @@
         <div class="select__wrapper" v-else-if="key === 'socials'">
           <div class="formControl__wrapper">
             <span>vk</span>
-            <input
-              :id="`${key}_vk`"
-              class="formControl"
-              v-model="jury[key]['vk']"
-            />
+            <input :id="`${key}_vk`" class="formControl" v-model="jury[key]['vk']" />
           </div>
           <div class="formControl__wrapper">
             <span>telegram</span>
-            <input
-              :id="`${key}_tg`"
-              class="formControl"
-              v-model="jury[key]['telegram']"
-            />
+            <input :id="`${key}_tg`" class="formControl" v-model="jury[key]['telegram']" />
           </div>
         </div>
 
-        <input
-          v-else
-          v-model="jury[key]"
-          :id="key"
-          :name="key"
-          :type="getInputType(key)"
-          class="formControl"
-        />
+        <input v-else v-model="jury[key]" :id="key" :name="key" :type="getInputType(key)" class="formControl" />
       </div>
     </div>
 
     <div class="formActions">
-      <v-btn
-        class="actionButton"
-        type="submit"
-        color="var(--text-contrast)"
-        small
-      >
-        {{ action === "create" ? "Создать" : "Обновить" }}
+      <v-btn class="actionButton" type="submit" color="var(--text-contrast)" small>
+        {{ action === 'create' ? 'Создать' : 'Обновить' }}
       </v-btn>
-      <v-btn
-        class="actionButton"
-        v-show="action === 'update'"
-        type="button"
-        color="var(--message-error)"
-        @click="deleteJury"
-        text
-        small
-      >
-        Удалить
-      </v-btn>
+      <v-btn class="actionButton" v-show="action === 'update'" type="button" color="var(--message-error)" @click="deleteJury" text small> Удалить </v-btn>
     </div>
   </form>
 </template>
 
 <script>
-import AthletePhotoFillerIcon from "@/assets/svg/athletePhotoFiller-icon.vue";
-import { getInputType } from "@/utils/get-input-type";
-import { getJuryCategoriesList } from "@/store/data/sport-data-sets";
-import { russiaRegions } from "@/store/data/russia-regions";
-import { countries, getCountryCode } from "@/store/data/countries";
-import { getDisciplines, sports } from "@/store/data/sports";
-import { capitalizeString } from "@/utils/capitalizeString";
-import { translateField } from "@/utils/formFields-translator";
-import { uploadsFolderUrl } from "@/store/constants";
-import {
-  addFieldValue,
-  removeFieldValue,
-  setFieldValue,
-} from "@/utils/form-data-helpers";
+import AthletePhotoFillerIcon from '@/assets/svg/athletePhotoFiller-icon.vue';
+import { getInputType } from '@/utils/get-input-type';
+import { getJuryCategoriesList } from '@/store/data/sport-data-sets';
+import { russiaRegions } from '@/store/data/russia-regions';
+import { countries, getCountryCode } from '@/store/data/countries';
+import { getDisciplines, sports } from '@/store/data/sports';
+import { capitalizeString } from '@/utils/capitalizeString';
+import { translateField } from '@/utils/formFields-translator';
+import { uploadsFolderUrl } from '@/store/constants';
+import { addFieldValue, removeFieldValue, setFieldValue } from '@/utils/form-data-helpers';
 
 export default {
-  name: "jury-form",
+  name: 'jury-form',
   components: { AthletePhotoFillerIcon },
   props: {
     jury: Object,
@@ -281,40 +168,36 @@ export default {
       }
 
       this.$set(this.selectedFile, imageType, e.target.files[0]);
-      this.previewImage(imageType, "file");
+      this.previewImage(imageType, 'file');
     },
     previewImage(imageType, sourceType) {
-      if (sourceType === "file" && this.selectedFile[imageType]) {
+      if (sourceType === 'file' && this.selectedFile[imageType]) {
         const reader = new FileReader();
         reader.onload = (e) => {
           this.$set(this.imagePreview, imageType, e.target.result);
         };
         reader.readAsDataURL(this.selectedFile[imageType]);
-      } else if (sourceType === "url") {
-        this.$set(
-          this.imagePreview,
-          imageType,
-          uploadsFolderUrl + this.juryImages[imageType]
-        );
+      } else if (sourceType === 'url') {
+        this.$set(this.imagePreview, imageType, uploadsFolderUrl + this.juryImages[imageType]);
       }
     },
 
     async submitForm() {
       switch (this.action) {
-        case "create": {
-          this.$emit("create-jury", this.selectedFile);
+        case 'create': {
+          this.$emit('create-jury', this.selectedFile);
           return;
         }
-        case "update": {
-          this.$emit("update-jury", this.selectedFile);
+        case 'update': {
+          this.$emit('update-jury', this.selectedFile);
           return;
         }
       }
     },
 
     deleteJury() {
-      if (confirm("Вы уверены, что хотите удалить судью?")) {
-        this.$emit("delete-jury", this.jury.jury_code);
+      if (confirm('Вы уверены, что хотите удалить судью?')) {
+        this.$emit('delete-jury', this.jury.jury_code);
       }
     },
   },
@@ -326,7 +209,7 @@ export default {
         if (!newImages) return;
 
         for (const imgKey in newImages) {
-          if (newImages[imgKey]) this.previewImage(imgKey, "url");
+          if (newImages[imgKey]) this.previewImage(imgKey, 'url');
         }
       },
     },
@@ -344,6 +227,8 @@ form {
   padding: 1rem 1.6rem;
 
   background-color: var(--background--card);
+  box-shadow: var(--container-shadow-m);
+  border: 1px solid var(--border-container);
   border-radius: 4px;
 
   .formHeader {
@@ -378,6 +263,7 @@ form {
           border-radius: 4px;
         }
       }
+
       .imageFiller {
         flex: 0 0 auto;
         display: flex;
@@ -390,6 +276,7 @@ form {
           height: auto;
         }
       }
+
       .imageInput__wrapper {
         display: flex;
         flex-direction: column;
@@ -397,6 +284,7 @@ form {
         .imageInput__title {
           flex: 0 0 auto;
         }
+
         .formControl-image {
           flex: 0 0 auto;
           margin-top: auto;
@@ -412,6 +300,7 @@ form {
 
             cursor: pointer;
           }
+
           &::file-selector-button:hover {
             background-color: var(--background--card-hover);
           }
@@ -429,12 +318,14 @@ form {
       &:focus-within {
         border-bottom: 1px solid var(--text-muted);
       }
+
       .formLabel {
         flex: 0 1 auto;
         width: 9rem;
         margin-right: 1rem;
         padding: 3px 6px;
       }
+
       .select__wrapper {
         flex: 1 1 0;
         display: flex;
@@ -450,6 +341,7 @@ form {
             width: 4rem;
             margin-right: 8px;
           }
+
           .formControl-image {
             font-size: 0.75rem;
 
@@ -464,10 +356,12 @@ form {
 
               cursor: pointer;
             }
+
             &::file-selector-button:hover {
               background-color: var(--background--card-hover);
             }
           }
+
           .removeOption__button {
             display: block;
             position: absolute;
@@ -479,13 +373,14 @@ form {
             opacity: 0.25;
             transition: opacity 92ms;
             cursor: pointer;
-            content: "";
+            content: '';
 
             &:hover {
               opacity: 1;
             }
+
             &::before {
-              content: "";
+              content: '';
               position: absolute;
               display: block;
               height: 4px;
@@ -496,8 +391,9 @@ form {
               top: 50%;
               transform: translate(-50%, -50%) rotate(45deg);
             }
+
             &::after {
-              content: "";
+              content: '';
               position: absolute;
               display: block;
               height: 4px;
@@ -511,6 +407,7 @@ form {
           }
         }
       }
+
       .formControl {
         position: relative;
         flex: 1 1 0;

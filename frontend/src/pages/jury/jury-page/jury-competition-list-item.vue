@@ -1,12 +1,7 @@
 <template>
   <div class="juryEvent__item__wrapper">
     <div class="event__image__wrapper">
-      <img
-        v-if="event['logo_image_url']"
-        :src="uploadsFolderUrl + event['logo_image_url']"
-        alt="Event Logo"
-        loading="lazy"
-      />
+      <img v-if="event['logo_image_url']" :src="uploadsFolderUrl + event['logo_image_url']" alt="Event Logo" loading="lazy" />
       <competition-image-filler-icon v-else></competition-image-filler-icon>
       <country-flag
         class="juryEvent_regionFlag"
@@ -24,11 +19,7 @@
         </div>
         <div class="juryEvent__sport">
           {{ event.sport }}
-          <country-flag
-            class="juryEvent_countryFlag"
-            height="1rem"
-            :country-code="getCountryCode(event.country)"
-          ></country-flag>
+          <country-flag class="juryEvent_countryFlag" height="1rem" :country-code="getCountryCode(event.country)"></country-flag>
         </div>
       </div>
       <div class="juryEvent__item__middleSection">
@@ -56,15 +47,15 @@
 </template>
 
 <script>
-import { uploadsFolderUrl } from "@/store/constants";
-import CompetitionImageFillerIcon from "@/assets/svg/competitionImageFiller-icon.vue";
-import CountryFlag from "@/components/ui-components/country-flag.vue";
-import { getCountryCode } from "@/store/data/countries";
-import { getRegionCode } from "@/store/data/russia-regions";
-import { formatDate } from "@/utils/data-formaters";
+import { uploadsFolderUrl } from '@/store/constants';
+import CompetitionImageFillerIcon from '@/assets/svg/competitionImageFiller-icon.vue';
+import CountryFlag from '@/components/ui-components/country-flag.vue';
+import { getCountryCode } from '@/store/data/countries';
+import { getRegionCode } from '@/store/data/russia-regions';
+import { formatDate } from '@/utils/data-formaters';
 
 export default {
-  name: "jury-competition-list-item",
+  name: 'jury-competition-list-item',
   components: { CountryFlag, CompetitionImageFillerIcon },
   computed: {
     uploadsFolderUrl() {
@@ -77,7 +68,7 @@ export default {
   },
   data() {
     return {
-      role: "",
+      role: '',
     };
   },
   methods: {
@@ -85,9 +76,7 @@ export default {
     getRegionCode,
     getCountryCode,
     getJuryCompetitionRole() {
-      const juryObj = this.event.jury.find(
-        (jury) => jury.jury_code === this.jury_code
-      );
+      const juryObj = this.event.jury.find((jury) => jury.jury_code === this.jury_code);
       if (!juryObj) return;
 
       this.role = juryObj.role;
@@ -120,6 +109,7 @@ export default {
       max-height: 100%;
       max-width: 100%;
     }
+
     .juryEvent_regionFlag {
       position: absolute;
       bottom: 0;
@@ -133,6 +123,7 @@ export default {
       height: 48px;
     }
   }
+
   .juryEvent__item__body {
     flex: 1 1 0;
     display: flex;
@@ -149,6 +140,7 @@ export default {
         font-size: 1.1rem;
         font-weight: bold;
       }
+
       .juryEvent__sport {
         display: flex;
         align-items: center;
@@ -160,6 +152,7 @@ export default {
         }
       }
     }
+
     .juryEvent__item__middleSection {
       flex: 0 0 auto;
       display: flex;
@@ -168,10 +161,12 @@ export default {
       .juryEvent__date {
         color: var(--text-muted);
       }
+
       .juryEvent__discipline {
         margin-left: auto;
       }
     }
+
     .juryEvent__item__bottomSection {
       flex: 0 0 auto;
       display: flex;
@@ -184,9 +179,11 @@ export default {
         margin-left: 0.5rem;
         color: var(--text-muted);
       }
+
       .juryEvent__location {
         color: var(--text-muted);
       }
+
       .juryEvent__role {
         margin-left: auto;
       }

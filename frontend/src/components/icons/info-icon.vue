@@ -9,7 +9,7 @@
 
 <script>
 export default {
-  name: "info-icon",
+  name: 'info-icon',
 };
 </script>
 

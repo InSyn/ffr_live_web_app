@@ -7,80 +7,36 @@
         <div class="athleteInfo__wrapper">
           <div class="athleteInfo__header">
             <div class="athletePhoto__wrapper">
-              <img
-                v-if="athlete['photo_url']"
-                class="athleteImage"
-                :src="uploadsFolderUrl() + `${athlete['photo_url']}`"
-                alt="Event Logo"
-              />
-              <athlete-photo-filler-icon
-                v-else
-                class="athletePhotoFiller__icon"
-                :gender="athlete.gender"
-              ></athlete-photo-filler-icon>
+              <img v-if="athlete['photo_url']" class="athleteImage" :src="uploadsFolderUrl() + `${athlete['photo_url']}`" alt="Event Logo" />
+              <athlete-photo-filler-icon v-else class="athletePhotoFiller__icon" :gender="athlete.gender"></athlete-photo-filler-icon>
 
-              <edit-button
-                class="editAthlete__button"
-                type="athlete"
-                :code="athlete_code"
-              ></edit-button>
+              <edit-button class="editAthlete__button" type="athlete" :code="athlete_code"></edit-button>
             </div>
             <div class="athleteMainInfo__wrapper">
               <div class="athleteMainInfo__header">
-                <div
-                  class="athleteFederation__wrapper"
-                  v-if="
-                    athlete['sport'] &&
-                    athlete['sport'].toLowerCase() === 'фристайл'
-                  "
-                >
-                  <img
-                    class="athleteFederation__logo"
-                    src="../../../assets/logo/FFR_logo_mini.png"
-                    alt="FFR_logo"
-                  />
+                <div class="athleteFederation__wrapper" v-if="athlete['sport'] && athlete['sport'].toLowerCase() === 'фристайл'">
+                  <img class="athleteFederation__logo" src="../../../assets/logo/FFR_logo_mini.png" alt="FFR_logo" />
                   <span>Федерация фристайла России</span>
                 </div>
-                <div
-                  class="athleteFederation__wrapper"
-                  v-else-if="
-                    athlete['sport'] &&
-                    athlete['sport'].toLowerCase() === 'сноуборд'
-                  "
-                >
-                  <img
-                    class="athleteFederation__logo"
-                    src="../../../assets/logo/FSR_logo_mini.png"
-                    alt="FSR_logo"
-                  />
+                <div class="athleteFederation__wrapper" v-else-if="athlete['sport'] && athlete['sport'].toLowerCase() === 'сноуборд'">
+                  <img class="athleteFederation__logo" src="../../../assets/logo/FSR_logo_mini.png" alt="FSR_logo" />
                   <span>Федерация сноуборда России</span>
                 </div>
 
                 <div class="athleteSport">
                   {{ athlete.sport }}
-                  <country-flag
-                    class="athleteCountryFlag"
-                    :country-code="getCountryCode(athlete['country'])"
-                    height="1.25rem"
-                  ></country-flag>
+                  <country-flag class="athleteCountryFlag" :country-code="getCountryCode(athlete['country'])" height="1.25rem"></country-flag>
                 </div>
               </div>
               <div class="athleteMainInfo__middle">
                 <div class="athleteName__wrapper">
                   <div class="athleteName">
-                    {{ athlete.lastname + " " + athlete.name }}
+                    {{ athlete.lastname + ' ' + athlete.name }}
                   </div>
 
-                  <div
-                    class="nationalTeamLogo__wrapper"
-                    v-if="athlete['is_national_team']"
-                  >
+                  <div class="nationalTeamLogo__wrapper" v-if="athlete['is_national_team']">
                     Сборная России
-                    <img
-                      class="nationalTeamLogo"
-                      src="../../../assets/logo/okr.png"
-                      alt="NT_Logo"
-                    />
+                    <img class="nationalTeamLogo" src="../../../assets/logo/okr.png" alt="NT_Logo" />
                   </div>
                 </div>
 
@@ -102,7 +58,7 @@
                   </div>
                   <div class="athleteRegions">
                     <span>
-                      {{ athlete.regions.join(", ") }}
+                      {{ athlete.regions.join(', ') }}
                     </span>
                   </div>
                 </div>
@@ -117,9 +73,7 @@
                   >
                     Тренер:&nbsp; {{ athlete.trainer?.fullname }}
                   </router-link>
-                  <span v-else>
-                    Тренер:&nbsp; {{ athlete.trainer?.fullname }}
-                  </span>
+                  <span v-else> Тренер:&nbsp; {{ athlete.trainer?.fullname }} </span>
                 </div>
               </div>
             </div>
@@ -145,10 +99,7 @@
                 <b> Разряд: </b>
                 <span> {{ athlete.category }}</span>
               </div>
-              <div
-                v-if="athlete.organizations.length"
-                class="athleteInfo__group"
-              >
+              <div v-if="athlete.organizations.length" class="athleteInfo__group">
                 <b> Школа: </b>
                 <div class="organizations__wrapper">
                   <span v-for="(org, idx) in athlete.organizations" :key="idx">
@@ -159,14 +110,7 @@
               <div v-if="athlete.disciplines.length" class="athleteInfo__group">
                 <b> Дисциплины: </b>
                 <div class="disciplines__wrapper">
-                  {{
-                    athlete.disciplines
-                      .map(
-                        (disciplineName) =>
-                          getDisciplineCode(disciplineName) || disciplineName
-                      )
-                      .join(", ")
-                  }}
+                  {{ athlete.disciplines.map((disciplineName) => getDisciplineCode(disciplineName) || disciplineName).join(', ') }}
                 </div>
               </div>
             </div>
@@ -178,7 +122,7 @@
               <div v-if="athlete.hobbies.length" class="athleteInfo__group">
                 <b> Хобби: </b>
                 <div class="athleteHobbies__wrapper">
-                  {{ athlete.hobbies.join(", ") }}
+                  {{ athlete.hobbies.join(', ') }}
                 </div>
               </div>
               <div v-if="athlete.athleteAbout" class="athleteInfo__group">
@@ -189,11 +133,7 @@
             <div class="athleteAdditionalInfoSection equipmentSection">
               <div v-if="athlete.equipment.length" class="athleteInfo__group">
                 <div class="athleteEquipment__wrapper">
-                  <div
-                    class="athleteEquipment__item"
-                    v-for="(equipment, equip_idx) in athlete.equipment"
-                    :key="equip_idx"
-                  >
+                  <div class="athleteEquipment__item" v-for="(equipment, equip_idx) in athlete.equipment" :key="equip_idx">
                     {{ equipment }}
                   </div>
                 </div>
@@ -204,42 +144,18 @@
           <div class="athleteSocials__section">
             <div class="sponsors__wrapper">
               <div class="sponsors__header">Спонсоры:&nbsp;</div>
-              <div
-                class="sponsor__item__wrapper"
-                v-for="(sponsor, idx) in athlete['sponsors']"
-                :key="idx"
-              >
-                <a
-                  class="sponsor__item"
-                  :href="sponsor['sponsor_link']"
-                  target="_blank"
-                >
-                  <img
-                    class="sponsorLogo__image"
-                    :alt="`sponsor${idx}_logo`"
-                    :src="uploadsFolderUrl() + sponsor['logo_url']"
-                  />
+              <div class="sponsor__item__wrapper" v-for="(sponsor, idx) in athlete['sponsors']" :key="idx">
+                <a class="sponsor__item" :href="sponsor['sponsor_link']" target="_blank">
+                  <img class="sponsorLogo__image" :alt="`sponsor${idx}_logo`" :src="uploadsFolderUrl() + sponsor['logo_url']" />
                 </a>
               </div>
             </div>
             <div class="socials">
-              <a
-                class="socials__link"
-                v-if="athlete.socials.vk"
-                :href="athlete.socials.vk"
-                target="_blank"
-              >
+              <a class="socials__link" v-if="athlete.socials.vk" :href="athlete.socials.vk" target="_blank">
                 <socials-vk-icon class="socials__link__icon"></socials-vk-icon>
               </a>
-              <a
-                class="socials__link"
-                v-if="athlete.socials.telegram"
-                :href="athlete.socials.telegram"
-                target="_blank"
-              >
-                <socials-telegram-icon
-                  class="socials__link__icon"
-                ></socials-telegram-icon>
+              <a class="socials__link" v-if="athlete.socials.telegram" :href="athlete.socials.telegram" target="_blank">
+                <socials-telegram-icon class="socials__link__icon"></socials-telegram-icon>
               </a>
             </div>
           </div>
@@ -267,25 +183,25 @@
 </template>
 
 <script>
-import axios from "axios";
-import { databaseUrl, uploadsFolderUrl } from "@/store/constants";
-import { mdiImage } from "@mdi/js";
-import AthletePhotoFillerIcon from "@/assets/svg/athletePhotoFiller-icon.vue";
-import CountryFlag from "@/components/ui-components/country-flag.vue";
-import AthleteEventItem from "@/pages/athletes/athlete-page/athleteEventItem.vue";
-import { getRegionCode } from "@/store/data/russia-regions";
-import { getDisciplineCode } from "@/store/data/sports";
-import SocialsVkIcon from "@/components/icons/socials-vk-icon.vue";
-import SocialsTelegramIcon from "@/components/icons/socials-telegram-icon.vue";
-import EditButton from "@/components/ui-components/edit-button.vue";
-import AthleteMedals from "@/pages/athletes/athlete-page/athleteMedals.vue";
-import { getShortAthleteRank } from "@/store/data/sport-data-sets";
-import BgMountains from "@/assets/riv/bg-mountains.vue";
-import { getCountryCode } from "@/store/data/countries";
+import axios from 'axios';
+import { databaseUrl, uploadsFolderUrl } from '@/store/constants';
+import { mdiImage } from '@mdi/js';
+import AthletePhotoFillerIcon from '@/assets/svg/athletePhotoFiller-icon.vue';
+import CountryFlag from '@/components/ui-components/country-flag.vue';
+import AthleteEventItem from '@/pages/athletes/athlete-page/athleteEventItem.vue';
+import { getRegionCode } from '@/store/data/russia-regions';
+import { getDisciplineCode } from '@/store/data/sports';
+import SocialsVkIcon from '@/components/icons/socials-vk-icon.vue';
+import SocialsTelegramIcon from '@/components/icons/socials-telegram-icon.vue';
+import EditButton from '@/components/ui-components/edit-button.vue';
+import AthleteMedals from '@/pages/athletes/athlete-page/athleteMedals.vue';
+import { getShortAthleteRank } from '@/store/data/sport-data-sets';
+import BgMountains from '@/assets/riv/bg-mountains.vue';
+import { getCountryCode } from '@/store/data/countries';
 
 export default {
-  name: "index",
-  props: ["athlete_code"],
+  name: 'index',
+  props: ['athlete_code'],
   components: {
     BgMountains,
     AthleteMedals,
@@ -314,7 +230,7 @@ export default {
     getRegionCode,
     async getAthleteById(id) {
       try {
-        const data = await axios.get(databaseUrl + "/athletes/" + id);
+        const data = await axios.get(databaseUrl + '/athletes/' + id);
         if (data.status === 200) {
           const eventData = data.data.data;
           if (eventData) this.athlete = { ...eventData };
@@ -331,9 +247,7 @@ export default {
     },
     async getAthleteCompetitions() {
       try {
-        const response = await axios.get(
-          databaseUrl + `/athletes/${this.athlete_code}/competitions`
-        );
+        const response = await axios.get(databaseUrl + `/athletes/${this.athlete_code}/competitions`);
         if (response.status === 200) {
           this.athleteCompetitions = response.data.events;
         }
@@ -368,6 +282,7 @@ export default {
   flex: 1 1 0;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
 
   .athleteCard__top__wrapper {
     position: relative;
@@ -380,6 +295,7 @@ export default {
     @media screen and (max-width: 640px) {
       flex-basis: auto;
     }
+
     .mountains_bg {
       position: absolute;
       z-index: 1;
@@ -387,6 +303,7 @@ export default {
       width: 100%;
       height: 100%;
     }
+
     .athleteCard__top__content {
       z-index: 2;
       position: relative;
@@ -406,13 +323,12 @@ export default {
         background-color: rgba(2, 2, 6, 0.6);
         backdrop-filter: blur(5px);
         border: 1px solid rgb(255, 255, 255);
-        box-shadow: 0 0 6px -2px rgb(255, 255, 255) inset,
-          0 16px 32px 0 rgba(12, 14, 46, 0.48),
-          -4px -8px 24px 0 rgba(255, 255, 255, 0.14) inset;
+        box-shadow: 0 0 6px -2px rgb(255, 255, 255) inset, 0 16px 32px 0 rgba(12, 14, 46, 0.48), -4px -8px 24px 0 rgba(255, 255, 255, 0.14) inset;
         border-radius: 12px;
 
-        content: "";
+        content: '';
       }
+
       .athleteInfo__wrapper {
         position: relative;
         flex: 1 1 0;
@@ -448,11 +364,13 @@ export default {
               max-height: 100%;
               border-radius: 50%;
             }
+
             .athletePhotoFiller__icon {
               height: 100%;
               aspect-ratio: 1;
               color: var(--text-default);
             }
+
             .editAthlete__button {
               position: absolute;
               bottom: 0;
@@ -476,6 +394,7 @@ export default {
               height: 96px;
             }
           }
+
           .athleteMainInfo__wrapper {
             flex: 1 1 0;
             display: flex;
@@ -500,6 +419,7 @@ export default {
                   margin-right: 1rem;
                 }
               }
+
               .athleteSport {
                 flex: 0 0 auto;
                 display: flex;
@@ -529,6 +449,7 @@ export default {
                   font-size: 1.75rem;
                   font-weight: bold;
                 }
+
                 .nationalTeamLogo__wrapper {
                   display: flex;
                   align-items: center;
@@ -563,6 +484,7 @@ export default {
                   flex-wrap: nowrap;
                   gap: 0.5rem;
                 }
+
                 .athleteRegions {
                   flex: 1 1 auto;
                   display: flex;
@@ -570,12 +492,14 @@ export default {
                   gap: 4px;
                 }
               }
+
               .athleteTrainer {
                 flex: 0 0 auto;
                 margin-left: auto;
 
                 .athleteTrainer__link {
                   color: var(--text-contrast);
+
                   &:hover {
                     color: var(--text-contrast-hovered);
                     text-decoration: underline;
@@ -588,7 +512,7 @@ export default {
 
         .athleteAdditionalInfo__wrapper {
           display: grid;
-          grid-template-areas: "main secondary equipment";
+          grid-template-areas: 'main secondary equipment';
           grid-template-columns: 2fr 1fr auto;
           grid-gap: 1.25rem;
           padding: 0.75rem 1rem;
@@ -605,13 +529,16 @@ export default {
               grid-template-columns: auto auto;
               grid-auto-rows: min-content;
             }
+
             &.secondarySection {
               grid-area: secondary;
             }
+
             &.equipmentSection {
               grid-area: equipment;
               justify-self: flex-end;
             }
+
             .athleteInfo__group {
               flex: 0 1 auto;
               display: flex;
@@ -624,15 +551,18 @@ export default {
                 overflow: hidden;
                 width: 11ch;
               }
+
               span {
                 flex: 1 1 0;
                 display: inline-block;
               }
+
               .organizations__wrapper {
                 flex: 1 1 0;
                 display: flex;
                 flex-direction: column;
               }
+
               .disciplines__wrapper {
                 flex: 1 1 0;
                 display: flex;
@@ -642,6 +572,7 @@ export default {
                   flex: 0 0 auto;
                 }
               }
+
               .athleteHobbies__wrapper {
                 display: flex;
                 flex-direction: column;
@@ -651,6 +582,7 @@ export default {
                   flex: 0 0 auto;
                 }
               }
+
               .athleteEquipment__wrapper {
                 display: flex;
                 flex-direction: column;
@@ -669,16 +601,17 @@ export default {
 
           @media screen and (max-width: 900px) {
             grid-template-areas:
-              "main main equipment"
-              "secondary secondary equipment";
+              'main main equipment'
+              'secondary secondary equipment';
           }
           @media screen and (max-width: 640px) {
             grid-template-areas:
-              "main main main"
-              "secondary secondary secondary"
-              "equipment equipment equipment";
+              'main main main'
+              'secondary secondary secondary'
+              'equipment equipment equipment';
           }
         }
+
         .athleteSocials__section {
           display: flex;
           flex-wrap: nowrap;
@@ -697,6 +630,7 @@ export default {
               flex: 0 0 auto;
               align-self: flex-start;
             }
+
             .sponsor__item__wrapper {
               flex: 1 0 auto;
               display: flex;
@@ -724,6 +658,7 @@ export default {
               }
             }
           }
+
           .socials {
             flex: 0 0 auto;
             display: flex;
@@ -735,6 +670,7 @@ export default {
             .socials__link {
               display: flex;
               align-items: center;
+
               .socials__link__icon {
                 height: 2rem;
                 color: var(--text-contrast);
@@ -782,6 +718,7 @@ export default {
         font-size: 1.1rem;
         font-weight: bold;
       }
+
       .athleteCompetitions__list {
         flex: 1 1 200px;
         display: flex;

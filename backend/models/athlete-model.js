@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-import { athleteTrainerSchema } from "./trainer-model.js";
+import mongoose from 'mongoose';
+import { athleteTrainerSchema } from './trainer-model.js';
 
 const sponsorSchema = new mongoose.Schema({
   logo_url: String,
@@ -65,8 +65,8 @@ export const athleteSchema = new mongoose.Schema({
 
 athleteSchema.index({
   rus_code: 1,
-  name: "text",
-  lastname: "text",
+  name: 'text',
+  lastname: 'text',
 });
 
-export const Athlete = mongoose.model("Athlete", athleteSchema);
+export const Athlete = mongoose.model('Athlete', athleteSchema);

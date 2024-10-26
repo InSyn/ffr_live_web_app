@@ -9,22 +9,16 @@
       </div>
     </div>
 
-    <input
-      id="image_url"
-      class="formControl-image"
-      name="image_url"
-      type="file"
-      @change="onFileChange($event, 'event-logo')"
-    />
+    <input id="image_url" class="formControl-image" name="image_url" type="file" @change="onFileChange($event, 'event-logo')" />
   </div>
 </template>
 
 <script>
-import { mdiImage } from "@mdi/js";
+import { mdiImage } from '@mdi/js';
 
 export default {
-  name: "fileUpload-control",
-  props: ["imageName", "isCompact"],
+  name: 'fileUpload-control',
+  props: ['imageName', 'isCompact'],
   methods: {},
   data() {
     return {

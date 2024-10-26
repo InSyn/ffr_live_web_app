@@ -1,12 +1,7 @@
 <template>
-  <select
-    @input="$emit('input', $event.target.value)"
-    id="gender"
-    name="gender"
-    :class="['searchInput__control', !elemValue && 'empty']"
-  >
+  <select @input="$emit('input', $event.target.value)" id="gender" name="gender" :class="['searchInput__control', !elemValue && 'empty']">
     <option :data-cancel-option="!!elemValue" value="">
-      {{ elemValue ? "Очистить" : "Выбрать пол..." }}
+      {{ elemValue ? 'Очистить' : 'Выбрать пол...' }}
     </option>
     <option v-for="gender in gendersList" :key="gender" :value="gender">
       {{ gender }}
@@ -16,10 +11,10 @@
 
 <script>
 export default {
-  name: "gender-input",
+  name: 'gender-input',
   computed: {
     gendersList() {
-      return ["М", "Ж"];
+      return ['М', 'Ж'];
     },
     elemValue() {
       return this.$attrs.value;
@@ -29,5 +24,5 @@ export default {
 </script>
 
 <style scoped>
-@import "search-input-style.css";
+@import 'search-input-style.css';
 </style>

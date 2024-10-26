@@ -4,13 +4,13 @@
   </div>
 </template>
 <script>
-import * as rive from "@rive-app/canvas";
+import * as rive from '@rive-app/canvas';
 
 export default {
-  name: "bg-mountains",
+  name: 'bg-mountains',
   methods: {
     async loadBackground() {
-      const canvas = document.getElementById("mountains");
+      const canvas = document.getElementById('mountains');
 
       const bgLayout = new rive.Layout({
         fit: rive.Fit.Cover,
@@ -18,7 +18,7 @@ export default {
       });
       const riveBg = new rive.Rive({
         canvas: canvas,
-        src: "/ffr_background.riv",
+        src: '/ffr_background.riv',
         layout: bgLayout,
         autoplay: true,
         onLoad: () => {
@@ -39,24 +39,17 @@ div {
   overflow: hidden;
 
   &::before {
-    content: "";
+    content: '';
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(
-      135deg,
-      rgb(63, 93, 128),
-      rgb(18, 70, 125),
-      rgb(121, 157, 193),
-      rgb(202, 226, 246),
-      rgb(60, 111, 159),
-      rgb(165, 195, 224)
-    );
+    background: linear-gradient(135deg, rgb(63, 93, 128), rgb(18, 70, 125), rgb(121, 157, 193), rgb(202, 226, 246), rgb(60, 111, 159), rgb(165, 195, 224));
     background-size: 300% 300%;
     animation: gradientAnimation 40s ease-in-out infinite alternate;
   }
+
   canvas {
     position: relative;
     height: 100%;
@@ -85,6 +78,7 @@ div {
     background-position: 200% 200%;
   }
 }
+
 @keyframes fadeInCanvas {
   100% {
     opacity: 1;

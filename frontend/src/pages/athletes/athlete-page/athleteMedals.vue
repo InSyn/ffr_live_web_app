@@ -1,24 +1,11 @@
 <template>
   <div class="athleteMedals__wrapper">
-    <div
-      class="medalEvent__wrapper"
-      v-for="(medalEvent, key) in getAthleteMedals()"
-      :key="key"
-    >
-      <abbr
-        class="medalEventName"
-        :title="medalEvent.name"
-        :aria-label="medalEvent.name"
-      >
+    <div class="medalEvent__wrapper" v-for="(medalEvent, key) in getAthleteMedals()" :key="key">
+      <abbr class="medalEventName" :title="medalEvent.name" :aria-label="medalEvent.name">
         {{ getMedalEventAbbr(medalEvent.name) }}
       </abbr>
 
-      <div
-        v-for="medalType in ['gold', 'silver', 'bronze']"
-        :key="medalType"
-        v-show="medalEvent[medalType] > 0"
-        class="medals__wrapper"
-      >
+      <div v-for="medalType in ['gold', 'silver', 'bronze']" :key="medalType" v-show="medalEvent[medalType] > 0" class="medals__wrapper">
         <div class="medalIcons__wrapper">
           <div
             v-for="(medalNum, m_idx) in medalEvent[medalType]"
@@ -30,7 +17,7 @@
               zIndex: -m_idx,
             }"
           >
-            {{ medalNum === 1 ? medalEvent[medalType] : "" }}
+            {{ medalNum === 1 ? medalEvent[medalType] : '' }}
           </div>
         </div>
       </div>
@@ -39,11 +26,11 @@
 </template>
 
 <script>
-import { getMedalEventAbbr } from "@/store/data/medal-events";
+import { getMedalEventAbbr } from '@/store/data/medal-events';
 
 export default {
-  name: "athleteMedals",
-  props: ["medals"],
+  name: 'athleteMedals',
+  props: ['medals'],
   methods: {
     getMedalEventAbbr,
     getAthleteMedals() {
@@ -52,14 +39,14 @@ export default {
     },
     getMedalColor(medalType) {
       switch (medalType) {
-        case "gold":
-          return "#D9C357";
-        case "silver":
-          return "#A3BBD9";
-        case "bronze":
-          return "#B16C3A";
+        case 'gold':
+          return '#D9C357';
+        case 'silver':
+          return '#A3BBD9';
+        case 'bronze':
+          return '#B16C3A';
         default:
-          return "transparent";
+          return 'transparent';
       }
     },
   },
@@ -85,6 +72,7 @@ export default {
       cursor: help;
       font-size: 1rem;
     }
+
     .medals__wrapper {
       display: flex;
       flex-wrap: nowrap;

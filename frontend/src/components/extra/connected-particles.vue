@@ -1,14 +1,14 @@
 <template>
   <section class="wrapper">
-    <canvas id="canvas"> </canvas>
+    <canvas id="canvas"></canvas>
   </section>
 </template>
 
 <script>
-import { debounce } from "@/utils/debounce";
+import { debounce } from '@/utils/debounce';
 
 export default {
-  name: "connected-particles",
+  name: 'connected-particles',
   data() {
     return {
       render: false,
@@ -16,12 +16,12 @@ export default {
       canvasContext: null,
       particles: [],
       properties: {
-        canvasWidth: "",
-        canvasHeight: "",
-        backgroundColor: "transparent",
+        canvasWidth: '',
+        canvasHeight: '',
+        backgroundColor: 'transparent',
         particleRadius: 3,
         particleCount: 100,
-        particleColor: "rgba(2,159,226,1)",
+        particleColor: 'rgba(2,159,226,1)',
         particleMaxVelocity: 0.25,
         lineLength: 145,
       },
@@ -29,13 +29,13 @@ export default {
   },
   computed: {
     canvWrapper() {
-      return document.querySelector(".wrapper");
+      return document.querySelector('.wrapper');
     },
   },
   methods: {
     initialize() {
-      this.canvas = document.querySelector("#canvas");
-      this.canvasContext = this.canvas.getContext("2d");
+      this.canvas = document.querySelector('#canvas');
+      this.canvasContext = this.canvas.getContext('2d');
 
       this.updateCanvasSize();
 
@@ -47,7 +47,7 @@ export default {
         );
       };
 
-      window.addEventListener("resize", this.handleResize);
+      window.addEventListener('resize', this.handleResize);
 
       for (let i = 0; i < this.properties.particleCount; i++) {
         this.particles.push(this.generateParticle());
@@ -58,7 +58,7 @@ export default {
     },
 
     updateCanvasSize() {
-      const wrapper = document.querySelector(".wrapper");
+      const wrapper = document.querySelector('.wrapper');
 
       this.properties.canvasWidth = wrapper.clientWidth;
       this.properties.canvasHeight = wrapper.clientHeight;
@@ -72,30 +72,18 @@ export default {
         x: Math.random() * this.properties.canvasWidth,
         y: Math.random() * this.properties.canvasHeight,
 
-        velocityX:
-          Math.random() * this.properties.particleMaxVelocity * 2 -
-          this.properties.particleMaxVelocity,
-        velocityY:
-          Math.random() * this.properties.particleMaxVelocity * 2 -
-          this.properties.particleMaxVelocity,
+        velocityX: Math.random() * this.properties.particleMaxVelocity * 2 - this.properties.particleMaxVelocity,
+        velocityY: Math.random() * this.properties.particleMaxVelocity * 2 - this.properties.particleMaxVelocity,
       };
     },
     setParticlePosition(particle) {
       particle.x += particle.velocityX;
       particle.y += particle.velocityY;
 
-      if (
-        particle.x <= this.properties.particleRadius ||
-        particle.x >=
-          this.properties.canvasWidth - this.properties.particleRadius
-      ) {
+      if (particle.x <= this.properties.particleRadius || particle.x >= this.properties.canvasWidth - this.properties.particleRadius) {
         particle.velocityX = -particle.velocityX;
       }
-      if (
-        particle.y <= this.properties.particleRadius ||
-        particle.y >=
-          this.properties.canvasHeight - this.properties.particleRadius
-      ) {
+      if (particle.y <= this.properties.particleRadius || particle.y >= this.properties.canvasHeight - this.properties.particleRadius) {
         particle.velocityY = -particle.velocityY;
       }
     },
@@ -103,13 +91,7 @@ export default {
       this.setParticlePosition(particle);
 
       this.canvasContext.beginPath();
-      this.canvasContext.arc(
-        particle.x,
-        particle.y,
-        this.properties.particleRadius,
-        0,
-        Math.PI * 2
-      );
+      this.canvasContext.arc(particle.x, particle.y, this.properties.particleRadius, 0, Math.PI * 2);
       this.canvasContext.closePath();
       this.canvasContext.fillStyle = this.properties.particleColor;
       this.canvasContext.fill();
@@ -138,12 +120,10 @@ export default {
             distanceRatio = 1 - distance / this.properties.lineLength;
 
             const color =
-              getComputedStyle(document.documentElement).getPropertyValue(
-                "--accent"
-              ) +
+              getComputedStyle(document.documentElement).getPropertyValue('--accent') +
               Math.round(10 * distanceRatio * 16)
                 .toString(16)
-                .padStart(2, "0");
+                .padStart(2, '0');
 
             this.canvasContext.strokeStyle = color;
             // `rgba(${2 * distanceRatio},${159 * distanceRatio},${226 * distanceRatio}, ${distanceRatio})`;
@@ -157,10 +137,7 @@ export default {
           if (distance < this.properties.lineLength / Math.log(distance ** 2)) {
             const angle = Math.atan2(y2 - y1, x2 - x1);
 
-            const force =
-              (this.properties.lineLength / 4 - distance) /
-              this.properties.lineLength /
-              2;
+            const force = (this.properties.lineLength / 4 - distance) / this.properties.lineLength / 2;
             const fx = Math.cos(angle) * force * 0.005;
             const fy = Math.sin(angle) * force * 0.005;
 
@@ -175,22 +152,12 @@ export default {
 
     redrawBackground() {
       this.canvasContext.fillStyle = this.properties.backgroundColor;
-      this.canvasContext.fillRect(
-        0,
-        0,
-        this.properties.canvasWidth,
-        this.properties.canvasHeight
-      );
+      this.canvasContext.fillRect(0, 0, this.properties.canvasWidth, this.properties.canvasHeight);
     },
     loop() {
       if (!this.render) return;
 
-      this.canvasContext.clearRect(
-        0,
-        0,
-        this.properties.canvasWidth,
-        this.properties.canvasHeight
-      );
+      this.canvasContext.clearRect(0, 0, this.properties.canvasWidth, this.properties.canvasHeight);
       this.redrawBackground();
       this.updateParticles();
       this.connectAndRepelParticles();
@@ -203,7 +170,7 @@ export default {
   },
   beforeDestroy() {
     this.render = false;
-    window.removeEventListener("resize", this.handleResize);
+    window.removeEventListener('resize', this.handleResize);
   },
 };
 </script>

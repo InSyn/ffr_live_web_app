@@ -22,64 +22,40 @@
           <label for="name">Имя участника</label>
           <input id="name" type="text" placeholder="Введите имя" />
         </div>
-        <v-btn
-          @click="addPerson"
-          class="addPerson__button"
-          color="var(--text-default)"
-          text
-        >
-          Добавить
-        </v-btn>
+        <v-btn @click="addPerson" class="addPerson__button" color="var(--text-default)" text> Добавить </v-btn>
       </div>
 
       <div class="personal__list__wrapper">
         <div class="personal__list__title">Участники семинара</div>
         <div class="personal__list">
-          <div
-            class="personal__item__wrapper"
-            v-for="(person, idx) in personal"
-            :key="idx"
-          >
+          <div class="personal__item__wrapper" v-for="(person, idx) in personal" :key="idx">
             <span>{{ person.fullname }}&nbsp;-&nbsp;</span>
             <input type="text" v-model="person.role" />
 
-            <span
-              @click="removeParticipant(idx)"
-              class="removeParticipant__button"
-            >
-              УДАЛИТЬ
-            </span>
+            <span @click="removeParticipant(idx)" class="removeParticipant__button"> УДАЛИТЬ </span>
           </div>
         </div>
         <div class="personal__list__menu">
-          <v-btn @click="updatePersonal" color="var(--accent)" text>
-            Сохранить
-          </v-btn>
+          <v-btn @click="updatePersonal" color="var(--accent)" text> Сохранить </v-btn>
         </div>
       </div>
 
       <message-container :errors="errors"></message-container>
 
-      <v-btn
-        class="closeButton"
-        @click="closeControl"
-        color="var(--message-error)"
-      >
-        Закрыть
-      </v-btn>
+      <v-btn class="closeButton" @click="closeControl" color="var(--message-error)"> Закрыть </v-btn>
     </div>
   </div>
 </template>
 
 <script>
-import axios from "axios";
-import { databaseUrl } from "@/store/constants";
-import { mapGetters } from "vuex";
-import MessageContainer from "@/components/ui-components/message-container.vue";
-import DbPersonalList from "@/pages/seminars/seminarParticipants-control/db-personal-list.vue";
+import axios from 'axios';
+import { databaseUrl } from '@/store/constants';
+import { mapGetters } from 'vuex';
+import MessageContainer from '@/components/ui-components/message-container.vue';
+import DbPersonalList from '@/pages/seminars/seminarParticipants-control/db-personal-list.vue';
 
 export default {
-  name: "seminar-participants-control",
+  name: 'seminar-participants-control',
   components: { DbPersonalList, MessageContainer },
   props: {
     seminar: {
@@ -102,14 +78,14 @@ export default {
     };
   },
   computed: {
-    ...mapGetters("authorization", {
-      userData: "getUserData",
+    ...mapGetters('authorization', {
+      userData: 'getUserData',
     }),
   },
   methods: {
     async fetchPersonal() {
       await Promise.all(
-        ["athletes", "jury", "trainers"].map(async (type) => {
+        ['athletes', 'jury', 'trainers'].map(async (type) => {
           try {
             const response = await axios.get(`${databaseUrl}/${type}`);
             if (response.status === 200) {
@@ -124,9 +100,7 @@ export default {
       );
     },
     getFilteredPersonalList(type) {
-      return this.dbPersonal[type].filter((person) =>
-        this.personal.every((_person) => _person.code !== person._id)
-      );
+      return this.dbPersonal[type].filter((person) => this.personal.every((_person) => _person.code !== person._id));
     },
     editPerson(id) {
       if (id === this.editingPerson) {
@@ -136,10 +110,8 @@ export default {
       this.editingPerson = id;
     },
     addDbPerson(person) {
-      const roleInput = document.getElementById(person._id + "_role");
-      const personName = person.fullname
-        ? person.fullname
-        : `${person.lastname ? person.lastname + " " : ""} ${person.name}`;
+      const roleInput = document.getElementById(person._id + '_role');
+      const personName = person.fullname ? person.fullname : `${person.lastname ? person.lastname + ' ' : ''} ${person.name}`;
 
       const personObj = {
         code: person._id,
@@ -148,21 +120,21 @@ export default {
       };
 
       this.personal.push(personObj);
-      roleInput.value = "";
+      roleInput.value = '';
     },
     addPerson() {
-      const roleInput = document.getElementById("role"),
-        nameInput = document.getElementById("name");
+      const roleInput = document.getElementById('role'),
+        nameInput = document.getElementById('name');
 
       const person = {
-        code: "",
+        code: '',
         role: roleInput.value,
         fullname: nameInput.value,
       };
 
       this.personal.push(person);
-      roleInput.value = "";
-      nameInput.value = "";
+      roleInput.value = '';
+      nameInput.value = '';
     },
     removeParticipant(idx) {
       this.personal.splice(idx, 1);
@@ -175,13 +147,13 @@ export default {
           { participants: JSON.stringify(this.personal) },
           {
             headers: {
-              "Content-Type": "application/json",
+              'Content-Type': 'application/json',
               authorization: `Bearer ${this.userData.token}`,
             },
           }
         );
         if (response.status === 200) {
-          this.$emit("close-participants-control");
+          this.$emit('close-participants-control');
         }
       } catch (error) {
         if (error) {
@@ -192,7 +164,7 @@ export default {
     },
 
     closeControl() {
-      this.$emit("close-participants-control");
+      this.$emit('close-participants-control');
     },
   },
 
@@ -215,7 +187,7 @@ export default {
   height: 100%;
   width: 100%;
   background-color: var(--background--card-secondary);
-  backdrop-filter: blur(4px);
+  border: 1px solid var(--border-container);
 
   .seminarParticipants__select__wrapper {
     flex: 1 1 0;
@@ -234,6 +206,7 @@ export default {
       flex-wrap: wrap;
       gap: 0.75rem;
     }
+
     .addNewPerson__wrapper {
       flex: 0 0 auto;
       display: flex;
@@ -253,6 +226,7 @@ export default {
         label {
           flex: 0 0 auto;
         }
+
         input {
           flex: 1 1 12ch;
           min-width: 0;
@@ -267,12 +241,14 @@ export default {
           }
         }
       }
+
       .addPerson__button {
         align-self: center;
         height: 2rem;
         margin-left: auto;
       }
     }
+
     .personal__list__wrapper {
       flex: 6 1 0;
       display: flex;
@@ -287,6 +263,7 @@ export default {
         padding: 0.5rem 0.5rem 0.75rem;
         font-size: 1.15rem;
       }
+
       .personal__list {
         flex: 1 1 0;
         display: flex;
@@ -303,6 +280,7 @@ export default {
           input {
             padding: 2px 8px;
           }
+
           .removeParticipant__button {
             display: none;
             position: absolute;
@@ -317,14 +295,17 @@ export default {
               font-weight: bold;
             }
           }
+
           &:hover {
             background-color: var(--background--card-hover);
+
             .removeParticipant__button {
               display: block;
             }
           }
         }
       }
+
       .personal__list__menu {
         flex: 0 0 auto;
         display: flex;

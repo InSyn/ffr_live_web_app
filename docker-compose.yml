@@ -16,9 +16,9 @@ services:
       - DB=$DB
     ports:
       - "8081:8080"
-      - "8082:443"
+      #- "8082:443"
     volumes:
-      - /etc/letsencrypt:/etc/letsencrypt
+      #- /etc/letsencrypt:/etc/letsencrypt
       - ./backend/uploads:/home/ffr_live_back/uploads
     links:
       - live_db
@@ -38,7 +38,7 @@ services:
 #    networks:
 #      - app-network
 
-#  tw_live_frontend:
+#  ffr_live_front:
 #    build:
 #      context: ./frontend
 #      dockerfile: Dockerfile

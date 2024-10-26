@@ -1,21 +1,10 @@
 <template>
-  <section
-    :class="[(messages.length || errors.length) && 'open']"
-    class="messages__wrapper"
-  >
+  <section :class="[(messages.length || errors.length) && 'open']" class="messages__wrapper">
     <div class="messages__innerWrapper">
-      <div
-        v-for="(err, err_idx) in errors"
-        :key="`err_${err_idx}`"
-        class="error__item"
-      >
+      <div v-for="(err, err_idx) in errors" :key="`err_${err_idx}`" class="error__item">
         {{ err }}
       </div>
-      <div
-        v-for="(msg, msg_idx) in messages"
-        :key="`msg_${msg_idx}`"
-        class="msg__item"
-      >
+      <div v-for="(msg, msg_idx) in messages" :key="`msg_${msg_idx}`" class="msg__item">
         {{ msg }}
       </div>
     </div>
@@ -24,7 +13,7 @@
 
 <script>
 export default {
-  name: "message-container",
+  name: 'message-container',
   props: {
     messages: { type: Array, default: () => [] },
     errors: { type: Array, default: () => [] },
@@ -36,13 +25,13 @@ export default {
     };
   },
   watch: {
-    "messages.length": function () {
+    'messages.length': function () {
       clearTimeout(this.messageTimeoutId);
       this.messageTimeoutId = setTimeout(() => {
         if (this.messages) this.messages.splice(0, 1);
       }, 2500);
     },
-    "errors.length": function () {
+    'errors.length': function () {
       clearTimeout(this.errorTimeoutId);
       this.errorTimeoutId = setTimeout(() => {
         if (this.errors) this.errors.splice(0, 1);
@@ -57,19 +46,15 @@ export default {
   display: grid;
   grid-template-rows: 0fr;
   gap: 8px;
-  margin: 1rem auto 0;
+  padding: 0 1.25rem;
   overflow: hidden;
   max-width: var(--tablet-default);
   width: 100%;
 
-  background-color: transparent;
-  border-radius: 4px;
-  backdrop-filter: blur(8px);
-
-  transition: opacity 92ms, grid-template-rows 92ms ease-in;
+  transition: opacity 128ms, grid-template-rows 128ms ease-in, padding 256ms;
 
   .messages__innerWrapper {
-    min-height: 0;
+    overflow: hidden;
 
     .error__item,
     .msg__item {
@@ -88,6 +73,7 @@ export default {
 
   &.open {
     grid-template-rows: 1fr;
+    padding: 0.5rem 1.25rem;
     opacity: 1;
   }
 }

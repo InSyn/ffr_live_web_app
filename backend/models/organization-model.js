@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 export const organizationSchema = new mongoose.Schema({
   logo_url: String,
@@ -14,8 +14,8 @@ export const organizationSchema = new mongoose.Schema({
 });
 
 organizationSchema.index({
-  title: "text",
+  title: 'text',
   region: 1,
 });
 
-export const Organization = mongoose.model("Organization", organizationSchema);
+export const Organization = mongoose.model('Organization', organizationSchema);

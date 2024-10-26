@@ -1,85 +1,51 @@
 <template>
   <div class="athleteMedalsControl__wrapper">
-    <div
-      v-for="(event, e_idx) in athleteMedalEvents"
-      :key="e_idx"
-      class="medalsEvent__wrapper"
-    >
+    <div v-for="(event, e_idx) in athleteMedalEvents" :key="e_idx" class="medalsEvent__wrapper">
       <div class="eventSelect__wrapper">
         <label for="eventName">Событие</label>
-        <select
-          id="eventName"
-          @change="validateEventName($event, e_idx)"
-          :value="event.name"
-        >
+        <select id="eventName" @change="validateEventName($event, e_idx)" :value="event.name">
           <option disabled value="">Выберите событие</option>
-          <option
-            v-for="(option, index) in medalEvents()"
-            :key="index"
-            :value="option"
-          >
+          <option v-for="(option, index) in medalEvents()" :key="index" :value="option">
             {{ option }}
           </option>
         </select>
       </div>
 
       <div v-show="event.name" class="eventMedals__wrapper">
-        <div
-          v-for="medalType in ['gold', 'silver', 'bronze']"
-          :key="medalType"
-          class="medalControl__wrapper"
-        >
-          <label :for="medalType">{{
-            `${getMedalName(medalType)}(кол - во):`
-          }}</label>
-          <input
-            @input="updateMedals($event, e_idx, medalType)"
-            :value="event[medalType]"
-            :id="medalType"
-            min="0"
-            max="9"
-            type="number"
-          />
+        <div v-for="medalType in ['gold', 'silver', 'bronze']" :key="medalType" class="medalControl__wrapper">
+          <label :for="medalType">{{ `${getMedalName(medalType)}(кол - во):` }}</label>
+          <input @input="updateMedals($event, e_idx, medalType)" :value="event[medalType]" :id="medalType" min="0" max="9" type="number" />
         </div>
       </div>
 
-      <v-btn
-        @click="removeEvent(e_idx)"
-        color="var(--message-error)"
-        text
-        small
-      >
-        Удалить событие
-      </v-btn>
+      <v-btn @click="removeEvent(e_idx)" color="var(--message-error)" text small> Удалить событие </v-btn>
     </div>
 
-    <v-btn @click="addEvent" color="var(--accent)" text small>
-      Добавить событие
-    </v-btn>
+    <v-btn @click="addEvent" color="var(--accent)" text small> Добавить событие </v-btn>
   </div>
 </template>
 
 <script>
-import { getMedalEvents } from "@/store/data/medal-events";
+import { getMedalEvents } from '@/store/data/medal-events';
 
 export default {
-  name: "medals-select",
+  name: 'medals-select',
   props: {
     athleteMedalEvents: Array,
   },
   methods: {
     addEvent() {
-      this.$emit("add-medals-event");
+      this.$emit('add-medals-event');
     },
     removeEvent(eIdx) {
-      this.$emit("remove-medals-event", eIdx);
+      this.$emit('remove-medals-event', eIdx);
     },
     validateEventName(e, event_index) {
       const event = this.athleteMedalEvents[event_index];
 
       if (e.target.value) event.name = e.target.value;
 
-      this.$emit("update-medals-event", event);
+      this.$emit('update-medals-event', event);
     },
     medalEvents() {
       return getMedalEvents();
@@ -95,16 +61,16 @@ export default {
 
       event[medal] = medalValue;
 
-      this.$emit("update-medals-event", event);
+      this.$emit('update-medals-event', event);
     },
 
     getMedalName(medal) {
       const medalsMap = {
-        gold: "Золото",
-        silver: "Серебро",
-        bronze: "Бронза",
+        gold: 'Золото',
+        silver: 'Серебро',
+        bronze: 'Бронза',
       };
-      return medalsMap[medal] || "";
+      return medalsMap[medal] || '';
     },
   },
 };
@@ -125,6 +91,7 @@ export default {
       flex: 0 0 auto;
       margin-right: 0.5rem;
     }
+
     select {
       padding: 3px 6px;
       border-radius: 2px;
@@ -133,6 +100,7 @@ export default {
       outline: transparent;
     }
   }
+
   .eventMedals__wrapper {
     flex: 0 0 auto;
     display: flex;
@@ -148,6 +116,7 @@ export default {
         flex: 0 0 auto;
         margin-right: 0.5rem;
       }
+
       input {
         min-width: 0;
         width: 3rem;

@@ -1,22 +1,17 @@
 <template>
   <router-link v-if="isAdmin" :to="getTargetLink(type, code)">
-    <button
-      class="editButton__wrapper"
-      :style="
-        type === 'seminar' || (type === 'event' && { marginLeft: '1rem' })
-      "
-    >
+    <button class="editButton__wrapper" :style="type === 'seminar' || (type === 'event' && { marginLeft: '1rem' })">
       <edit-icon class="editButton__icon"></edit-icon>
     </button>
   </router-link>
 </template>
 
 <script>
-import EditIcon from "@/components/icons/edit-icon.vue";
-import { mapGetters } from "vuex";
+import EditIcon from '@/components/icons/edit-icon.vue';
+import { mapGetters } from 'vuex';
 
 export default {
-  name: "edit-button",
+  name: 'edit-button',
   props: {
     code: String,
     type: String,
@@ -25,49 +20,49 @@ export default {
   methods: {
     getTargetLink(type, code) {
       switch (type) {
-        case "event": {
+        case 'event': {
           return {
-            name: "editEventPage",
+            name: 'editEventPage',
             params: {
               event_id: code,
             },
           };
         }
-        case "athlete": {
+        case 'athlete': {
           return {
-            name: "editAthletePage",
+            name: 'editAthletePage',
             params: {
               athlete_code: code,
             },
           };
         }
-        case "jury": {
+        case 'jury': {
           return {
-            name: "editJuryPage",
+            name: 'editJuryPage',
             params: {
               jury_code: code,
             },
           };
         }
-        case "trainer": {
+        case 'trainer': {
           return {
-            name: "editTrainerPage",
+            name: 'editTrainerPage',
             params: {
               trainer_id: code,
             },
           };
         }
-        case "organization": {
+        case 'organization': {
           return {
-            name: "editOrganizationPage",
+            name: 'editOrganizationPage',
             params: {
               org_id: code,
             },
           };
         }
-        case "seminar": {
+        case 'seminar': {
           return {
-            name: "editSeminarPage",
+            name: 'editSeminarPage',
             params: {
               seminar_id: code,
             },
@@ -77,8 +72,8 @@ export default {
     },
   },
   computed: {
-    ...mapGetters("authorization", {
-      isAdmin: "isAdmin",
+    ...mapGetters('authorization', {
+      isAdmin: 'isAdmin',
     }),
   },
 };

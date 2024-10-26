@@ -1,25 +1,15 @@
 <template>
   <div class="juryPage__wrapper">
-    <search
-      @search-loading="setLoadingState"
-      @search-results-loaded="showSearchResults"
-      mode="jury"
-    ></search>
+    <search @search-loading="setLoadingState" @search-results-loaded="showSearchResults" mode="jury"></search>
 
     <div class="juryList__wrapper">
       <div class="juryList">
-        <div
-          class="alphabetCharSection"
-          v-for="char in getAlphabetList(this.getJuryList, 'lastname')"
-          :key="char"
-        >
+        <div class="alphabetCharSection" v-for="char in getAlphabetList(this.getJuryList, 'lastname')" :key="char">
           <span class="alphabetChar">&nbsp;-&nbsp;{{ char }}</span>
           <router-link
-            v-for="jury in getJuryList.filter(
-              (j) => j.lastname[0].toUpperCase() === char
-            )"
+            v-for="jury in getJuryList.filter((j) => j.lastname[0].toUpperCase() === char)"
             :key="jury._id"
-            :to="'/jury_page/' + jury.jury_code"
+            :to="{ name: 'juryPage', params: { jury_code: jury.jury_code } }"
           >
             <div class="juryList__item__wrapper">
               <person-photo class="juryPhoto" :person="jury"></person-photo>
@@ -31,11 +21,7 @@
 
                 <span class="juryInfo__code">
                   <b>FFR-ID:&nbsp; {{ jury.jury_code }}</b>
-                  <country-flag
-                    class="countryFlag"
-                    :country-code="getCountryCode(jury.country)"
-                    width="1.5rem"
-                  ></country-flag>
+                  <country-flag class="countryFlag" :country-code="getCountryCode(jury.country)" height="1.2rem" rounding="2px"></country-flag>
                 </span>
               </div>
 
@@ -52,11 +38,7 @@
                 <div class="jurySport__wrapper">
                   <div class="sport">{{ jury.sport }}</div>
                   <div class="disciplines__wrapper">
-                    <div
-                      class="discipline__item"
-                      v-for="(dsc, idx) in jury.disciplines"
-                      :key="idx"
-                    >
+                    <div class="discipline__item" v-for="(dsc, idx) in jury.disciplines" :key="idx">
                       {{ getDisciplineCode(dsc) }}
                     </div>
                   </div>
@@ -65,38 +47,30 @@
             </div>
           </router-link>
         </div>
-        <span
-          class="emptySearchResults"
-          v-if="getJuryList.length === 0 && !loading"
-        >
-          Судьи не найдены
-        </span>
+        <span class="emptySearchResults" v-if="getJuryList.length === 0 && !loading"> Судьи не найдены </span>
 
-        <loader-spinner
-          v-if="loading"
-          class="loading__spinner"
-        ></loader-spinner>
+        <loader-spinner v-if="loading" class="loading__spinner"></loader-spinner>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { uploadsFolderUrl } from "@/store/constants";
-import { mdiAccount } from "@mdi/js";
-import CountryFlag from "@/components/ui-components/country-flag.vue";
-import Search from "@/components/ui-components/search/index.vue";
-import { getDisciplineCode } from "@/store/data/sports";
-import { getRegionCode } from "@/store/data/russia-regions";
-import { getCountryCode } from "@/store/data/countries";
-import { getAgeFromBirthdate, getAthleteName } from "@/utils/data-formaters";
-import LoaderSpinner from "@/components/ui-components/loader-spinner.vue";
-import PersonPhoto from "@/components/ui-components/person-photo.vue";
-import { mapActions, mapGetters } from "vuex";
-import { getAlphabetList } from "@/utils/alphabet-generator";
+import { uploadsFolderUrl } from '@/store/constants';
+import { mdiAccount } from '@mdi/js';
+import CountryFlag from '@/components/ui-components/country-flag.vue';
+import Search from '@/components/ui-components/search/index.vue';
+import { getDisciplineCode } from '@/store/data/sports';
+import { getRegionCode } from '@/store/data/russia-regions';
+import { getCountryCode } from '@/store/data/countries';
+import { getAgeFromBirthdate, getAthleteName } from '@/utils/data-formaters';
+import LoaderSpinner from '@/components/ui-components/loader-spinner.vue';
+import PersonPhoto from '@/components/ui-components/person-photo.vue';
+import { mapActions, mapGetters } from 'vuex';
+import { getAlphabetList } from '@/utils/alphabet-generator';
 
 export default {
-  name: "juryPage",
+  name: 'juryPage',
   components: {
     PersonPhoto,
     LoaderSpinner,
@@ -111,8 +85,8 @@ export default {
     };
   },
   computed: {
-    ...mapGetters("jury", {
-      juryList: "getJury",
+    ...mapGetters('jury', {
+      juryList: 'getJury',
     }),
     uploadsFolderUrl() {
       return uploadsFolderUrl;
@@ -123,9 +97,9 @@ export default {
   },
   methods: {
     getAlphabetList,
-    ...mapActions("jury", {
-      fetchJury: "LOAD_JURY",
-      setJury: "SET_JURY",
+    ...mapActions('jury', {
+      fetchJury: 'LOAD_JURY',
+      setJury: 'SET_JURY',
     }),
     getAthleteName,
     getAgeFromBirthdate,
@@ -166,7 +140,6 @@ export default {
   flex-wrap: nowrap;
   max-width: var(--desktop-small);
   width: 100%;
-  overflow-y: auto;
   margin: 0 auto;
   padding: var(--padd-page);
 
@@ -178,6 +151,8 @@ export default {
     overflow-y: auto;
 
     background-color: var(--background--card);
+    box-shadow: var(--container-shadow-l);
+    border: 1px solid var(--border-container);
     border-radius: 4px;
 
     .juryList {
@@ -188,67 +163,54 @@ export default {
       .juryList__item__wrapper {
         display: grid;
         grid-template-areas:
-          "image top"
-          "image bottom";
+          'image top'
+          'image bottom';
         grid-template-columns: 96px auto;
         grid-template-rows: auto 1fr;
-        grid-gap: 0.5rem 0.75rem;
+        grid-gap: 0.5rem 1.25rem;
         border-bottom: 1px solid var(--background--primary);
 
         &:first-child {
           border-top: 1px solid var(--background--primary);
         }
+
         &:hover {
           background-color: var(--background--card-hover);
         }
+
         .juryPhoto {
           place-self: start center;
           grid-area: image;
         }
+
         .juryInfo__top {
           grid-area: top;
           display: flex;
-          flex-wrap: nowrap;
-          align-items: flex-start;
-          color: var(--text-default);
+          padding: 0.5rem 1rem 0 0;
 
           .juryInfo__name {
-            position: relative;
-            padding: 8px 0 0 4px;
-            font-size: 1.15rem;
             font-weight: bold;
           }
+
           .juryInfo__code {
             display: flex;
             align-items: center;
+            gap: 0.5rem;
             margin-left: auto;
-            padding: 0.5rem 1rem;
-            color: var(--text-card-contrast);
-            background-color: var(--text-default);
-            border-bottom-left-radius: 2px;
-            line-height: 1;
 
             .countryFlag {
-              margin-left: 8px;
-            }
-          }
-          @media screen and (max-width: 1200px) {
-            .juryInfo__name {
-              flex: 1 1 auto;
-            }
-            .juryInfo__code {
-              margin: 0;
+              box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25);
             }
           }
         }
+
         .juryInfo__bottom {
           grid-area: bottom;
           display: flex;
           align-items: flex-end;
           flex-wrap: wrap;
           gap: 0.25rem;
-          padding: 3px 6px 8px;
-          font-size: 0.9rem;
+          padding: 0 1rem 0.5rem 0;
           color: var(--text-muted);
 
           .personalInfo__wrapper {
@@ -262,11 +224,13 @@ export default {
               display: flex;
               align-items: center;
             }
+
             .personalInfo__item {
               flex: 0 0 auto;
               white-space: nowrap;
             }
           }
+
           .jurySport__wrapper {
             flex: 0 0 auto;
             display: flex;
@@ -278,6 +242,7 @@ export default {
             .sport {
               flex: 0 0 auto;
             }
+
             .disciplines__wrapper {
               flex: 0 0 auto;
               display: flex;
@@ -299,6 +264,7 @@ export default {
         }
       }
     }
+
     .emptySearchResults {
       align-self: center;
       display: inline-block;

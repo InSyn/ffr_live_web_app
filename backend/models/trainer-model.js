@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 export const athleteTrainerSchema = new mongoose.Schema({
   trainer_id: String,
@@ -27,11 +27,11 @@ export const trainerSchema = new mongoose.Schema({
 
 trainerSchema.index({
   trainer_id: 1,
-  fullname: "text",
+  fullname: 'text',
   region: 1,
 });
 
-export const Trainer = mongoose.model("Trainer", trainerSchema);
+export const Trainer = mongoose.model('Trainer', trainerSchema);
 // Trainer.updateMany(
 //   {},
 //   {

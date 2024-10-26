@@ -1,10 +1,5 @@
 <template>
-  <select
-    @input="$emit('input', $event.target.value)"
-    id="sport"
-    name="sport"
-    class="searchInput__control"
-  >
+  <select @input="$emit('input', $event.target.value)" id="sport" name="sport" class="searchInput__control">
     <option :value="sportsList[0]" selected>
       {{ sportsList[0] }}
     </option>
@@ -15,10 +10,10 @@
 </template>
 
 <script>
-import { sports } from "@/store/data/sports";
+import { sports } from '@/store/data/sports';
 
 export default {
-  name: "sport-input",
+  name: 'sport-input',
   computed: {
     sportsList() {
       return sports.map((sport) => sport.name_rus);
@@ -28,5 +23,5 @@ export default {
 </script>
 
 <style scoped>
-@import "search-input-style.css";
+@import 'search-input-style.css';
 </style>

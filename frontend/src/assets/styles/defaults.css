@@ -1,3 +1,10 @@
+
+@import url('./../../assets/styles/elem-styles.css');
+@import url('./../../assets/styles/variables/colors.css');
+@import url('./../../assets/styles/variables/sizes.css');
+@import url('./../../assets/styles/variables/styling.css');
+@import url('./../../assets/fonts/Petrov Sans-Trial/petrov-sans-trial.css');
+
 :root {
     --app-height: 100vh;
 }
@@ -8,10 +15,13 @@ html {
 }
 
 body {
-    height: inherit;
+    height: 100%;
     background-color: inherit;
+    overflow: hidden;
 }
+
 body * {
+    box-sizing: border-box;
     transition: background-color 192ms;
 }
 
@@ -19,6 +29,7 @@ h3 {
     font-size: 1.2rem;
     margin: 0 .75rem .5rem;
 }
+
 h4 {
     font-size: 1.05rem;
     margin: 0 .5rem .25rem;

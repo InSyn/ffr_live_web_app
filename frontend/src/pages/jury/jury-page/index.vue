@@ -7,66 +7,33 @@
         <div class="juryCard__content">
           <div class="juryCard__mainInfo">
             <div class="juryPhoto__wrapper">
-              <img
-                v-if="jury['photo_url']"
-                class="juryPhoto"
-                :src="uploadsFolderUrl + `${jury['photo_url']}`"
-                alt="Event Logo"
-              />
-              <athlete-photo-filler-icon
-                v-else
-                class="juryPhotoFiller__icon"
-                :gender="jury.gender"
-              ></athlete-photo-filler-icon>
+              <img v-if="jury['photo_url']" class="juryPhoto" :src="uploadsFolderUrl + `${jury['photo_url']}`" alt="Event Logo" />
+              <athlete-photo-filler-icon v-else class="juryPhotoFiller__icon" :gender="jury.gender"></athlete-photo-filler-icon>
 
-              <edit-button
-                class="edit__button"
-                type="jury"
-                :code="jury_code"
-              ></edit-button>
+              <edit-button class="edit__button" type="jury" :code="jury_code"></edit-button>
             </div>
 
             <div class="juryInfo__wrapper">
               <div class="juryInfo__header">
-                <div
-                  class="federation__wrapper"
-                  v-if="
-                    jury['sport'] && jury['sport'].toLowerCase() === 'фристайл'
-                  "
-                >
-                  <img
-                    src="../../../assets/logo/FFR_logo_mini.png"
-                    alt="FFR_logo"
-                  />
+                <div class="federation__wrapper" v-if="jury['sport'] && jury['sport'].toLowerCase() === 'фристайл'">
+                  <img src="../../../assets/logo/FFR_logo_mini.png" alt="FFR_logo" />
                   <span>Федерация фристайла России</span>
                 </div>
-                <div
-                  class="federation__wrapper"
-                  v-if="
-                    jury['sport'] && jury['sport'].toLowerCase() === 'сноуборд'
-                  "
-                >
-                  <img
-                    src="../../../assets/logo/FSR_logo_mini.png"
-                    alt="FSR_logo"
-                  />
+                <div class="federation__wrapper" v-if="jury['sport'] && jury['sport'].toLowerCase() === 'сноуборд'">
+                  <img src="../../../assets/logo/FSR_logo_mini.png" alt="FSR_logo" />
                   <span>Федерация сноуборда России</span>
                 </div>
 
                 <div class="jurySport">
                   {{ jury.sport }}
 
-                  <country-flag
-                    class="countryFlag"
-                    :country-code="getCountryCode(jury.country)"
-                    height="1.25rem"
-                  ></country-flag>
+                  <country-flag class="countryFlag" :country-code="getCountryCode(jury.country)" height="1.25rem"></country-flag>
                 </div>
               </div>
 
               <div class="juryInfo__nameLine">
                 <div class="juryName">
-                  {{ jury.lastname + " " + jury.name }}
+                  {{ jury.lastname + ' ' + jury.name }}
                 </div>
                 <div v-if="jury.jury_category" class="juryCategory">
                   {{ jury.jury_category }}
@@ -94,20 +61,10 @@
                   </div>
                 </div>
 
-                <div
-                  v-if="jury.disciplines.length"
-                  class="juryDisciplines__wrapper"
-                >
+                <div v-if="jury.disciplines.length" class="juryDisciplines__wrapper">
                   <span> Дисциплины: </span>
                   <div class="disciplines__wrapper">
-                    {{
-                      jury.disciplines
-                        .map(
-                          (disciplineName) =>
-                            getDisciplineCode(disciplineName) || disciplineName
-                        )
-                        .join(", ")
-                    }}
+                    {{ jury.disciplines.map((disciplineName) => getDisciplineCode(disciplineName) || disciplineName).join(', ') }}
                   </div>
                 </div>
               </div>
@@ -120,61 +77,29 @@
               <span> {{ jury.jury_code }}</span>
             </div>
             <div v-if="jury.socials" class="socials">
-              <a
-                class="socials__link"
-                v-if="jury.socials.vk"
-                :href="jury.socials.vk"
-                target="_blank"
-              >
+              <a class="socials__link" v-if="jury.socials.vk" :href="jury.socials.vk" target="_blank">
                 <socials-vk-icon class="socials__link__icon"></socials-vk-icon>
               </a>
-              <a
-                class="socials__link"
-                v-if="jury.socials.telegram"
-                :href="jury.socials.telegram"
-                target="_blank"
-              >
-                <socials-telegram-icon
-                  class="socials__link__icon"
-                ></socials-telegram-icon>
+              <a class="socials__link" v-if="jury.socials.telegram" :href="jury.socials.telegram" target="_blank">
+                <socials-telegram-icon class="socials__link__icon"></socials-telegram-icon>
               </a>
             </div>
           </div>
           <div class="jury__menu">
-            <button
-              @click="bottomMenu = 'competitions'"
-              class="jury__menu__item"
-              type="button"
-            >
-              Соревнования
-            </button>
-            <button
-              @click="bottomMenu = 'seminars'"
-              class="jury__menu__item"
-              type="button"
-            >
-              Семинары
-            </button>
-            <button class="jury__menu__item" type="button" disabled>
-              Статистика
-            </button>
+            <button @click="bottomMenu = 'competitions'" class="jury__menu__item" type="button">Соревнования</button>
+            <button @click="bottomMenu = 'seminars'" class="jury__menu__item" type="button">Семинары</button>
+            <button class="jury__menu__item" type="button" disabled>Статистика</button>
           </div>
         </div>
       </div>
     </div>
 
     <div class="juryPage__bottom">
-      <div
-        v-if="bottomMenu === 'competitions'"
-        class="juryBottomSection__wrapper"
-      >
+      <div v-if="bottomMenu === 'competitions'" class="juryBottomSection__wrapper">
         <div class="juryBottomSection__title">Соревнования</div>
         <jury-competitions-list :jury_code="jury_code"></jury-competitions-list>
       </div>
-      <div
-        v-else-if="bottomMenu === 'seminars'"
-        class="juryBottomSection__wrapper"
-      >
+      <div v-else-if="bottomMenu === 'seminars'" class="juryBottomSection__wrapper">
         <div class="juryBottomSection__title">Семинары</div>
         <jury-seminars-list :jury_code="jury_code"></jury-seminars-list>
       </div>
@@ -183,25 +108,25 @@
 </template>
 
 <script>
-import AthletePhotoFillerIcon from "@/assets/svg/athletePhotoFiller-icon.vue";
-import EditButton from "@/components/ui-components/edit-button.vue";
-import CountryFlag from "@/components/ui-components/country-flag.vue";
-import axios from "axios";
-import { databaseUrl, uploadsFolderUrl } from "@/store/constants";
-import { getRegionCode } from "@/store/data/russia-regions";
-import { getDisciplineCode } from "@/store/data/sports";
-import { mdiImage } from "@mdi/js";
-import SocialsVkIcon from "@/components/icons/socials-vk-icon.vue";
-import SocialsTelegramIcon from "@/components/icons/socials-telegram-icon.vue";
-import { getCountryCode } from "@/store/data/countries";
-import { getAgeFromBirthdate } from "@/utils/data-formaters";
-import JurySeminarsList from "@/pages/jury/jury-page/jurySeminars-list.vue";
-import JuryCompetitionsList from "@/pages/jury/jury-page/juryCompetitions-list.vue";
-import BgMountains from "@/assets/riv/bg-mountains.vue";
+import AthletePhotoFillerIcon from '@/assets/svg/athletePhotoFiller-icon.vue';
+import EditButton from '@/components/ui-components/edit-button.vue';
+import CountryFlag from '@/components/ui-components/country-flag.vue';
+import axios from 'axios';
+import { databaseUrl, uploadsFolderUrl } from '@/store/constants';
+import { getRegionCode } from '@/store/data/russia-regions';
+import { getDisciplineCode } from '@/store/data/sports';
+import { mdiImage } from '@mdi/js';
+import SocialsVkIcon from '@/components/icons/socials-vk-icon.vue';
+import SocialsTelegramIcon from '@/components/icons/socials-telegram-icon.vue';
+import { getCountryCode } from '@/store/data/countries';
+import { getAgeFromBirthdate } from '@/utils/data-formaters';
+import JurySeminarsList from '@/pages/jury/jury-page/jurySeminars-list.vue';
+import JuryCompetitionsList from '@/pages/jury/jury-page/juryCompetitions-list.vue';
+import BgMountains from '@/assets/riv/bg-mountains.vue';
 
 export default {
-  name: "index",
-  props: ["jury_code"],
+  name: 'index',
+  props: ['jury_code'],
   components: {
     BgMountains,
     JuryCompetitionsList,
@@ -218,7 +143,7 @@ export default {
 
       loadingState: false,
       updateTimeoutId: null,
-      bottomMenu: "competitions",
+      bottomMenu: 'competitions',
 
       imageFillerIcon: mdiImage,
     };
@@ -230,7 +155,7 @@ export default {
     getRegionCode,
     async getJuryByCode(id) {
       try {
-        const data = await axios.get(databaseUrl + "/jury/" + id);
+        const data = await axios.get(databaseUrl + '/jury/' + id);
 
         if (data.status === 200) {
           const juryData = data.data.jury;
@@ -284,6 +209,7 @@ export default {
     @media screen and (max-width: 640px) {
       flex-basis: auto;
     }
+
     .mountains_bg {
       position: absolute;
       z-index: 1;
@@ -291,6 +217,7 @@ export default {
       width: 100%;
       height: 100%;
     }
+
     .juryCard__wrapper {
       position: relative;
       z-index: 2;
@@ -310,13 +237,12 @@ export default {
         background-color: rgba(2, 2, 6, 0.6);
         backdrop-filter: blur(5px);
         border: 1px solid rgb(255, 255, 255);
-        box-shadow: 0 0 6px -2px rgb(255, 255, 255) inset,
-          0 16px 32px 0 rgba(12, 14, 46, 0.48),
-          -4px -8px 24px 0 rgba(255, 255, 255, 0.14) inset;
+        box-shadow: 0 0 6px -2px rgb(255, 255, 255) inset, 0 16px 32px 0 rgba(12, 14, 46, 0.48), -4px -8px 24px 0 rgba(255, 255, 255, 0.14) inset;
         border-radius: 12px;
 
-        content: "";
+        content: '';
       }
+
       .juryCard__content {
         position: relative;
         flex: 1 1 0;
@@ -353,11 +279,13 @@ export default {
               max-height: 100%;
               border-radius: 50%;
             }
+
             .juryPhotoFiller__icon {
               height: 100%;
               aspect-ratio: 1;
               color: var(--text-default);
             }
+
             .edit__button {
               position: absolute;
               bottom: 0;
@@ -381,6 +309,7 @@ export default {
               height: 96px;
             }
           }
+
           .juryInfo__wrapper {
             flex: 1 1 0;
             display: flex;
@@ -405,6 +334,7 @@ export default {
                   margin-right: 1rem;
                 }
               }
+
               .jurySport {
                 flex: 0 0 auto;
                 display: flex;
@@ -417,6 +347,7 @@ export default {
                 }
               }
             }
+
             .juryInfo__nameLine {
               flex: 0 0 auto;
               display: flex;
@@ -430,12 +361,14 @@ export default {
                 font-size: 1.5rem;
                 font-weight: bold;
               }
+
               .juryCategory {
                 flex: 0 1 auto;
                 font-size: 1.25rem;
                 font-weight: 300;
               }
             }
+
             .juryInfo__footer {
               flex: 0 0 auto;
               display: flex;
@@ -454,12 +387,14 @@ export default {
                 .regionFlag {
                   margin-right: 0.5rem;
                 }
+
                 .juryRegion {
                   display: flex;
                   flex-wrap: wrap;
                   gap: 4px;
                 }
               }
+
               .juryAge__wrapper {
                 flex: 0 0 auto;
                 display: flex;
@@ -477,6 +412,7 @@ export default {
                   margin-left: 1rem;
                 }
               }
+
               @media screen and (max-width: 480px) {
                 .juryAge__wrapper {
                   justify-content: flex-end;
@@ -507,11 +443,13 @@ export default {
               white-space: nowrap;
               overflow: hidden;
             }
+
             span {
               display: inline-block;
               flex: 1 1 0;
               white-space: nowrap;
             }
+
             .disciplines__wrapper {
               flex: 1 1 0;
               display: flex;
@@ -533,6 +471,7 @@ export default {
             .socials__link {
               display: flex;
               align-items: center;
+
               .socials__link__icon {
                 height: 2rem;
                 color: var(--text-contrast);
@@ -544,6 +483,7 @@ export default {
             max-height: none;
           }
         }
+
         .jury__menu {
           display: flex;
           justify-content: space-between;
@@ -561,6 +501,7 @@ export default {
               opacity: 1;
             }
           }
+
           button[disabled] {
             font-weight: 300;
             color: var(--text-muted);
@@ -606,6 +547,7 @@ export default {
         font-size: 1.1rem;
         font-weight: bold;
       }
+
       .juryCompetitions__list {
         flex: 1 1 200px;
         display: flex;

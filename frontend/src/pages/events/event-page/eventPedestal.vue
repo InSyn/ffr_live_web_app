@@ -1,30 +1,15 @@
 <template>
   <div v-if="competition" class="pedestal__wrapper">
-    <div
-      class="pedestalAthlete_wrapper"
-      v-for="athletePlace in [1, 0, 2]"
-      v-show="pedestalAthletes[athletePlace]"
-      :key="athletePlace"
-    >
-      <div
-        v-if="pedestalAthletes[athletePlace]"
-        class="pedestalAthleteImage__wrapper"
-      >
+    <div class="pedestalAthlete_wrapper" v-for="athletePlace in [1, 0, 2]" v-show="pedestalAthletes[athletePlace]" :key="athletePlace">
+      <div v-if="pedestalAthletes[athletePlace]" class="pedestalAthleteImage__wrapper">
         <img
           v-if="pedestalAthletes[athletePlace]['photo_url']"
           class="pedestalAthlete__image"
-          :src="
-            uploadsFolderUrl() +
-            `${pedestalAthletes[athletePlace]['photo_url']}`
-          "
+          :src="uploadsFolderUrl() + `${pedestalAthletes[athletePlace]['photo_url']}`"
           alt="img"
           loading="lazy"
         />
-        <athlete-photo-filler-icon
-          v-else
-          class="athletePhotoFiller__icon"
-          :gender="pedestalAthletes[athletePlace]?.gender"
-        ></athlete-photo-filler-icon>
+        <athlete-photo-filler-icon v-else class="athletePhotoFiller__icon" :gender="pedestalAthletes[athletePlace]?.gender"></athlete-photo-filler-icon>
         <country-flag
           class="countryFlag"
           v-for="(region, idx) in pedestalAthletes[athletePlace]['regions']"
@@ -38,17 +23,11 @@
           }"
           width="1.5rem"
         ></country-flag>
-        <div
-          class="athleteMedal"
-          :style="{ backgroundColor: getMedalColor(athletePlace) }"
-        >
+        <div class="athleteMedal" :style="{ backgroundColor: getMedalColor(athletePlace) }">
           <span>{{ athletePlace + 1 }}</span>
         </div>
       </div>
-      <div
-        v-if="pedestalAthletes[athletePlace]"
-        class="pedestalAthleteInfo__wrapper"
-      >
+      <div v-if="pedestalAthletes[athletePlace]" class="pedestalAthleteInfo__wrapper">
         <router-link
           v-if="pedestalAthletes[athletePlace].rus_code"
           class="athleteName__link"
@@ -63,11 +42,7 @@
           {{ getAthleteName(pedestalAthletes[athletePlace]) }}
         </div>
         <div class="athleteRegions">
-          <span
-            class="region__item"
-            v-for="region in pedestalAthletes[athletePlace].regions"
-            :key="region"
-          >
+          <span class="region__item" v-for="region in pedestalAthletes[athletePlace].regions" :key="region">
             {{ region }}
           </span>
         </div>
@@ -77,15 +52,15 @@
 </template>
 
 <script>
-import AthletePhotoFillerIcon from "@/assets/svg/athletePhotoFiller-icon.vue";
-import CountryFlag from "@/components/ui-components/country-flag.vue";
-import { databaseUrl, uploadsFolderUrl } from "@/store/constants";
-import { getRegionCode } from "@/store/data/russia-regions";
-import { getAthleteName } from "@/utils/data-formaters";
-import axios from "axios";
+import AthletePhotoFillerIcon from '@/assets/svg/athletePhotoFiller-icon.vue';
+import CountryFlag from '@/components/ui-components/country-flag.vue';
+import { databaseUrl, uploadsFolderUrl } from '@/store/constants';
+import { getRegionCode } from '@/store/data/russia-regions';
+import { getAthleteName } from '@/utils/data-formaters';
+import axios from 'axios';
 
 export default {
-  name: "eventPedestal",
+  name: 'eventPedestal',
   components: { CountryFlag, AthletePhotoFillerIcon },
   props: {
     competition: {
@@ -104,17 +79,15 @@ export default {
       return uploadsFolderUrl;
     },
     async getAthletesTop() {
-      if (!this.competition || !this.competition["total_results"]) return;
+      if (!this.competition || !this.competition['total_results']) return;
 
-      const resultsTop = this.competition["total_results"].slice(0, 3);
+      const resultsTop = this.competition['total_results'].slice(0, 3);
       let athletesTop = [];
 
       if (resultsTop.length) {
         athletesTop = await Promise.all(
           resultsTop.map(async (result) => {
-            let athlete = this.competition["competitors"].find(
-              (competitor) => competitor["local_id"] === result["competitor_id"]
-            );
+            let athlete = this.competition['competitors'].find((competitor) => competitor['local_id'] === result['competitor_id']);
 
             if (athlete && athlete.rus_code) {
               const athleteData = await this.loadAthleteData(athlete.rus_code);
@@ -130,7 +103,7 @@ export default {
     },
     async loadAthleteData(code) {
       try {
-        const data = await axios.get(databaseUrl + "/athletes/" + code);
+        const data = await axios.get(databaseUrl + '/athletes/' + code);
         if (data.status === 200) {
           const athleteData = data.data.data;
           if (athleteData) return athleteData;
@@ -144,13 +117,13 @@ export default {
     getMedalColor(place) {
       switch (place) {
         case 0:
-          return "#D9C357";
+          return '#D9C357';
         case 1:
-          return "#A3BBD9";
+          return '#A3BBD9';
         case 2:
-          return "#B16C3A";
+          return '#B16C3A';
         default:
-          return "transparent";
+          return 'transparent';
       }
     },
   },
@@ -159,7 +132,7 @@ export default {
     this.getAthletesTop();
   },
   watch: {
-    "competition.total_results": {
+    'competition.total_results': {
       deep: true,
       handler() {
         this.getAthletesTop();
@@ -203,15 +176,18 @@ export default {
         border: 1px solid var(--background--primary-hover);
         border-radius: 50%;
       }
+
       .athletePhotoFiller__icon {
         height: 100%;
         width: 100%;
       }
+
       .countryFlag {
         position: absolute;
         right: -0.5rem;
         bottom: 0;
       }
+
       .athleteMedal {
         position: absolute;
         display: flex;
@@ -241,6 +217,7 @@ export default {
         height: 58px;
       }
     }
+
     .pedestalAthleteInfo__wrapper {
       display: flex;
       flex-direction: column;
@@ -253,14 +230,17 @@ export default {
         font-weight: bold;
         text-align: center;
       }
+
       .athleteName__link {
         font-size: 1.2rem;
         font-weight: bold;
         text-align: center;
+
         &:hover {
           color: var(--text-hovered);
         }
       }
+
       .athleteRegions {
         display: flex;
         flex-direction: column;

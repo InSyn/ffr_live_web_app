@@ -1,5 +1,5 @@
-import axios from "axios";
-import { databaseUrl } from "@/store/constants";
+import axios from 'axios';
+import { databaseUrl } from '@/store/constants';
 
 export default {
   namespaced: true,
@@ -16,17 +16,17 @@ export default {
   },
   actions: {
     SET_TRAINERS: ({ commit }, payload) => {
-      commit("setTrainers", payload);
+      commit('setTrainers', payload);
     },
     LOAD_TRAINERS: async (store) => {
       try {
-        const response = await axios.get(databaseUrl + "/trainers");
+        const response = await axios.get(databaseUrl + '/trainers');
         if (response.status === 200) {
-          store.commit("setTrainers", response.data.trainers);
+          store.commit('setTrainers', response.data.trainers);
         }
       } catch (err) {
         if (err) {
-          setTimeout(() => store.dispatch("LOAD_TRAINERS"), 2000);
+          setTimeout(() => store.dispatch('LOAD_TRAINERS'), 2000);
         }
       }
     },

@@ -9,7 +9,7 @@
 
 <script>
 export default {
-  name: "competitionImageFiller-icon",
+  name: 'competitionImageFiller-icon',
 };
 </script>
 

@@ -1,31 +1,18 @@
 <template>
   <div class="trainersPage__wrapper">
-    <search
-      @search-loading="setLoadingState"
-      @search-results-loaded="showSearchResults"
-      mode="trainers"
-    ></search>
+    <search @search-loading="setLoadingState" @search-results-loaded="showSearchResults" mode="trainers"></search>
 
     <div class="trainersList__wrapper">
       <div class="trainersList">
-        <div
-          class="alphabetCharSection"
-          v-for="char in getAlphabetList(this.getTrainersList, 'fullname')"
-          :key="char"
-        >
+        <div class="alphabetCharSection" v-for="char in getAlphabetList(this.getTrainersList, 'fullname')" :key="char">
           <span class="alphabetChar">&nbsp;-&nbsp;{{ char }}</span>
           <router-link
-            v-for="trainer in getTrainersList.filter(
-              (t) => t.fullname[0].toUpperCase() === char
-            )"
+            v-for="trainer in getTrainersList.filter((t) => t.fullname[0].toUpperCase() === char)"
             :key="trainer._id"
-            :to="'/trainer_page/' + trainer.trainer_id"
+            :to="{ name: 'trainerPage', params: { trainer_id: trainer.trainer_id } }"
           >
             <div class="trainersList__item__wrapper">
-              <person-photo
-                class="trainerPhoto"
-                :person="trainer"
-              ></person-photo>
+              <person-photo class="trainerPhoto" :person="trainer"></person-photo>
 
               <div class="trainerInfo__top">
                 <span class="trainerInfo__name">
@@ -34,20 +21,13 @@
 
                 <span class="trainerInfo__code">
                   <b>FFR-ID:&nbsp; {{ trainer.trainer_id }}</b>
-                  <country-flag
-                    class="countryFlag"
-                    :country-code="getCountryCode(trainer.country)"
-                    width="1.5rem"
-                  ></country-flag>
+                  <country-flag class="countryFlag" :country-code="getCountryCode(trainer.country)" height="1.2rem" rounding="2px"></country-flag>
                 </span>
               </div>
 
               <div class="trainerInfo__bottom">
                 <div class="trainerPersonalInfo__wrapper">
-                  <div
-                    v-if="trainer.birth_date"
-                    class="trainerPersonalInfo__item__wrapper"
-                  >
+                  <div v-if="trainer.birth_date" class="trainerPersonalInfo__item__wrapper">
                     <div class="trainerCategory">
                       {{ trainer.trainer_category }}
                     </div>
@@ -61,11 +41,7 @@
                 <div class="trainerSport__wrapper">
                   <div class="sport">{{ trainer.sport }}</div>
                   <div class="disciplines__wrapper">
-                    <div
-                      class="discipline__item"
-                      v-for="(dsc, idx) in trainer.disciplines"
-                      :key="idx"
-                    >
+                    <div class="discipline__item" v-for="(dsc, idx) in trainer.disciplines" :key="idx">
                       {{ getDisciplineCode(dsc) }}
                     </div>
                   </div>
@@ -74,38 +50,30 @@
             </div>
           </router-link>
         </div>
-        <span
-          class="emptySearchResults"
-          v-if="getTrainersList.length === 0 && !loading"
-        >
-          Тренеры не найдены
-        </span>
+        <span class="emptySearchResults" v-if="getTrainersList.length === 0 && !loading"> Тренеры не найдены </span>
 
-        <loader-spinner
-          v-if="loading"
-          class="loading__spinner"
-        ></loader-spinner>
+        <loader-spinner v-if="loading" class="loading__spinner"></loader-spinner>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { uploadsFolderUrl } from "@/store/constants";
-import { mdiAccount } from "@mdi/js";
-import CountryFlag from "@/components/ui-components/country-flag.vue";
-import Search from "@/components/ui-components/search/index.vue";
-import { getDisciplineCode } from "@/store/data/sports";
-import { getRegionCode } from "@/store/data/russia-regions";
-import { getCountryCode } from "@/store/data/countries";
-import { getAgeFromBirthdate } from "@/utils/data-formaters";
-import LoaderSpinner from "@/components/ui-components/loader-spinner.vue";
-import PersonPhoto from "@/components/ui-components/person-photo.vue";
-import { mapActions, mapGetters } from "vuex";
-import { getAlphabetList } from "@/utils/alphabet-generator";
+import { uploadsFolderUrl } from '@/store/constants';
+import { mdiAccount } from '@mdi/js';
+import CountryFlag from '@/components/ui-components/country-flag.vue';
+import Search from '@/components/ui-components/search/index.vue';
+import { getDisciplineCode } from '@/store/data/sports';
+import { getRegionCode } from '@/store/data/russia-regions';
+import { getCountryCode } from '@/store/data/countries';
+import { getAgeFromBirthdate } from '@/utils/data-formaters';
+import LoaderSpinner from '@/components/ui-components/loader-spinner.vue';
+import PersonPhoto from '@/components/ui-components/person-photo.vue';
+import { mapActions, mapGetters } from 'vuex';
+import { getAlphabetList } from '@/utils/alphabet-generator';
 
 export default {
-  name: "trainersPage",
+  name: 'trainersPage',
   components: {
     PersonPhoto,
     LoaderSpinner,
@@ -120,23 +88,21 @@ export default {
     };
   },
   computed: {
-    ...mapGetters("trainers", {
-      trainersList: "getTrainers",
+    ...mapGetters('trainers', {
+      trainersList: 'getTrainers',
     }),
     uploadsFolderUrl() {
       return uploadsFolderUrl;
     },
     getTrainersList() {
-      return this.searchResults === null
-        ? this.trainersList
-        : this.searchResults;
+      return this.searchResults === null ? this.trainersList : this.searchResults;
     },
   },
   methods: {
     getAlphabetList,
-    ...mapActions("trainers", {
-      fetchTrainers: "LOAD_TRAINERS",
-      setTrainers: "SET_TRAINERS",
+    ...mapActions('trainers', {
+      fetchTrainers: 'LOAD_TRAINERS',
+      setTrainers: 'SET_TRAINERS',
     }),
     getAgeFromBirthdate,
     getCountryCode,
@@ -176,7 +142,6 @@ export default {
   flex-wrap: nowrap;
   max-width: var(--desktop-small);
   width: 100%;
-  overflow-y: auto;
   margin: 0 auto;
   padding: var(--padd-page);
 
@@ -188,6 +153,8 @@ export default {
     overflow-y: auto;
 
     background-color: var(--background--card);
+    box-shadow: var(--container-shadow-l);
+    border: 1px solid var(--border-container);
     border-radius: 4px;
 
     .trainersList {
@@ -198,53 +165,49 @@ export default {
       .trainersList__item__wrapper {
         display: grid;
         grid-template-areas:
-          "image top"
-          "image bottom";
+          'image top'
+          'image bottom';
         grid-template-columns: 96px auto;
         grid-template-rows: auto 1fr;
-        grid-gap: 0.5rem 0.75rem;
+        grid-gap: 0.5rem 1rem;
         border-bottom: 1px solid var(--background--primary);
 
         &:first-child {
           border-top: 1px solid var(--background--primary);
         }
+
         &:hover {
           background-color: var(--background--card-hover);
         }
+
         .trainerPhoto {
           place-self: start center;
           grid-area: image;
         }
+
         .trainerInfo__top {
           grid-area: top;
           display: flex;
           flex-wrap: nowrap;
           align-items: flex-start;
-          color: var(--text-default);
+          padding: 0.5rem 1rem 0 0;
 
           .trainerInfo__name {
             position: relative;
-            padding: 8px 0 0 4px;
-            font-size: 1.15rem;
             font-weight: bold;
           }
+
           .trainerInfo__code {
             display: flex;
             align-items: center;
+            gap: 0.5rem;
             margin-left: auto;
-            padding: 0.5rem 1rem;
-            color: var(--text-card-contrast);
-            background-color: var(--text-default);
-            border-bottom-left-radius: 2px;
-            line-height: 1;
 
-            span {
-              font-weight: 700;
-            }
             .countryFlag {
-              margin-left: 8px;
+              box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25);
             }
           }
+
           @media screen and (max-width: 1200px) {
             .trainerInfo__name {
               flex: 1 1 auto;
@@ -254,13 +217,14 @@ export default {
             }
           }
         }
+
         .trainerInfo__bottom {
           grid-area: bottom;
           display: flex;
           flex-wrap: wrap;
           gap: 0.25rem 0.5rem;
           align-items: flex-end;
-          padding: 3px 6px 8px;
+          padding: 0 1rem 0.5rem 0;
           color: var(--text-muted);
           font-size: 0.9rem;
 
@@ -276,11 +240,13 @@ export default {
               align-items: center;
               gap: 0.75rem;
             }
+
             .trainerPersonalInfo__item {
               flex: 0 0 auto;
               white-space: nowrap;
             }
           }
+
           .trainerSport__wrapper {
             flex: 0 0 auto;
             display: flex;
@@ -292,6 +258,7 @@ export default {
             .sport {
               flex: 0 0 auto;
             }
+
             .disciplines__wrapper {
               flex: 0 0 auto;
               display: flex;
@@ -302,6 +269,7 @@ export default {
           }
         }
       }
+
       .alphabetCharSection {
         .alphabetChar {
           display: inline-block;
@@ -312,6 +280,7 @@ export default {
         }
       }
     }
+
     .emptySearchResults {
       align-self: center;
       display: inline-block;

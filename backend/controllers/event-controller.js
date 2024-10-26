@@ -1,15 +1,10 @@
-import { Event } from "../models/event-model.js";
-import * as crypto from "crypto";
-import { getSeason } from "../utils/formatters.js";
-import { flushDocuments, removeOldFile } from "../file-storage/fileStorage.js";
-import { dirname, join } from "path";
-import { fileURLToPath } from "url";
-import {
-  createEntityDocuments,
-  extractDocumentFiles,
-  parseDocuments,
-  updateDocuments,
-} from "../middleware/documentsHandlers.js";
+import { Event } from '../models/event-model.js';
+import * as crypto from 'crypto';
+import { getSeason } from '../utils/formatters.js';
+import { flushDocuments, removeOldFile } from '../file-storage/fileStorage.js';
+import { dirname, resolve } from 'path';
+import { fileURLToPath } from 'url';
+import { createEntityDocuments, extractDocumentFiles, parseDocuments, updateDocuments } from '../middleware/documentsHandlers.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -20,13 +15,13 @@ export const getAllEvents = async (req, res) => {
       start_at: -1,
     });
     res.status(200).json({
-      status: "success",
+      status: 'success',
       events,
     });
   } catch (e) {
     res.status(404).json({
-      status: "Err",
-      data: "Ошибка загрузки событий",
+      status: 'Err',
+      data: 'Ошибка загрузки событий',
       err: e,
     });
   }
@@ -60,7 +55,7 @@ export const searchEvents = async (req, res) => {
       };
     }
     if (req.query.location) {
-      query.location = new RegExp(req.query.location, "i");
+      query.location = new RegExp(req.query.location, 'i');
     }
 
     if (req.query.calendar_code) {
@@ -69,15 +64,15 @@ export const searchEvents = async (req, res) => {
 
     const events = await Event.find(query).sort({ start_at: -1 });
     res.status(200).json({
-      status: "success",
+      status: 'success',
       results: events.length,
       events,
     });
   } catch (error) {
-    console.error("Error during search:", error);
+    console.error('Error during search:', error);
     res.status(500).json({
-      status: "error",
-      message: "Failed to search events",
+      status: 'error',
+      message: 'Failed to search events',
       error: error.message,
     });
   }
@@ -90,10 +85,7 @@ export const getEventByDate = async (req, res) => {
     const month = date.getMonth();
 
     const startDate = new Date(year, month, 1);
-    const endDate =
-      month === 11
-        ? new Date(year + 1, 0, 0, 23, 59, 59, 999)
-        : new Date(year, month + 1, 0, 23, 59, 59, 999);
+    const endDate = month === 11 ? new Date(year + 1, 0, 0, 23, 59, 59, 999) : new Date(year, month + 1, 0, 23, 59, 59, 999);
 
     const events = await Event.find({
       start_at: {
@@ -105,13 +97,31 @@ export const getEventByDate = async (req, res) => {
     });
 
     res.status(200).json({
-      status: "success",
+      status: 'success',
       events,
     });
   } catch (e) {
     res.status(404).json({
-      status: "Err",
-      data: "События не найдены",
+      status: 'Err',
+      data: 'События не найдены',
+      err: e,
+    });
+  }
+};
+
+export const getEventsWithRegistration = async (req, res) => {
+  try {
+    const events = await Event.find({ registration_status: true }, { competitions: 0 }).sort({
+      start_at: -1,
+    });
+    res.status(200).json({
+      status: 'success',
+      events,
+    });
+  } catch (e) {
+    res.status(404).json({
+      status: 'Err',
+      data: 'Ошибка загрузки событий',
       err: e,
     });
   }
@@ -121,13 +131,13 @@ export const getEvent = async (req, res) => {
   try {
     const event = await Event.findOne({ event_id: req.params.id });
     res.status(200).json({
-      status: "success",
+      status: 'success',
       event,
     });
   } catch (e) {
     res.status(404).json({
-      status: "Err",
-      data: "Событие не найдено",
+      status: 'Err',
+      data: 'Событие не найдено',
       err: e,
     });
   }
@@ -135,23 +145,15 @@ export const getEvent = async (req, res) => {
 
 export const addNewEvent = async (req, res) => {
   try {
-    const logoImage = req.files["logo_image_url"]
-      ? `/uploads/images/${req.files["logo_image_url"][0].filename}`
-      : "";
-    const trackImage = req.files["track_image_url"]
-      ? `/uploads/images/${req.files["track_image_url"][0].filename}`
-      : "";
-    const organizationLogo = req.files["organization_logo"]
-      ? `/uploads/images/${req.files["organization_logo"][0].filename}`
-      : "";
+    const logoImage = req.files['logo_image_url'] ? `/uploads/images/${req.files['logo_image_url'][0].filename}` : '';
+    const trackImage = req.files['track_image_url'] ? `/uploads/images/${req.files['track_image_url'][0].filename}` : '';
+    const organizationLogo = req.files['organization_logo'] ? `/uploads/images/${req.files['organization_logo'][0].filename}` : '';
 
     const documents = parseDocuments(req.body);
-
     const documentFiles = extractDocumentFiles(req.files);
-
     const eventDocuments = createEntityDocuments(documents, documentFiles);
 
-    const event = new Event({
+    const eventObj = {
       event_id: req.body.event_id || crypto.randomUUID(),
       created_at: new Date(),
       logo_image_url: logoImage,
@@ -161,7 +163,7 @@ export const addNewEvent = async (req, res) => {
       title: req.body.title,
       international: req.body.international,
       start_at: req.body.start_at,
-      season: req.body.start_at ? getSeason(req.body.start_at) : "",
+      season: req.body.start_at ? getSeason(req.body.start_at) : '',
       sport: req.body.sport,
       discipline: req.body.discipline,
       country: req.body.country,
@@ -174,19 +176,21 @@ export const addNewEvent = async (req, res) => {
 
       translation_url: req.body.translation_url,
       documents: eventDocuments,
-    });
+    };
+
+    const event = new Event(eventObj);
 
     await event.save();
 
     res.status(200).json({
-      status: "success",
+      status: 'success',
       event,
     });
   } catch (e) {
-    console.log("ADD ERR", e);
-    res.status(404).json({
-      status: "Err",
-      data: "Ошибка, событие не было добавлено",
+    console.log('ADD ERR', e);
+    res.status(500).json({
+      status: 'Err',
+      data: `Ошибка, событие не было добавлено: ${e.message}`,
       err: e,
     });
   }
@@ -197,107 +201,140 @@ export const updateEvent = async (req, res) => {
     const event = await Event.findOne({ event_id: req.params.id });
     if (!event) {
       return res.status(404).json({
-        status: "error",
-        message: "Событие с указанным id не найдено",
+        status: 'error',
+        message: 'Событие с указанным id не найдено',
       });
     }
+
+    const updateFields = {};
 
     const originalLogoImage = event.logo_image_url;
     const originalTrackImage = event.track_image_url;
     const originalOrganizationLogo = event.organization_logo;
 
-    const logoImage = req.files["logo_image_url"]
-      ? `/uploads/images/${req.files["logo_image_url"][0].filename}`
-      : event.logo_image_url;
-    const trackImage = req.files["track_image_url"]
-      ? `/uploads/images/${req.files["track_image_url"][0].filename}`
-      : event.track_image_url;
-    const organizationLogo = req.files["organization_logo"]
-      ? `/uploads/images/${req.files["organization_logo"][0].filename}`
-      : event.organization_logo;
-
+    if (req.files['logo_image_url']) {
+      updateFields.logo_image_url = `/uploads/images/${req.files['logo_image_url'][0].filename}`;
+    }
+    if (req.files['track_image_url']) {
+      updateFields.track_image_url = `/uploads/images/${req.files['track_image_url'][0].filename}`;
+    }
+    if (req.files['organization_logo']) {
+      updateFields.organization_logo = `/uploads/images/${req.files['organization_logo'][0].filename}`;
+    }
     const documentFiles = extractDocumentFiles(req.files);
-
-    const documents = req.body.documents
-      ? JSON.parse(req.body.documents)
-      : event.documents;
-
+    const documents = req.body.documents ? JSON.parse(req.body.documents) : event.documents;
     const updatedDocuments = await updateDocuments(documents, documentFiles);
+    updateFields.documents = updatedDocuments;
 
-    event.logo_image_url = logoImage;
-    event.track_image_url = trackImage;
+    Object.assign(updateFields, {
+      calendar_code: req.body.calendar_code || event.calendar_code,
+      title: req.body.title || event.title,
+      start_at: req.body.start_at || event.start_at,
+      season: req.body.start_at ? getSeason(req.body.start_at) : event.season,
+      sport: req.body.sport || event.sport,
+      discipline: req.body.discipline || event.discipline,
+      country: req.body.country || event.country,
+      region: req.body.region || event.region,
+      location: req.body.location || event.location,
+      organization: req.body.organization || event.organization,
+      timing_provider: req.body.timing_provider || event.timing_provider,
+      translation_url: req.body.translation_url || event.translation_url,
+      international: req.body.international !== undefined ? req.body.international : event.international,
+    });
 
-    event.calendar_code = req.body.calendar_code || event.calendar_code;
-    event.title = req.body.title || event.title;
-    event.start_at = req.body.start_at || event.start_at;
-    event.season = req.body.start_at
-      ? getSeason(req.body.start_at)
-      : event.season;
-    event.sport = req.body.sport || event.sport;
-    event.discipline = req.body.discipline || event.discipline;
-    event.country = req.body.country || event.country;
-    event.region = req.body.region || event.region;
-    event.location = req.body.location || event.location;
-    event.organization = req.body.organization || event.organization;
-    event.organization_logo = organizationLogo;
-    event.timing_provider = req.body.timing_provider || event.timing_provider;
-    event.translation_url = req.body.translation_url || event.translation_url;
+    await Event.updateOne({ event_id: req.params.id }, { $set: updateFields });
 
-    event.international =
-      req.body.international !== undefined
-        ? req.body.international
-        : event.international;
-
-    event.documents = updatedDocuments;
-
-    await event.save();
-
-    if (logoImage !== originalLogoImage && originalLogoImage) {
-      await removeOldFile(join(__dirname, "..", originalLogoImage));
+    if (updateFields.logo_image_url !== originalLogoImage && originalLogoImage) {
+      await removeOldFile(resolve(__dirname, '..', originalLogoImage));
     }
-    if (trackImage !== originalTrackImage && originalTrackImage) {
-      await removeOldFile(join(__dirname, "..", originalTrackImage));
+    if (updateFields.track_image_url !== originalTrackImage && originalTrackImage) {
+      await removeOldFile(resolve(__dirname, '..', originalTrackImage));
     }
-    if (
-      organizationLogo !== originalOrganizationLogo &&
-      originalOrganizationLogo
-    ) {
-      await removeOldFile(join(__dirname, "..", originalOrganizationLogo));
+    if (updateFields.organization_logo !== originalOrganizationLogo && originalOrganizationLogo) {
+      await removeOldFile(resolve(__dirname, '..', originalOrganizationLogo));
     }
 
     res.status(200).json({
-      status: "success",
+      status: 'success',
       event,
     });
   } catch (e) {
-    res.status(404).json({
-      status: "Err",
+    res.status(500).json({
+      status: 'Err',
       data: `Не удалось обновить данные события: ${e.message}`,
       err: e,
     });
   }
 };
 
+export const updateEventRegistrationSettings = async (req, res) => {
+  try {
+    const { id: event_id } = req.params;
+
+    const updateFields = {};
+
+    if ('registration_status' in req.body) updateFields.registration_status = req.body.registration_status;
+    if ('allow_registration_by_trainer' in req.body) updateFields.allow_registration_by_trainer = req.body.allow_registration_by_trainer;
+    if ('allow_registration_by_organization' in req.body) updateFields.allow_registration_by_organization = req.body.allow_registration_by_organization;
+    if ('allowed_secretaries' in req.body) updateFields.allowed_secretaries = req.body.allowed_secretaries;
+    if ('athletes_groups' in req.body) updateFields.athletes_groups = req.body.athletes_groups;
+
+    const event = await Event.findOneAndUpdate({ event_id }, { $set: updateFields }, { new: true });
+
+    if (!event) {
+      return res.status(404).json({
+        status: 'Error',
+        message: 'Event not found',
+      });
+    }
+
+    res.status(200).json({
+      status: 'success',
+      event,
+    });
+  } catch (e) {
+    console.error('Update Event Registration Settings Error', e);
+    res.status(500).json({
+      status: 'Error',
+      message: `Failed to update event registration settings: ${e.message}`,
+    });
+  }
+};
+
 export const updateEventResults = async (req, res) => {
   try {
+    const updateFields = {};
+
+    if (req.body.competitions !== undefined) {
+      updateFields.competitions = req.body.competitions;
+    }
+    if (req.body.jury !== undefined) {
+      updateFields.jury = req.body.jury;
+    }
+    if (req.body.forerunners !== undefined) {
+      updateFields.forerunners = req.body.forerunners;
+    }
+    if (req.body.track_info !== undefined) {
+      updateFields.track_info = req.body.track_info;
+    }
+    if (req.body.conditions !== undefined) {
+      updateFields.conditions = req.body.conditions;
+    }
+
     await Event.updateOne(
       { event_id: req.body.event_id },
       {
-        competitions: req.body.competitions ? req.body.competitions : [],
-        jury: req.body.jury ? req.body.jury : [],
-        forerunners: req.body.forerunners ? req.body.forerunners : [],
-        track_info: req.body.track_info ? req.body.track_info : [],
-        conditions: req.body.conditions ? req.body.conditions : [],
+        $set: updateFields,
       }
     );
 
     res.status(200).json({
-      status: "success",
+      status: 'success',
       data: `Данные события ID-${req.params.id} обновлены`,
     });
   } catch (e) {
-    res.status(404).json({
-      status: "Err",
+    res.status(500).json({
+      status: 'Err',
       data: `Не удалось обновить данные события. ${e.message}`,
       err: e,
     });
@@ -310,22 +347,33 @@ export const deleteEvent = async (req, res) => {
 
     if (!event) {
       return res.status(404).json({
-        status: "error",
-        message: "Событие с указанным id не найдено",
+        status: 'error',
+        message: 'Событие с указанным id не найдено',
       });
     }
 
     await flushDocuments(event);
 
     res.status(200).json({
-      status: "success",
-      data: "Событие было успешно удалено",
+      status: 'success',
+      data: 'Событие было успешно удалено',
     });
   } catch (e) {
-    res.status(404).json({
-      status: "Err",
-      data: "Не удалось удалить событие",
+    res.status(500).json({
+      status: 'Err',
+      data: `Не удалось удалить событие: ${e.message}`,
       err: e,
     });
   }
 };
+
+// const setDefaultEventAccessSettings = (event) => {
+//   return {
+//     ...event,
+//     registration_status: false,
+//     allow_registration_by_trainer: true,
+//     allow_registration_by_organization: true,
+//     allowed_secretaries: [],
+//     athletes_groups: [],
+//   };
+// };

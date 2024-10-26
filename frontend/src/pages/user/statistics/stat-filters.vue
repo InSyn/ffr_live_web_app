@@ -1,50 +1,17 @@
 <template>
-  <form
-    v-if="selectedFilter"
-    @submit.prevent="getFilteredStats"
-    class="statisticsFilter__wrapper"
-  >
+  <form v-if="selectedFilter" @submit.prevent="getFilteredStats" class="statisticsFilter__wrapper">
     <div class="filters__section__header">Фильтры</div>
     <div class="filters__section__body">
-      <div
-        v-for="(_, key) in filters[selectedFilter]"
-        :key="key"
-        class="filterControl__wrapper"
-      >
-        <sport-input
-          v-if="key === 'sport'"
-          v-model="filters[selectedFilter][key]"
-        ></sport-input>
-        <discipline-input
-          v-else-if="key === 'discipline'"
-          v-model="filters[selectedFilter][key]"
-        ></discipline-input>
-        <gender-input
-          v-else-if="key === 'gender'"
-          v-model="filters[selectedFilter][key]"
-        ></gender-input>
-        <athlete-category-input
-          v-else-if="key === 'category'"
-          v-model="filters[selectedFilter][key]"
-        ></athlete-category-input>
-        <jury-category-input
-          v-else-if="key === 'jury_category'"
-          v-model="filters[selectedFilter][key]"
-        ></jury-category-input>
+      <div v-for="(_, key) in filters[selectedFilter]" :key="key" class="filterControl__wrapper">
+        <sport-input v-if="key === 'sport'" v-model="filters[selectedFilter][key]"></sport-input>
+        <discipline-input v-else-if="key === 'discipline'" v-model="filters[selectedFilter][key]"></discipline-input>
+        <gender-input v-else-if="key === 'gender'" v-model="filters[selectedFilter][key]"></gender-input>
+        <athlete-category-input v-else-if="key === 'category'" v-model="filters[selectedFilter][key]"></athlete-category-input>
+        <jury-category-input v-else-if="key === 'jury_category'" v-model="filters[selectedFilter][key]"></jury-category-input>
 
-        <date-input
-          v-else-if="key === 'date'"
-          v-model="filters[selectedFilter][key]"
-        ></date-input>
+        <date-input v-else-if="key === 'date'" v-model="filters[selectedFilter][key]"></date-input>
 
-        <input
-          v-else
-          class="searchControl__input"
-          v-model="filters[selectedFilter][key]"
-          :id="key"
-          :name="key"
-          :placeholder="translateField(key)"
-        />
+        <input v-else class="searchControl__input" v-model="filters[selectedFilter][key]" :id="key" :name="key" :placeholder="translateField(key)" />
       </div>
     </div>
     <div class="filters__section__actions">
@@ -58,26 +25,26 @@
         </v-btn>
       </div>
 
-      <v-btn type="submit" color="var(--accent)" text> Применить фильтр </v-btn>
+      <v-btn type="submit" color="var(--accent)" text> Применить фильтр</v-btn>
     </div>
   </form>
 </template>
 
 <script>
-import SportInput from "@/components/ui-components/search/search-inputs/sport-input.vue";
-import GenderInput from "@/components/ui-components/search/search-inputs/gender-input.vue";
-import DisciplineInput from "@/components/ui-components/search/search-inputs/discipline-input.vue";
-import AthleteCategoryInput from "@/components/ui-components/search/search-inputs/athlete-category-input.vue";
-import JuryCategoryInput from "@/components/ui-components/search/search-inputs/jury-category-input.vue";
-import DateInput from "@/components/ui-components/search/search-inputs/date-input.vue";
-import { translateField } from "@/utils/formFields-translator";
-import axios from "axios";
-import { databaseUrl } from "@/store/constants";
-import { mdiDownload } from "@mdi/js";
-import { saveExcelData } from "@/utils/excel-data-saver";
+import SportInput from '@/components/ui-components/search/search-inputs/sport-input.vue';
+import GenderInput from '@/components/ui-components/search/search-inputs/gender-input.vue';
+import DisciplineInput from '@/components/ui-components/search/search-inputs/discipline-input.vue';
+import AthleteCategoryInput from '@/components/ui-components/search/search-inputs/athlete-category-input.vue';
+import JuryCategoryInput from '@/components/ui-components/search/search-inputs/jury-category-input.vue';
+import DateInput from '@/components/ui-components/search/search-inputs/date-input.vue';
+import { translateField } from '@/utils/formFields-translator';
+import axios from 'axios';
+import { databaseUrl } from '@/store/constants';
+import { mdiDownload } from '@mdi/js';
+import { saveExcelData } from '@/utils/excel-data-saver';
 
 export default {
-  name: "stat-filters",
+  name: 'stat-filters',
   props: {
     selectedFilter: String,
   },
@@ -94,54 +61,54 @@ export default {
       filterResults: null,
       filters: {
         events: {
-          title: "",
-          sport: "",
-          discipline: "",
-          season: "",
-          date: "",
-          location: "",
-          calendar_code: "",
+          title: '',
+          sport: '',
+          discipline: '',
+          season: '',
+          date: '',
+          location: '',
+          calendar_code: '',
         },
         athletes: {
-          rus_code: "",
-          sport: "",
-          discipline: "",
-          name: "",
-          gender: "",
-          year: "",
-          category: "",
-          region: "",
+          rus_code: '',
+          sport: '',
+          discipline: '',
+          name: '',
+          gender: '',
+          year: '',
+          category: '',
+          region: '',
         },
         jury: {
-          jury_code: "",
-          name: "",
-          sport: "",
-          discipline: "",
-          gender: "",
-          age: "",
-          jury_category: "",
-          region: "",
+          jury_code: '',
+          name: '',
+          sport: '',
+          discipline: '',
+          gender: '',
+          age: '',
+          jury_category: '',
+          region: '',
         },
         trainers: {
-          trainer_id: "",
-          fullname: "",
-          sport: "",
-          discipline: "",
-          gender: "",
-          region: "",
+          trainer_id: '',
+          fullname: '',
+          sport: '',
+          discipline: '',
+          gender: '',
+          region: '',
         },
         organizations: {
-          sport: "",
-          title: "",
-          region: "",
+          sport: '',
+          title: '',
+          region: '',
         },
         seminars: {
-          sport: "",
-          discipline: "",
-          season: "",
-          region: "",
-          location: "",
-          date: "",
+          sport: '',
+          discipline: '',
+          season: '',
+          region: '',
+          location: '',
+          date: '',
         },
       },
       loading: false,
@@ -157,29 +124,20 @@ export default {
     async getFilteredStats() {
       try {
         const searchParams = new URLSearchParams();
-        for (const [key, value] of Object.entries(
-          this.filters[this.selectedFilter]
-        )) {
+        for (const [key, value] of Object.entries(this.filters[this.selectedFilter])) {
           if (value) {
             searchParams.append(key, value);
           }
         }
         const queryString = searchParams.toString();
 
-        const response = await axios.get(
-          `${databaseUrl}/${this.selectedFilter}/find${
-            queryString ? "?" + queryString : ""
-          }`
-        );
+        const response = await axios.get(`${databaseUrl}/${this.selectedFilter}/find${queryString ? '?' + queryString : ''}`);
         if (response.status === 200) {
           this.filterResults = response.data[this.selectedFilter];
         }
       } catch (e) {
         if (e) {
-          console.error(
-            "Error fetching events:",
-            e.response?.data?.message || e.message
-          );
+          console.error('Error fetching events:', e.response?.data?.message || e.message);
         }
       }
     },
@@ -210,6 +168,7 @@ export default {
     padding: 0 0.5rem 0.25rem;
     font-weight: bold;
   }
+
   .filters__section__body {
     flex: 0 0 auto;
     display: grid;
@@ -234,6 +193,7 @@ export default {
       }
     }
   }
+
   .filters__section__actions {
     margin-top: 1.75rem;
     display: flex;
@@ -251,11 +211,13 @@ export default {
       button {
         margin-left: 1rem;
         color: var(--text-muted);
+
         &:hover {
           color: var(--accent);
         }
       }
     }
+
     button {
       margin-left: auto;
     }

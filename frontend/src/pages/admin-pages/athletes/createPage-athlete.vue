@@ -1,53 +1,46 @@
 <template>
   <div class="createAthletePage__wrapper">
-    <athlete-form
-      @create-athlete="createAthlete"
-      :athlete="athlete"
-      action="create"
-    ></athlete-form>
-    <message-container
-      :messages="messages"
-      :errors="errors"
-    ></message-container>
+    <athlete-form @create-athlete="createAthlete" :athlete="athlete" action="create"></athlete-form>
+    <message-container :messages="messages" :errors="errors"></message-container>
   </div>
 </template>
 
 <script>
-import axios from "axios";
-import { databaseUrl } from "@/store/constants";
-import { mapGetters } from "vuex";
-import MessageContainer from "@/components/ui-components/message-container.vue";
-import AthleteForm from "@/pages/admin-pages/athletes/form-athlete.vue";
+import axios from 'axios';
+import { databaseUrl } from '@/store/constants';
+import { mapActions, mapGetters } from 'vuex';
+import MessageContainer from '@/components/ui-components/message-container.vue';
+import AthleteForm from '@/pages/admin-pages/athletes/form-athlete.vue';
 
 export default {
-  name: "createAthletePage",
+  name: 'createAthletePage',
   components: { AthleteForm, MessageContainer },
   data() {
     return {
       athlete: {
-        rus_code: "",
-        gender: "",
-        lastname: "",
-        name: "",
-        birth_date: "",
-        category: "",
-        country: "",
-        country_code: "",
+        rus_code: '',
+        gender: '',
+        lastname: '',
+        name: '',
+        birth_date: '',
+        category: '',
+        country: '',
+        country_code: '',
         regions: [],
-        region_code: "",
-        sport: "",
+        region_code: '',
+        sport: '',
         disciplines: [],
         organizations: [],
-        trainer: "",
-        education: "",
+        trainer: '',
+        education: '',
         sponsors: [],
         socials: {
-          vk: "",
-          telegram: "",
+          vk: '',
+          telegram: '',
         },
         equipment: [],
         hobbies: [],
-        athleteAbout: "",
+        athleteAbout: '',
         medals: [],
         is_national_team: false,
       },
@@ -57,19 +50,19 @@ export default {
     };
   },
   computed: {
-    ...mapGetters("authorization", {
-      userData: "getUserData",
+    ...mapGetters('authorization', {
+      userData: 'getUserData',
     }),
   },
   methods: {
+    ...mapActions('athletes', {
+      fetchAthletes: 'LOAD_ATHLETES',
+    }),
     async createAthlete(selectedFile) {
       const formData = new FormData();
 
       Object.keys(this.athlete).forEach((key) => {
-        if (
-          Array.isArray(this.athlete[key]) ||
-          typeof this.athlete[key] === "object"
-        ) {
+        if (Array.isArray(this.athlete[key]) || typeof this.athlete[key] === 'object') {
           formData.append(key, JSON.stringify(this.athlete[key]));
         } else {
           formData.append(key, this.athlete[key]);
@@ -81,32 +74,29 @@ export default {
       }
 
       try {
-        const response = await axios.post(
-          `${databaseUrl}/athletes/`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-              authorization: `Bearer ${this.userData.token}`,
-            },
-          }
-        );
+        const response = await axios.post(`${databaseUrl}/athletes/`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            authorization: `Bearer ${this.userData.token}`,
+          },
+        });
 
         if (response.status === 200) {
-          this.messages.push("Спортсмен успешно добавлен в базу данных");
+          this.messages.push('Спортсмен успешно добавлен в базу данных');
+          await this.fetchAthletes();
 
           setTimeout(() => {
-            if (this.$route.name === "createAthletePage") {
+            if (this.$route.name === 'createAthletePage') {
               this.$router.push({
-                name: "athletePage",
-                params: { athlete_code: this.athlete.rus_code },
+                name: 'athletePage',
+                params: { athlete_code: response.data.athlete.rus_code },
               });
             }
           }, 2000);
         }
       } catch (err) {
         if (err) {
-          this.errors.push(`Error: ${err.response?.data?.data || err.message}`);
+          this.errors.push(`Error: ${err.response?.data?.message || err.message}`);
         }
       }
     },

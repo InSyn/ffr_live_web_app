@@ -1,31 +1,24 @@
 <template>
   <div class="createJuryPage__wrapper">
-    <jury-form
-      @create-jury="createJury"
-      :jury="jury"
-      action="create"
-    ></jury-form>
-    <message-container
-      :messages="messages"
-      :errors="errors"
-    ></message-container>
+    <jury-form @create-jury="createJury" :jury="jury" action="create"></jury-form>
+    <message-container :messages="messages" :errors="errors"></message-container>
   </div>
 </template>
 
 <script>
-import MessageContainer from "@/components/ui-components/message-container.vue";
-import { translateField } from "@/utils/formFields-translator";
-import axios from "axios";
-import { databaseUrl } from "@/store/constants";
-import { capitalizeString } from "@/utils/capitalizeString";
-import { getDisciplines } from "@/store/data/sports";
-import { getInputType } from "@/utils/get-input-type";
-import { mapGetters } from "vuex";
-import { getJuryCategoriesList } from "@/store/data/sport-data-sets";
-import JuryForm from "@/pages/admin-pages/jury/form-jury.vue";
+import MessageContainer from '@/components/ui-components/message-container.vue';
+import { translateField } from '@/utils/formFields-translator';
+import axios from 'axios';
+import { databaseUrl } from '@/store/constants';
+import { capitalizeString } from '@/utils/capitalizeString';
+import { getDisciplines } from '@/store/data/sports';
+import { getInputType } from '@/utils/get-input-type';
+import { mapGetters } from 'vuex';
+import { getJuryCategoriesList } from '@/store/data/sport-data-sets';
+import JuryForm from '@/pages/admin-pages/jury/form-jury.vue';
 
 export default {
-  name: "createJuryPage",
+  name: 'createJuryPage',
   components: {
     JuryForm,
     MessageContainer,
@@ -33,19 +26,19 @@ export default {
   data() {
     return {
       jury: {
-        jury_code: "",
-        lastname: "",
-        name: "",
-        sport: "",
+        jury_code: '',
+        lastname: '',
+        name: '',
+        sport: '',
         disciplines: [],
-        jury_category: "",
-        gender: "",
-        birth_date: "",
-        country: "",
-        region: "",
+        jury_category: '',
+        gender: '',
+        birth_date: '',
+        country: '',
+        region: '',
         socials: {
-          vk: "",
-          telegram: "",
+          vk: '',
+          telegram: '',
         },
       },
 
@@ -54,8 +47,8 @@ export default {
     };
   },
   computed: {
-    ...mapGetters("authorization", {
-      userData: "getUserData",
+    ...mapGetters('authorization', {
+      userData: 'getUserData',
     }),
   },
   methods: {
@@ -69,10 +62,7 @@ export default {
       const formData = new FormData();
 
       Object.keys(this.jury).forEach((key) => {
-        if (
-          Array.isArray(this.jury[key]) ||
-          typeof this.jury[key] === "object"
-        ) {
+        if (Array.isArray(this.jury[key]) || typeof this.jury[key] === 'object') {
           formData.append(key, JSON.stringify(this.jury[key]));
         } else {
           formData.append(key, this.jury[key]);
@@ -84,19 +74,19 @@ export default {
       }
 
       try {
-        const response = await axios.post(databaseUrl + "/jury/", formData, {
+        const response = await axios.post(databaseUrl + '/jury/', formData, {
           headers: {
-            "Content-Type": "multipart/form-data",
+            'Content-Type': 'multipart/form-data',
             authorization: `Bearer ${this.userData.token}`,
           },
         });
 
         if (response.status === 200) {
-          this.messages.push("Судья успешно добавлен в базу данных");
+          this.messages.push('Судья успешно добавлен в базу данных');
 
           setTimeout(() => {
             this.$router.push({
-              name: "juryPage",
+              name: 'juryPage',
               params: { jury_code: this.jury.jury_code },
             });
           }, 2000);
@@ -104,9 +94,7 @@ export default {
       } catch (err) {
         if (err) {
           console.log(err);
-          this.errors.push(
-            "Судья не был добавлен: " + err.response?.data?.data
-          );
+          this.errors.push('Судья не был добавлен: ' + err.response?.data?.data);
         }
       }
     },

@@ -7,69 +7,24 @@
         <div class="organizationInfo__wrapper">
           <div class="organizationInfo__header">
             <div class="organizationImage__wrapper">
-              <img
-                v-if="organization['logo_url']"
-                class="organizationImage"
-                :src="uploadsFolderUrl + `${organization['logo_url']}`"
-                alt="Event Logo"
-              />
-              <competition-image-filler-icon
-                v-else
-                class="imageFiller__icon"
-              ></competition-image-filler-icon>
+              <img v-if="organization['logo_url']" class="organizationImage" :src="uploadsFolderUrl + `${organization['logo_url']}`" alt="Event Logo" />
+              <competition-image-filler-icon v-else class="imageFiller__icon"></competition-image-filler-icon>
 
-              <edit-button
-                class="editOrganization__button"
-                type="organization"
-                :code="org_id"
-              ></edit-button>
+              <edit-button class="editOrganization__button" type="organization" :code="org_id"></edit-button>
             </div>
 
             <div class="organizationMainInfo__wrapper">
               <div class="organizationMainInfo__top">
-                <div
-                  class="organizationFederation__wrapper"
-                  v-if="
-                    organization['sport'] &&
-                    organization['sport'].toLowerCase() === 'фристайл'
-                  "
-                >
-                  <img
-                    class="athleteFederation__logo"
-                    src="../../../assets/logo/FFR_logo_mini.png"
-                    alt="FFR_logo"
-                  />
-                  <span>Федерация фристайла России</span>
-                </div>
-                <div
-                  class="organizationFederation__wrapper"
-                  v-if="
-                    organization['sport'] &&
-                    organization['sport'].toLowerCase() === 'сноуборд'
-                  "
-                >
-                  <img
-                    class="athleteFederation__logo"
-                    src="../../../assets/logo/FSR_logo_mini.png"
-                    alt="FSR_logo"
-                  />
-                  <span>Федерация сноуборда России</span>
-                </div>
-                <div class="organizationSport">
-                  {{ organization.sport }}
-                  <country-flag
-                    class="countryFlag"
-                    :country-code="getCountryCode(organization.country)"
-                    height="1.25rem"
-                  ></country-flag>
-                </div>
-              </div>
-
-              <div class="organizationTitle__wrapper">
                 <div class="organizationName">
                   {{ organization.title }}
                 </div>
+                <div class="organizationSport">
+                  {{ organization.sport }}
+                  <country-flag class="countryFlag" :country-code="getCountryCode(organization.country)" height="1.25rem"></country-flag>
+                </div>
               </div>
+
+              <div class="organizationTitle__wrapper"></div>
 
               <div class="organizationInfo__secondLine">
                 <div class="organizationRegionInfo__wrapper">
@@ -83,11 +38,7 @@
                   {{ organization.region }}
                 </div>
                 <div class="organizationContacts__wrapper">
-                  <div
-                    v-for="(contact, idx) in organization.contacts"
-                    :key="idx"
-                    class="organizationContacts__item"
-                  >
+                  <div v-for="(contact, idx) in organization.contacts" :key="idx" class="organizationContacts__item">
                     {{ contact }}
                   </div>
                 </div>
@@ -98,31 +49,17 @@
           <div class="organizationAdditionalInfo__wrapper">
             <div class="socials">
               <span>Социальные сети:</span>
-              <a
-                class="socials__link"
-                v-if="organization.socials.vk"
-                :href="organization.socials.vk"
-                target="_blank"
-              >
+              <a class="socials__link" v-if="organization.socials.vk" :href="organization.socials.vk" target="_blank">
                 <socials-vk-icon class="socials__link__icon"></socials-vk-icon>
               </a>
-              <a
-                class="socials__link"
-                v-if="organization.socials.telegram"
-                :href="organization.socials.telegram"
-                target="_blank"
-              >
-                <socials-telegram-icon
-                  class="socials__link__icon"
-                ></socials-telegram-icon>
+              <a class="socials__link" v-if="organization.socials.telegram" :href="organization.socials.telegram" target="_blank">
+                <socials-telegram-icon class="socials__link__icon"></socials-telegram-icon>
               </a>
             </div>
           </div>
           <div class="organization__menu">
-            <button class="organization__menu__item" type="button">
-              Команда
-            </button>
-            <button class="organization__menu__item" type="button" disabled>
+            <button class="organization__menu__item" type="button" @click.prevent="bottomPage = 'team'">Команда</button>
+            <button class="organization__menu__item" type="button" :disabled="!getRegistrationAccess" @click.prevent="bottomPage = 'eventsWithRegistration'">
               Заявки
             </button>
           </div>
@@ -131,46 +68,40 @@
     </div>
 
     <div class="organizationCard__bottom">
-      <div class="organizationTeam__wrapper">
+      <div v-if="bottomPage === 'team'" class="organizationTeam__wrapper">
         <div class="organizationTeam__header">Команда</div>
-
         <div class="organizationTeam__list">
-          <athlete-list-item
-            v-for="(athlete, idx) in team"
-            :key="idx"
-            :athlete="athlete"
-            :idx="idx"
-          ></athlete-list-item>
+          <athlete-list-item v-for="(athlete, idx) in team" :key="idx" :athlete="athlete" :idx="idx"></athlete-list-item>
         </div>
       </div>
+      <events-with-registration-list v-if="bottomPage === 'eventsWithRegistration'"></events-with-registration-list>
     </div>
   </div>
 </template>
 
 <script>
-import SocialsVkIcon from "@/components/icons/socials-vk-icon.vue";
-import CountryFlag from "@/components/ui-components/country-flag.vue";
-import SocialsTelegramIcon from "@/components/icons/socials-telegram-icon.vue";
-import EditButton from "@/components/ui-components/edit-button.vue";
-import { mdiImage } from "@mdi/js";
-import {
-  formatBirthDate,
-  getAgeFromBirthdate,
-  getAthleteName,
-} from "@/utils/data-formaters";
-import { getCountryCode } from "@/store/data/countries";
-import { getDisciplineCode } from "@/store/data/sports";
-import { getRegionCode } from "@/store/data/russia-regions";
-import axios from "axios";
-import { databaseUrl, uploadsFolderUrl } from "@/store/constants";
-import CompetitionImageFillerIcon from "@/assets/svg/competitionImageFiller-icon.vue";
-import AthleteListItem from "@/pages/athletes/athlete-listItem.vue";
-import BgMountains from "@/assets/riv/bg-mountains.vue";
+import SocialsVkIcon from '@/components/icons/socials-vk-icon.vue';
+import CountryFlag from '@/components/ui-components/country-flag.vue';
+import SocialsTelegramIcon from '@/components/icons/socials-telegram-icon.vue';
+import EditButton from '@/components/ui-components/edit-button.vue';
+import { mdiImage } from '@mdi/js';
+import { formatBirthDate, getAgeFromBirthdate, getAthleteName } from '@/utils/data-formaters';
+import { getCountryCode } from '@/store/data/countries';
+import { getDisciplineCode } from '@/store/data/sports';
+import { getRegionCode } from '@/store/data/russia-regions';
+import axios from 'axios';
+import { databaseUrl, uploadsFolderUrl } from '@/store/constants';
+import CompetitionImageFillerIcon from '@/assets/svg/competitionImageFiller-icon.vue';
+import AthleteListItem from '@/pages/athletes/athlete-listItem.vue';
+import BgMountains from '@/assets/riv/bg-mountains.vue';
+import EventsWithRegistrationList from '@/pages/organizations/organization-page/events-with-registration-list.vue';
+import { mapGetters } from 'vuex';
 
 export default {
-  name: "index",
-  props: ["org_id"],
+  name: 'index',
+  props: ['org_id'],
   components: {
+    EventsWithRegistrationList,
     BgMountains,
     AthleteListItem,
     CompetitionImageFillerIcon,
@@ -184,6 +115,8 @@ export default {
       organization: null,
       team: [],
 
+      bottomPage: 'team',
+
       loadingState: false,
       updateTimeoutId: null,
 
@@ -191,8 +124,15 @@ export default {
     };
   },
   computed: {
+    ...mapGetters('authorization', {
+      userData: 'getUserData',
+    }),
     uploadsFolderUrl() {
       return uploadsFolderUrl;
+    },
+
+    getRegistrationAccess() {
+      return this.organization.region === this.userData.region;
     },
   },
   methods: {
@@ -207,7 +147,7 @@ export default {
         const response = await axios.get(`${databaseUrl}/organizations/${id}`);
 
         if (response.status === 200) {
-          const organizationData = response.data["organization"];
+          const organizationData = response.data['organization'];
           if (organizationData) this.organization = { ...organizationData };
         }
 
@@ -223,12 +163,10 @@ export default {
     },
     async getOrganizationTeam(id) {
       try {
-        const response = await axios.get(
-          `${databaseUrl}/organizations/${id}/athletes`
-        );
+        const response = await axios.get(`${databaseUrl}/organizations/${id}/athletes`);
 
         if (response.status === 200) {
-          const organizationTeam = response.data["athletes"];
+          const organizationTeam = response.data['athletes'];
           if (organizationTeam.length) this.team = [...organizationTeam];
         }
       } catch (err) {
@@ -271,6 +209,7 @@ export default {
     @media screen and (max-width: 640px) {
       flex-basis: auto;
     }
+
     .mountains_bg {
       position: absolute;
       z-index: 1;
@@ -278,6 +217,7 @@ export default {
       width: 100%;
       height: 100%;
     }
+
     .organizationCard__top__content {
       position: relative;
       z-index: 2;
@@ -297,13 +237,12 @@ export default {
         background-color: rgba(2, 2, 6, 0.6);
         backdrop-filter: blur(5px);
         border: 1px solid rgb(255, 255, 255);
-        box-shadow: 0 0 6px -2px rgb(255, 255, 255) inset,
-          0 16px 32px 0 rgba(12, 14, 46, 0.48),
-          -4px -8px 24px 0 rgba(255, 255, 255, 0.14) inset;
+        box-shadow: 0 0 6px -2px rgb(255, 255, 255) inset, 0 16px 32px 0 rgba(12, 14, 46, 0.48), -4px -8px 24px 0 rgba(255, 255, 255, 0.14) inset;
         border-radius: 12px;
 
-        content: "";
+        content: '';
       }
+
       .organizationInfo__wrapper {
         position: relative;
         flex: 1 1 0;
@@ -335,10 +274,12 @@ export default {
               max-width: 100%;
               max-height: 100%;
             }
+
             .imageFiller__icon {
               width: 192px;
               color: var(--text-default);
             }
+
             .editOrganization__button {
               position: absolute;
               bottom: 0;
@@ -362,6 +303,7 @@ export default {
               height: 86px;
             }
           }
+
           .organizationMainInfo__wrapper {
             flex: 1 1 0;
             display: flex;
@@ -372,40 +314,24 @@ export default {
               display: flex;
               align-items: flex-start;
 
-              .organizationFederation__wrapper {
-                display: flex;
-                align-items: center;
-                font-size: 1.1rem;
-
-                .athleteFederation__logo {
-                  height: 2rem;
-                  margin-right: 1rem;
-                }
+              .organizationName {
+                font-size: 1.25rem;
+                font-weight: bold;
+                text-wrap: balance;
               }
               .organizationSport {
                 flex: 0 0 auto;
                 display: flex;
                 align-items: center;
                 margin-left: auto;
-                font-size: 1.2rem;
+                font-size: 1.25rem;
 
                 .countryFlag {
                   margin-left: 0.5rem;
                 }
               }
             }
-            .organizationTitle__wrapper {
-              flex: 0 0 auto;
-              display: flex;
-              align-items: center;
-              margin-left: 0.5rem;
 
-              .organizationName {
-                font-size: 1.5rem;
-                font-weight: bold;
-                text-wrap: balance;
-              }
-            }
             .organizationInfo__secondLine {
               display: flex;
               flex-wrap: wrap;
@@ -417,13 +343,13 @@ export default {
               .organizationRegionInfo__wrapper {
                 display: flex;
                 align-items: center;
-                font-size: 1.25rem;
-                font-weight: 300;
+                font-size: 1.4rem;
 
                 .regionFlag {
                   margin-right: 0.5rem;
                 }
               }
+
               .organizationContacts__wrapper {
                 display: flex;
                 flex-direction: column;
@@ -454,6 +380,7 @@ export default {
             .socials__link {
               display: flex;
               align-items: center;
+
               .socials__link__icon {
                 height: 2rem;
                 color: var(--text-contrast);
@@ -461,6 +388,7 @@ export default {
             }
           }
         }
+
         .organization__menu {
           display: flex;
           gap: 2rem;
@@ -478,6 +406,7 @@ export default {
               opacity: 1;
             }
           }
+
           button[disabled] {
             font-weight: 300;
             color: var(--text-muted);
@@ -523,6 +452,7 @@ export default {
         font-size: 1.1rem;
         font-weight: bold;
       }
+
       .organizationTeam__list {
         flex: 1 1 200px;
         display: flex;

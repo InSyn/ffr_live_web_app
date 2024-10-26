@@ -9,14 +9,9 @@
       <div class="date__input__wrapper">
         <label for="calendar-date" @click="openDatePicker">
           {{ formattedDate }}
-          <v-icon class="calendar__arrow"> {{ icons.arrowIcon }} </v-icon>
+          <v-icon class="calendar__arrow"> {{ icons.arrowIcon }}</v-icon>
         </label>
-        <input
-          id="calendar-date"
-          ref="dateInput"
-          v-model="calendarDate"
-          type="date"
-        />
+        <input id="calendar-date" ref="dateInput" v-model="calendarDate" type="date" />
       </div>
       <div class="calendar__control">
         <v-btn color="var(--text-default)" text small @click="nextMonth">
@@ -26,12 +21,7 @@
     </div>
     <div class="calendar__days__wrapper">
       <button
-        :class="[
-          'calendar__day__item',
-          selectedDay === day && 'selected',
-          isCurrentDay(day) && 'isCurrentDay',
-          hasEvents(day) && 'hasEvents',
-        ]"
+        :class="['calendar__day__item', selectedDay === day && 'selected', isCurrentDay(day) && 'isCurrentDay', hasEvents(day) && 'hasEvents']"
         @click="selectDay(day)"
         type="button"
         v-for="day in days"
@@ -44,20 +34,20 @@
 </template>
 
 <script>
-import { getDaysOfMonth } from "@/utils/calendar-helpers";
-import { mdiChevronLeft, mdiChevronRight } from "@mdi/js";
-import { capitalizeString } from "@/utils/capitalizeString";
-import { mdiChevronDown } from "@mdi/js";
+import { getDaysOfMonth } from '@/utils/calendar-helpers';
+import { mdiChevronLeft, mdiChevronRight } from '@mdi/js';
+import { capitalizeString } from '@/utils/capitalizeString';
+import { mdiChevronDown } from '@mdi/js';
 
 export default {
-  name: "calendar-carousel",
-  props: ["calendarDateProp", "events"],
+  name: 'calendar-carousel',
+  props: ['calendarDateProp', 'events'],
   methods: {
     getDaysOfMonth,
     selectDay(day) {
       const date = new Date(this.calendarDate);
       date.setDate(day);
-      this.$emit("set-calendar-date", date.toISOString().substring(0, 10));
+      this.$emit('set-calendar-date', date.toISOString().substring(0, 10));
     },
     openDatePicker() {
       const input = this.$refs.dateInput;
@@ -66,19 +56,17 @@ export default {
     previousMonth() {
       const date = new Date(this.calendarDate);
       date.setMonth(date.getMonth() - 1);
-      this.$emit("set-calendar-date", date.toISOString().substring(0, 10));
+      this.$emit('set-calendar-date', date.toISOString().substring(0, 10));
     },
     nextMonth() {
       const date = new Date(this.calendarDate);
       date.setMonth(date.getMonth() + 1);
-      this.$emit("set-calendar-date", date.toISOString().substring(0, 10));
+      this.$emit('set-calendar-date', date.toISOString().substring(0, 10));
     },
     isCurrentDay(day) {
       const currentDay = new Date().getDate();
-      const currentMonth =
-        new Date().getMonth() === new Date(this.calendarDate).getMonth();
-      const currentYear =
-        new Date().getFullYear() === new Date(this.calendarDate).getFullYear();
+      const currentMonth = new Date().getMonth() === new Date(this.calendarDate).getMonth();
+      const currentYear = new Date().getFullYear() === new Date(this.calendarDate).getFullYear();
 
       return day === currentDay && currentMonth && currentYear;
     },
@@ -86,9 +74,7 @@ export default {
       if (!this.events) return;
 
       return this.events.some((evt) => {
-        const evtDate = new Date(
-          evt.start_at === undefined ? evt.date : evt.start_at
-        );
+        const evtDate = new Date(evt.start_at === undefined ? evt.date : evt.start_at);
         if (!evtDate) return false;
 
         const evtDay = evtDate.getDate();
@@ -96,11 +82,7 @@ export default {
 
         const evtYear = evtDate.getFullYear(),
           evtMonth = evtDate.getMonth();
-        if (
-          evtYear === new Date(this.calendarDate).getFullYear() &&
-          evtMonth === new Date(this.calendarDate).getMonth()
-        )
-          return true;
+        if (evtYear === new Date(this.calendarDate).getFullYear() && evtMonth === new Date(this.calendarDate).getMonth()) return true;
       });
     },
   },
@@ -122,7 +104,7 @@ export default {
     },
     formattedDate() {
       const date = new Date(this.calendarDate);
-      const month = date.toLocaleString("default", { month: "long" });
+      const month = date.toLocaleString('default', { month: 'long' });
 
       return `${capitalizeString(month.toString())} ${date.getFullYear()}`;
     },
@@ -131,12 +113,12 @@ export default {
         return this.calendarDateProp;
       },
       set(val) {
-        this.$emit("set-calendar-date", val);
+        this.$emit('set-calendar-date', val);
       },
     },
     selectedDay() {
       const date = new Date(this.calendarDate);
-      if (!date) return "";
+      if (!date) return '';
 
       return date.getDate();
     },
@@ -166,6 +148,7 @@ export default {
         border-radius: 0;
       }
     }
+
     .date__input__wrapper {
       flex: 1 1 0;
       display: flex;
@@ -184,6 +167,7 @@ export default {
           color: var(--text-default);
         }
       }
+
       input {
         position: absolute;
         opacity: 0;
@@ -191,6 +175,7 @@ export default {
       }
     }
   }
+
   .calendar__days__wrapper {
     flex: 0 0 auto;
     display: flex;
@@ -213,14 +198,17 @@ export default {
         font-weight: bold;
         color: var(--text-default);
       }
+
       &.selected {
         flex-basis: 1.75rem;
         box-shadow: 0 0 0 2px var(--text-default);
         font-weight: bold;
       }
+
       &.isCurrentDay {
         color: var(--accent);
       }
+
       span {
         display: block;
         margin: auto;

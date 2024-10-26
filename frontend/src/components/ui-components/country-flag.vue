@@ -12,21 +12,14 @@
 
 <script>
 export default {
-  name: "country-flag",
-  props: [
-    "countryCode",
-    "regionCode",
-    "isRegionFlag",
-    "width",
-    "height",
-    "rounding",
-  ],
+  name: 'country-flag',
+  props: ['countryCode', 'regionCode', 'isRegionFlag', 'width', 'height', 'rounding'],
   methods: {
     adjustWidth() {
       if (!this.$el.style) return;
-      this.$el.style.setProperty("--flag-width", this.width);
-      this.$el.style.setProperty("--flag-height", this.height || "auto");
-      this.$el.style.setProperty("--flag-bRadius", this.rounding || "0");
+      this.$el.style.setProperty('--flag-width', this.width);
+      this.$el.style.setProperty('--flag-height', this.height || 'auto');
+      this.$el.style.setProperty('--flag-bRadius', this.rounding || '0');
     },
     getImage(countryCode, regionCode) {
       let imagePath;
@@ -65,6 +58,7 @@ export default {
   align-items: center;
   justify-content: center;
 }
+
 .countryFlag__image {
   display: block;
   height: var(--flag-height);

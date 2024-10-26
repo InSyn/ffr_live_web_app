@@ -1,11 +1,11 @@
-import { Event } from "../models/event-model.js";
-import { Jury } from "../models/jury-model.js";
-import { dirname, join } from "path";
-import { fileURLToPath } from "url";
-import { removeOldFile } from "../file-storage/fileStorage.js";
-import { formatLastname } from "../utils/formatters.js";
-import { Seminar } from "../models/seminar-model.js";
-import { Trainer } from "../models/trainer-model.js";
+import { Event } from '../models/event-model.js';
+import { Jury } from '../models/jury-model.js';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
+import { removeOldFile } from '../file-storage/fileStorage.js';
+import { formatLastname } from '../utils/formatters.js';
+import { Seminar } from '../models/seminar-model.js';
+import { Trainer } from '../models/trainer-model.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -17,13 +17,13 @@ export const getAllJury = async (req, res) => {
       name: 1,
     });
     res.status(200).json({
-      status: "success",
+      status: 'success',
       jury,
     });
   } catch (e) {
     res.status(404).json({
-      status: "Err",
-      data: "Jury not found ",
+      status: 'Err',
+      data: 'Jury not found ',
       err: e,
     });
   }
@@ -34,13 +34,13 @@ export const getJury = async (req, res) => {
     const jury = await Jury.findOne({ jury_code: req.params.code });
 
     res.status(200).json({
-      status: "success",
+      status: 'success',
       jury: jury,
     });
   } catch (e) {
     res.status(404).json({
-      status: "Err",
-      data: "Jury not found",
+      status: 'Err',
+      data: 'Jury not found',
       err: e,
     });
   }
@@ -53,9 +53,9 @@ export const searchJury = async (req, res) => {
       query.jury_code = req.query.jury_code;
     }
     if (req.query.name) {
-      const [lastname, name] = req.query.name.split(" ");
-      if (lastname) query.lastname = new RegExp(lastname, "i");
-      if (name) query.name = new RegExp(name, "i");
+      const [lastname, name] = req.query.name.split(' ');
+      if (lastname) query.lastname = new RegExp(lastname, 'i');
+      if (name) query.name = new RegExp(name, 'i');
     }
     if (req.query.sport) {
       query.sport = req.query.sport;
@@ -69,16 +69,8 @@ export const searchJury = async (req, res) => {
     if (req.query.age) {
       const age = parseInt(req.query.age);
       const currentDate = new Date();
-      const minBirthDate = new Date(
-        currentDate.getFullYear() - (age + 1),
-        currentDate.getMonth(),
-        currentDate.getDate()
-      );
-      const maxBirthDate = new Date(
-        currentDate.getFullYear() - age,
-        currentDate.getMonth(),
-        currentDate.getDate()
-      );
+      const minBirthDate = new Date(currentDate.getFullYear() - (age + 1), currentDate.getMonth(), currentDate.getDate());
+      const maxBirthDate = new Date(currentDate.getFullYear() - age, currentDate.getMonth(), currentDate.getDate());
 
       query.birth_date = { $gte: minBirthDate, $lt: maxBirthDate };
     }
@@ -86,19 +78,19 @@ export const searchJury = async (req, res) => {
       query.jury_category = req.query.jury_category;
     }
     if (req.query.region) {
-      query.region = new RegExp(req.query.region, "i");
+      query.region = new RegExp(req.query.region, 'i');
     }
 
     const jury = await Jury.find(query).sort({ lastname: 1, name: 1 });
 
     res.status(200).json({
-      status: "success",
+      status: 'success',
       results: jury.length,
       jury,
     });
   } catch (e) {
     res.status(404).json({
-      status: "Err",
+      status: 'Err',
       data: `Ошибка во время поиска: ${e.message}`,
       err: e,
     });
@@ -107,9 +99,7 @@ export const searchJury = async (req, res) => {
 
 export const addNewJury = async (req, res) => {
   try {
-    const photoUrl = req.files["photo_url"]
-      ? `/uploads/images/${req.files["photo_url"][0].filename}`
-      : "";
+    const photoUrl = req.files['photo_url'] ? `/uploads/images/${req.files['photo_url'][0].filename}` : '';
 
     const jury = new Jury({
       jury_code: req.body.jury_code,
@@ -132,14 +122,14 @@ export const addNewJury = async (req, res) => {
     await jury.save();
 
     res.status(200).json({
-      status: "success",
+      status: 'success',
       data: jury,
     });
   } catch (e) {
-    console.error("ADD ERR", e);
+    console.error('ADD ERR', e);
     res.status(404).json({
-      status: "Err",
-      data: "Не удалось добавить судью:" + e.message,
+      status: 'Err',
+      data: 'Не удалось добавить судью:' + e.message,
       err: e,
     });
   }
@@ -150,16 +140,14 @@ export const updateJury = async (req, res) => {
     const jury = await Jury.findOne({ jury_code: req.params.code });
     if (!jury) {
       return res.status(404).json({
-        status: "Err",
-        data: "Судья с таким кодом не найден",
+        status: 'Err',
+        data: 'Судья с таким кодом не найден',
       });
     }
 
     const originalPhotoUrl = jury.photo_url;
 
-    const photoUrl = req.files["photo_url"]
-      ? `/uploads/images/${req.files["photo_url"][0].filename}`
-      : jury.photo_url;
+    const photoUrl = req.files['photo_url'] ? `/uploads/images/${req.files['photo_url'][0].filename}` : jury.photo_url;
 
     jury.photo_url = photoUrl;
 
@@ -171,28 +159,24 @@ export const updateJury = async (req, res) => {
     jury.region = req.body.region || jury.region;
     jury.jury_category = req.body.jury_category || jury.jury_category;
     jury.sport = req.body.sport || jury.sport;
-    jury.disciplines = req.body.disciplines
-      ? JSON.parse(req.body.disciplines)
-      : jury.disciplines;
-    jury.socials = req.body.socials
-      ? JSON.parse(req.body.socials)
-      : jury.socials;
+    jury.disciplines = req.body.disciplines ? JSON.parse(req.body.disciplines) : jury.disciplines;
+    jury.socials = req.body.socials ? JSON.parse(req.body.socials) : jury.socials;
 
     await jury.save();
 
     if (photoUrl !== originalPhotoUrl && originalPhotoUrl) {
-      await removeOldFile(join(__dirname, "..", originalPhotoUrl));
+      await removeOldFile(join(__dirname, '..', originalPhotoUrl));
     }
 
     res.status(200).json({
-      status: "success",
+      status: 'success',
       data: jury,
     });
   } catch (e) {
-    console.error("UPDATE ERR", e);
+    console.error('UPDATE ERR', e);
     res.status(500).json({
-      status: "Err",
-      data: "Не удалось обновить данные судьи",
+      status: 'Err',
+      data: 'Не удалось обновить данные судьи',
       err: e.message,
     });
   }
@@ -206,30 +190,30 @@ export const deleteJury = async (req, res) => {
 
     if (!jury) {
       return res.status(404).json({
-        status: "Err",
-        data: "Тренер с таким кодом не найден",
+        status: 'Err',
+        data: 'Тренер с таким кодом не найден',
       });
     }
 
-    if (jury["photo_url"]) {
-      const fullPath = join(__dirname, "..", jury["photo_url"]);
+    if (jury['photo_url']) {
+      const fullPath = join(__dirname, '..', jury['photo_url']);
       try {
         await removeOldFile(fullPath);
       } catch (err) {
-        console.error("Failed to delete file:", err);
+        console.error('Failed to delete file:', err);
       }
     }
 
     await Jury.deleteOne({ jury_code: req.params.code });
 
     res.status(200).json({
-      status: "success",
-      data: "Судья был успешно удален",
+      status: 'success',
+      data: 'Судья был успешно удален',
     });
   } catch (e) {
     res.status(404).json({
-      status: "Err",
-      data: "Не удалось удалить судью",
+      status: 'Err',
+      data: 'Не удалось удалить судью',
       err: e.message,
     });
   }
@@ -239,7 +223,7 @@ export const getJuryCompetitions = async (req, res) => {
   try {
     const events = await Event.find(
       {
-        "jury.jury_code": req.params.code,
+        'jury.jury_code': req.params.code,
       },
       {
         created_at: 0,
@@ -248,18 +232,18 @@ export const getJuryCompetitions = async (req, res) => {
         timing_provider: 0,
         conditions: 0,
         contacts: 0,
-        "competitions.races": 0,
+        'competitions.races': 0,
       }
     );
 
     res.status(200).json({
-      status: "success",
+      status: 'success',
       events,
     });
   } catch (e) {
     res.status(404).json({
-      status: "Err",
-      data: "Не удалось получить список соревнований судьи",
+      status: 'Err',
+      data: 'Не удалось получить список соревнований судьи',
       err: e,
     });
   }
@@ -269,7 +253,7 @@ export const getJurySeminars = async (req, res) => {
   try {
     const seminars = await Seminar.find(
       {
-        "participants.code": req.params.code,
+        'participants.code': req.params.code,
       },
       {
         participants: 0,
@@ -278,13 +262,13 @@ export const getJurySeminars = async (req, res) => {
     ).sort({ date: -1 });
 
     res.status(200).json({
-      status: "success",
+      status: 'success',
       seminars,
     });
   } catch (e) {
     res.status(404).json({
-      status: "Err",
-      data: "Не удалось получить список семинаров судьи",
+      status: 'Err',
+      data: 'Не удалось получить список семинаров судьи',
       err: e,
     });
   }

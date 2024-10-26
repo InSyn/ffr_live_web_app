@@ -10,7 +10,7 @@
 
 <script>
 export default {
-  name: "socials-telegram-icon",
+  name: 'socials-telegram-icon',
 };
 </script>
 
@@ -19,10 +19,12 @@ svg {
   * {
     transition: fill 92ms;
   }
+
   &:hover {
     circle {
       fill: white;
     }
+
     path {
       fill: #2096d4;
     }

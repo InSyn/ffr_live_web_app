@@ -1,30 +1,26 @@
 <template>
   <div class="createEventPage__wrapper">
-    <event-form @create-event="createEvent" :event="event" action="create">
-    </event-form>
+    <event-form @create-event="createEvent" :event="event" action="create"> </event-form>
 
-    <message-container
-      :messages="messages"
-      :errors="errors"
-    ></message-container>
+    <message-container :messages="messages" :errors="errors"></message-container>
   </div>
 </template>
 
 <script>
-import axios from "axios";
-import { databaseUrl } from "@/store/constants";
-import { mdiImage } from "@mdi/js";
-import { mapActions, mapGetters } from "vuex";
-import MessageContainer from "@/components/ui-components/message-container.vue";
-import { getInputType } from "@/utils/get-input-type";
-import { translateField } from "@/utils/formFields-translator";
-import { countries, getCountryCode } from "@/store/data/countries";
-import { getDisciplines, sports } from "@/store/data/sports";
-import { capitalizeString } from "@/utils/capitalizeString";
-import EventForm from "@/pages/admin-pages/events/form-event.vue";
+import axios from 'axios';
+import { databaseUrl } from '@/store/constants';
+import { mdiImage } from '@mdi/js';
+import { mapActions, mapGetters } from 'vuex';
+import MessageContainer from '@/components/ui-components/message-container.vue';
+import { getInputType } from '@/utils/get-input-type';
+import { translateField } from '@/utils/formFields-translator';
+import { countries, getCountryCode } from '@/store/data/countries';
+import { getDisciplines, sports } from '@/store/data/sports';
+import { capitalizeString } from '@/utils/capitalizeString';
+import EventForm from '@/pages/admin-pages/events/form-event.vue';
 
 export default {
-  name: "createEventPage",
+  name: 'createEventPage',
   components: { EventForm, MessageContainer },
   methods: {
     getCountryCode,
@@ -32,8 +28,8 @@ export default {
     capitalizeString,
     translateField,
     getInputType,
-    ...mapActions("events", {
-      loadEvents: "LOAD_EVENTS",
+    ...mapActions('events', {
+      loadEvents: 'LOAD_EVENTS',
     }),
 
     async createEvent(selectedFile) {
@@ -42,12 +38,12 @@ export default {
       Object.keys(this.event).forEach((key) => {
         const value = this.event[key];
 
-        if (key === "documents") return;
+        if (key === 'documents') return;
 
-        if (Array.isArray(value) || typeof value === "object") {
+        if (Array.isArray(value) || typeof value === 'object') {
           formData.append(key, JSON.stringify(value));
         } else {
-          if (key === "start_at") {
+          if (key === 'start_at') {
             formData.append(key, new Date(value).toISOString());
             return;
           }
@@ -58,12 +54,10 @@ export default {
       if (this.event.documents.length) {
         const documents = this.event.documents.filter((doc) => doc.file);
 
-        const filteredDocuments = documents.filter(
-          (doc) => doc.file?.url || doc.file?.newFile
-        );
+        const filteredDocuments = documents.filter((doc) => doc.file?.url || doc.file?.newFile);
 
         formData.append(
-          "documents",
+          'documents',
           JSON.stringify(
             filteredDocuments.map((doc) => {
               const file = doc.file?.newFile ? {} : doc.file;
@@ -87,26 +81,26 @@ export default {
       }
 
       try {
-        const response = await axios.post(databaseUrl + "/events/", formData, {
+        const response = await axios.post(databaseUrl + '/events/', formData, {
           headers: {
-            "Content-Type": "multipart/form-data",
+            'Content-Type': 'multipart/form-data',
             authorization: `Bearer ${this.userData.token}`,
           },
         });
 
         if (response.status === 200) {
-          this.messages.push("Соревнование создано успешно");
+          this.messages.push('Соревнование создано успешно');
+          await this.loadEvents();
 
           setTimeout(() => {
-            this.loadEvents();
             this.$router.push({
-              name: "eventPage",
-              params: { event_id: this.event.event_id },
+              name: 'eventPage',
+              params: { event_id: response.data.event.event_id },
             });
           }, 2000);
         }
       } catch (error) {
-        console.error("Error submitting form:", error);
+        console.error('Error submitting form:', error);
       }
     },
   },
@@ -115,19 +109,19 @@ export default {
       imageFillerIcon: mdiImage,
 
       event: {
-        title: "",
-        start_at: "",
-        sport: "",
-        discipline: "",
-        country: "",
-        country_code: "",
-        region: "",
-        region_code: "",
-        location: "",
-        organization: "",
-        calendar_code: "",
-        timing_provider: "",
-        translation_url: "",
+        title: '',
+        start_at: '',
+        sport: '',
+        discipline: '',
+        country: '',
+        country_code: '',
+        region: '',
+        region_code: '',
+        location: '',
+        organization: '',
+        calendar_code: '',
+        timing_provider: '',
+        translation_url: '',
         international: false,
         documents: [],
       },
@@ -137,8 +131,8 @@ export default {
     };
   },
   computed: {
-    ...mapGetters("authorization", {
-      userData: "getUserData",
+    ...mapGetters('authorization', {
+      userData: 'getUserData',
     }),
     sports() {
       return sports;

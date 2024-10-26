@@ -10,7 +10,7 @@
 
 <script>
 export default {
-  name: "socials-vk-icon",
+  name: 'socials-vk-icon',
 };
 </script>
 
@@ -19,10 +19,12 @@ svg {
   * {
     transition: fill 92ms;
   }
+
   &:hover {
     circle {
       fill: white;
     }
+
     path {
       fill: #3f64ad;
     }

@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-import { resultSchema } from "./result-model.js";
+import mongoose from 'mongoose';
+import { resultSchema } from './result-model.js';
 
 export const raceSchema = new mongoose.Schema({
   race_id: String,

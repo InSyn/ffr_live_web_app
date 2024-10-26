@@ -1,6 +1,6 @@
 ﻿<script>
 export default {
-  name: "AppFooter",
+  name: 'AppFooter',
 };
 </script>
 
@@ -10,11 +10,8 @@ export default {
       <div class="appFooter__info">
         <span>Created by TimingWeb &copy;&nbsp;</span>
         <span class="projectDate">{{ new Date().getFullYear() }}</span>
-        <img
-          alt="SportTech-Logo"
-          class="companyLogo__image"
-          src="@/assets/logo/SPORTTECHLOGO-WHITE.png"
-        />
+        <img alt="SportTech-Logo" class="companyLogo__image light" src="@/assets/logo/TIMINGWEBLOGO-BLACK.png" />
+        <img alt="SportTech-Logo" class="companyLogo__image dark" src="@/assets/logo/TIMINGWEBLOGO-WHITE.png" />
       </div>
     </div>
   </div>
@@ -35,8 +32,9 @@ export default {
     height: 22px;
     background-color: var(--ffr-brand-accent);
     transform: skewY(-0.085deg);
-    content: "";
+    content: '';
   }
+
   .appFooter__content {
     position: relative;
     z-index: 2;
@@ -47,7 +45,7 @@ export default {
       align-items: center;
       max-width: var(--desktop-medium);
       margin: 0 auto;
-      padding: 0.25rem 2rem;
+      padding: 8px 2rem;
       color: var(--text-card);
       font-size: 0.75rem;
 
@@ -56,6 +54,22 @@ export default {
         max-height: 1.4rem;
       }
     }
+  }
+}
+.appFooter__info {
+  .companyLogo__image.light {
+    display: block;
+  }
+  .companyLogo__image.dark {
+    display: none;
+  }
+}
+.theme-dark .appFooter__info {
+  .companyLogo__image.light {
+    display: none;
+  }
+  .companyLogo__image.dark {
+    display: block;
   }
 }
 </style>

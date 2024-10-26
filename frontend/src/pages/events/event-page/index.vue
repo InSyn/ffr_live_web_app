@@ -6,53 +6,22 @@
           @click="selectStage(stage)"
           v-for="stage in eventStages"
           :key="stage['competition_id']"
-          :class="[
-            'stage__button',
-            selectedStage &&
-              stage['competition_id'] === selectedStage &&
-              'isSelectedStage',
-          ]"
+          :class="['stage__button', selectedStage && stage['competition_id'] === selectedStage && 'isSelectedStage']"
         >
-          {{ stage["stage"] }}
+          {{ stage['stage'] }}
         </button>
       </div>
 
       <div :class="['event__header', !showHeader && 'minimized']">
         <div class="event__header__leftSection">
           <div class="competitionImage__container">
-            <img
-              v-if="event['logo_image_url']"
-              :src="uploadsFolderUrl + event['logo_image_url']"
-              alt="Event Logo"
-            />
-            <competition-image-filler-icon
-              v-else
-              class="competitionImage__imageFiller__icon"
-            ></competition-image-filler-icon>
-
-            <country-flag
-              class="competitionImage__regionFlag"
-              :country-code="getCountryCode(event.country)"
-              :region-code="getRegionCode(event.region)"
-              :is-region-flag="true"
-              :width="showHeader ? '2rem' : '1.45rem'"
-              rounding="2px"
-            ></country-flag>
+            <img v-if="event['logo_image_url']" :src="uploadsFolderUrl + event['logo_image_url']" alt="Event Logo" />
+            <competition-image-filler-icon v-else class="competitionImage__imageFiller__icon"></competition-image-filler-icon>
           </div>
 
-          <div
-            v-if="event['translation_url']"
-            v-show="showHeader"
-            class="eventTranslation__wrapper"
-          >
-            <a
-              class="eventTranslation__link"
-              :href="event['translation_url']"
-              target="_blank"
-            >
-              <event-translation-icon
-                class="eventTranslation__icon"
-              ></event-translation-icon>
+          <div v-if="event['translation_url']" v-show="showHeader" class="eventTranslation__wrapper">
+            <a class="eventTranslation__link" :href="event['translation_url']" target="_blank">
+              <event-translation-icon class="eventTranslation__icon"></event-translation-icon>
               <span>Трансляция</span>
             </a>
           </div>
@@ -62,76 +31,59 @@
           <div class="competitionInfo__header">
             <div class="event__header__titleSection">
               <div class="event__header__titleSection__title">
-                {{ event["title"] }}
+                {{ event['title'] }}
                 <edit-button type="event" :code="event.event_id"></edit-button>
               </div>
-              <div
-                v-show="showHeader && event['calendar_code']"
-                class="event__header__titleSection__calendarCode"
-              >
-                {{ "ЕКП:&nbsp;" + event["calendar_code"] }}
+              <div v-show="showHeader && event['calendar_code']" class="event__header__titleSection__calendarCode">
+                {{ 'ЕКП:&nbsp;' + event['calendar_code'] }}
               </div>
             </div>
 
             <div class="event__header__sportSection">
-              <span>{{ event["sport"] }}</span>
-              <country-flag
-                v-if="event.country"
-                class="eventImage__countryFlag"
-                :country-code="getCountryCode(event.country)"
-                width="1.75rem"
-              ></country-flag>
+              <span>{{ event['sport'] }}</span>
+              <country-flag v-if="event.country" class="eventImage__countryFlag" :country-code="getCountryCode(event.country)" width="1.75rem"></country-flag>
             </div>
           </div>
 
           <div class="competitionInfo__infoSection">
             <div class="competitionInfo__infoSection__mainData">
               <div class="event__header__infoSection__discipline">
-                {{ event["discipline"] }}
-                <span v-show="!showHeader">{{
-                  "&nbsp;" + formatDate(event["start_at"], { full: true })
-                }}</span>
+                {{ event['discipline'] }}
+                <span v-show="!showHeader">{{ '&nbsp;' + formatDate(event['start_at'], { full: true }) }}</span>
               </div>
 
-              <div
-                v-show="showHeader"
-                class="competitionInfo__infoSection__location"
-              >
+              <div v-show="showHeader" class="competitionInfo__infoSection__location">
+                <country-flag
+                  class="competitionImage__regionFlag"
+                  :country-code="getCountryCode(event.country)"
+                  :region-code="getRegionCode(event.region)"
+                  :is-region-flag="true"
+                  height="1.25rem"
+                  rounding="2px"
+                ></country-flag>
                 <span v-show="event['region']">
-                  {{ event["region"] + ",&nbsp;" }}
+                  {{ event['region'] + ',&nbsp;' }}
                 </span>
 
                 <span v-show="event['location']">
-                  {{ event["location"] }}
+                  {{ event['location'] }}
                 </span>
               </div>
 
-              <div
-                v-show="showHeader"
-                class="competitionInfo__infoSection__date"
-              >
-                <span>{{ formatDate(event["start_at"], { full: true }) }}</span>
+              <div v-show="showHeader" class="competitionInfo__infoSection__date">
+                <span>{{ formatDate(event['start_at'], { full: true }) }}</span>
               </div>
 
               <div class="event__header__actions">
-                <div
-                  @click="toggleAdditionalSection('pedestal')"
-                  class="headerAction__wrapper"
-                >
+                <div @click="toggleAdditionalSection('pedestal')" class="headerAction__wrapper">
                   <medal-icon class="headerAction__icon"></medal-icon>
                   <span>Пъедестал</span>
                 </div>
-                <div
-                  @click="toggleAdditionalSection('technical')"
-                  class="headerAction__wrapper"
-                >
+                <div @click="toggleAdditionalSection('technical')" class="headerAction__wrapper">
                   <info-icon class="headerAction__icon"></info-icon>
                   <span>Техническая информация</span>
                 </div>
-                <div
-                  @click="toggleAdditionalSection('files')"
-                  class="headerAction__wrapper"
-                >
+                <div @click="toggleAdditionalSection('files')" class="headerAction__wrapper">
                   <file-icon class="headerAction__icon"></file-icon>
                   <span>Файлы</span>
                 </div>
@@ -140,13 +92,9 @@
 
             <div class="competitionInfo__infoSection__trackInfo">
               <div v-show="showHeader" class="trackImage__container">
-                <img
-                  v-if="event['track_image_url']"
-                  :src="uploadsFolderUrl + `${event['track_image_url']}`"
-                  alt="Track Image"
-                />
+                <img v-if="event['track_image_url']" :src="uploadsFolderUrl + `${event['track_image_url']}`" alt="Track Image" />
                 <span class="disciplineCode" v-if="event['discipline']">
-                  {{ getDisciplineCode(event["discipline"]) }}
+                  {{ getDisciplineCode(event['discipline']) }}
                 </span>
               </div>
               <div @click="toggleHeader()" class="headerSwitch">
@@ -157,21 +105,10 @@
           </div>
         </div>
 
-        <div
-          :class="[
-            'eventAdditionalInfo__section',
-            additionalSection && 'opened',
-          ]"
-        >
-          <event-pedestal
-            v-if="additionalSection === 'pedestal'"
-            :competition="competition"
-          ></event-pedestal>
+        <div :class="['eventAdditionalInfo__section', additionalSection && 'opened']">
+          <event-pedestal v-if="additionalSection === 'pedestal'" :competition="competition"></event-pedestal>
 
-          <div
-            v-else-if="additionalSection === 'technical'"
-            class="additionalSection__content"
-          >
+          <div v-else-if="additionalSection === 'technical'" class="additionalSection__content">
             <div class="juryList__wrapper">
               <div class="juryItem" v-for="(jury, idx) in juryList" :key="idx">
                 <span class="role">{{ jury.role }}</span>
@@ -181,71 +118,36 @@
             </div>
             <div class="technicalInfo__wrapper">
               <div class="trackParameters__wrapper">
-                <div
-                  class="trackParameters__item"
-                  v-for="(parameter, idx) in event['track_info']"
-                  :key="idx"
-                >
-                  <span
-                    class="trackParameters__item__value"
-                    v-for="(val, idx) in parameter.split('@')"
-                    :key="idx"
-                  >
+                <div class="trackParameters__item" v-for="(parameter, idx) in event['track_info']" :key="idx">
+                  <span class="trackParameters__item__value" v-for="(val, idx) in parameter.split('@')" :key="idx">
                     {{ val }}
                   </span>
                 </div>
               </div>
               <div class="conditions__wrapper">
-                <div
-                  class="conditions__item"
-                  v-for="(parameter, idx) in event['conditions']"
-                  :key="idx"
-                >
-                  <span
-                    class="conditions__item__value"
-                    v-for="(val, idx) in parameter.split('@')"
-                    :key="idx"
-                  >
+                <div class="conditions__item" v-for="(parameter, idx) in event['conditions']" :key="idx">
+                  <span class="conditions__item__value" v-for="(val, idx) in parameter.split('@')" :key="idx">
                     {{ val }}
                   </span>
                 </div>
               </div>
             </div>
-            <div
-              class="forerunners__wrapper"
-              v-if="event['forerunners'].length"
-            >
+            <div class="forerunners__wrapper" v-if="event['forerunners'].length">
               <div class="forerunners__header">Открывающие</div>
               <div class="forerunners__body">
-                <div
-                  class="forerunners__item"
-                  v-for="(forerunner, idx) in event['forerunners']"
-                  :key="idx"
-                >
+                <div class="forerunners__item" v-for="(forerunner, idx) in event['forerunners']" :key="idx">
                   {{ `${forerunner.number} ${forerunner.name}` }}
                 </div>
               </div>
             </div>
           </div>
 
-          <div
-            v-else-if="additionalSection === 'files'"
-            class="additionalSection__content"
-          >
+          <div v-else-if="additionalSection === 'files'" class="additionalSection__content">
             <div class="eventFiles__wrapper">
               <div class="eventFiles__title">Документы:</div>
               <div class="eventFiles__list">
-                <div
-                  v-for="(document, idx) in event.documents"
-                  :key="idx"
-                  class="eventFile__item"
-                >
-                  <a
-                    v-if="document?.file?.url"
-                    :href="`${uploadsFolderUrl}${document.file.url}`"
-                    target="_blank"
-                    class="eventFile__item__link"
-                  >
+                <div v-for="(document, idx) in event.documents" :key="idx" class="eventFile__item">
+                  <a v-if="document?.file?.url" :href="`${uploadsFolderUrl}${document.file.url}`" target="_blank" class="eventFile__item__link">
                     <file-icon class="eventFile__item__icon"></file-icon>
                     {{ document.title }}
                   </a>
@@ -257,50 +159,34 @@
         </div>
       </div>
 
-      <div
-        class="event_emptyData"
-        v-if="
-          event && event['competitions'] && event['competitions'].length < 1
-        "
-      >
-        Результаты события ещё не добавлены
-      </div>
+      <div class="event_emptyData" v-if="event && event['competitions'] && event['competitions'].length < 1">Результаты события ещё не добавлены</div>
 
-      <results-table
-        v-if="competition && competition['races'].length > 0"
-        :competition="competition"
-        :selectedStage="selectedStage"
-      ></results-table>
+      <results-table v-if="competition && competition['races'].length > 0" :competition="competition" :selectedStage="selectedStage"></results-table>
     </div>
 
-    <div v-if="!event && !eventIsLoading" class="status__container">
-      Такого события не существует
-    </div>
-    <loader-spinner
-      v-if="!event && eventIsLoading"
-      class="loader__spinner"
-    ></loader-spinner>
+    <div v-if="!event && !eventIsLoading" class="status__container">Такого события не существует</div>
+    <loader-spinner v-if="!event && eventIsLoading" class="loader__spinner"></loader-spinner>
   </div>
 </template>
 
 <script>
-import axios from "axios";
-import ResultsTable from "@/pages/events/event-page/resultsTable.vue";
-import { formatDate } from "@/utils/data-formaters";
-import LoaderSpinner from "@/components/ui-components/loader-spinner.vue";
-import { databaseUrl, uploadsFolderUrl } from "@/store/constants";
-import { mdiImage } from "@mdi/js";
-import CompetitionImageFillerIcon from "@/assets/svg/competitionImageFiller-icon.vue";
-import CountryFlag from "@/components/ui-components/country-flag.vue";
-import EventTranslationIcon from "@/components/icons/eventTranslation-icon.vue";
-import InfoIcon from "@/components/icons/info-icon.vue";
-import FileIcon from "@/components/icons/file-icon.vue";
-import { getDisciplineCode, sports } from "@/store/data/sports";
-import EventPedestal from "@/pages/events/event-page/eventPedestal.vue";
-import MedalIcon from "@/components/icons/medal-icon.vue";
-import EditButton from "@/components/ui-components/edit-button.vue";
-import { getCountryCode } from "@/store/data/countries";
-import { getRegionCode } from "@/store/data/russia-regions";
+import axios from 'axios';
+import ResultsTable from '@/pages/events/event-page/resultsTable.vue';
+import { formatDate } from '@/utils/data-formaters';
+import LoaderSpinner from '@/components/ui-components/loader-spinner.vue';
+import { databaseUrl, uploadsFolderUrl } from '@/store/constants';
+import { mdiImage } from '@mdi/js';
+import CompetitionImageFillerIcon from '@/assets/svg/competitionImageFiller-icon.vue';
+import CountryFlag from '@/components/ui-components/country-flag.vue';
+import EventTranslationIcon from '@/components/icons/eventTranslation-icon.vue';
+import InfoIcon from '@/components/icons/info-icon.vue';
+import FileIcon from '@/components/icons/file-icon.vue';
+import { getDisciplineCode, sports } from '@/store/data/sports';
+import EventPedestal from '@/pages/events/event-page/eventPedestal.vue';
+import MedalIcon from '@/components/icons/medal-icon.vue';
+import EditButton from '@/components/ui-components/edit-button.vue';
+import { getCountryCode } from '@/store/data/countries';
+import { getRegionCode } from '@/store/data/russia-regions';
 
 export default {
   components: {
@@ -315,8 +201,8 @@ export default {
     LoaderSpinner,
     ResultsTable,
   },
-  props: ["event_id"],
-  name: "result",
+  props: ['event_id'],
+  name: 'result',
   data() {
     return {
       event: null,
@@ -340,21 +226,19 @@ export default {
     },
 
     eventStages() {
-      return this.event["competitions"] || [];
+      return this.event['competitions'] || [];
     },
     competition() {
-      if (!this.event["competitions"]) return;
+      if (!this.event['competitions']) return;
 
-      const stage = this.event["competitions"].find(
-        (competition) => competition["competition_id"] === this.selectedStage
-      );
+      const stage = this.event['competitions'].find((competition) => competition['competition_id'] === this.selectedStage);
       if (!stage) return null;
 
       return stage;
     },
     juryList() {
-      const juryArr = this.event["jury"] || [],
-        judgesArr = this.event["judges"] || [];
+      const juryArr = this.event['jury'] || [],
+        judgesArr = this.event['judges'] || [];
 
       return juryArr.concat(judgesArr);
     },
@@ -369,24 +253,17 @@ export default {
       this.eventIsLoading = true;
 
       try {
-        const response = await axios.get(
-          databaseUrl + "/events/" + this.$route.params.event_id
-        );
+        const response = await axios.get(databaseUrl + '/events/' + this.$route.params.event_id);
         if (response.status === 200) {
           const eventData = response.data.event;
-          if (eventData.event_id === this.$route.params.event_id)
-            this.event = eventData;
+          if (eventData.event_id === this.$route.params.event_id) this.event = eventData;
 
           this.setupStage();
           this.updateTimeoutId = setTimeout(() => this.getEventById(), 2000);
         }
       } catch (e) {
         if (e) {
-          throw new Error(
-            `Unable to load event data. ${
-              e?.response?.data?.message || e.message
-            }`
-          );
+          throw new Error(`Unable to load event data. ${e?.response?.data?.message || e.message}`);
         }
       } finally {
         this.eventIsLoading = false;
@@ -394,15 +271,10 @@ export default {
     },
 
     selectStage(stage) {
-      this.selectedStage = stage["competition_id"];
+      this.selectedStage = stage['competition_id'];
     },
     setupStage() {
-      if (
-        !this.selectedStage &&
-        this.event &&
-        this.event["competitions"].length > 0
-      )
-        this.selectStage(this.event["competitions"][0]);
+      if (!this.selectedStage && this.event && this.event['competitions'].length > 0) this.selectStage(this.event['competitions'][0]);
     },
 
     toggleHeader() {
@@ -420,7 +292,7 @@ export default {
 
   watch: {
     additionalSection(newVal) {
-      if (newVal === "pedestal") {
+      if (newVal === 'pedestal') {
         this.showHeader = false;
       }
     },
@@ -480,6 +352,7 @@ export default {
           background-color: var(--ffr-brand);
         }
       }
+
       .isSelectedStage {
         color: var(--text-contrast);
         background-color: var(--ffr-brand);
@@ -492,9 +365,12 @@ export default {
       display: flex;
       flex-wrap: wrap;
       margin-bottom: 16px;
+      padding: 1.25rem 0.75rem 0.75rem;
+
       border-radius: 4px;
       background-color: var(--background--card);
-      backdrop-filter: blur(8px);
+      box-shadow: var(--container-shadow-m);
+      border: 1px solid var(--border-container);
 
       &.minimized > .event__header__leftSection > .competitionImage__container {
         height: 96px;
@@ -507,6 +383,7 @@ export default {
           height: 60px;
         }
       }
+
       .event__header__leftSection {
         flex: 0 0 auto;
         display: flex;
@@ -527,14 +404,10 @@ export default {
             max-width: 100%;
             max-height: 100%;
           }
+
           .competitionImage__imageFiller__icon {
             height: 100%;
             width: 100%;
-          }
-          .competitionImage__regionFlag {
-            position: absolute;
-            bottom: 0;
-            right: -0.5rem;
           }
 
           @media screen and (max-width: 1200px) {
@@ -562,17 +435,20 @@ export default {
             &:hover {
               color: var(--text-hovered);
             }
+
             span {
               display: inline-block;
               margin-top: 4px;
               font-size: 0.85rem;
             }
+
             .eventTranslation__icon {
               height: 1.5rem;
             }
           }
         }
       }
+
       .eventInfo__wrapper {
         flex: 1 1 0;
         display: flex;
@@ -599,11 +475,13 @@ export default {
               font-size: 1.25rem;
               font-weight: bold;
             }
+
             .event__header__titleSection__calendarCode {
               flex: 0 0 auto;
               font-size: 0.9rem;
             }
           }
+
           .event__header__sportSection {
             display: flex;
             align-items: center;
@@ -634,13 +512,19 @@ export default {
               flex: 0 0 auto;
               font-size: 1.1rem;
             }
+
             .event__header__infoSection__calendarCode {
               flex: 0 0 auto;
               color: var(--text-muted);
             }
+
             .competitionInfo__infoSection__location {
               flex: 0 0 auto;
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
             }
+
             .competitionInfo__infoSection__date {
               flex: 0 0 auto;
             }
@@ -663,10 +547,12 @@ export default {
                 &:hover {
                   color: var(--text-hovered);
                 }
+
                 .headerAction__icon {
                   height: 1rem;
                   margin-right: 0.4rem;
                 }
+
                 span {
                   font-size: 0.9rem;
                   line-height: 0.9rem;
@@ -674,6 +560,7 @@ export default {
               }
             }
           }
+
           .competitionInfo__infoSection__trackInfo {
             display: flex;
             flex-direction: column;
@@ -695,7 +582,7 @@ export default {
                 font-size: 1.75rem;
                 font-weight: bold;
                 line-height: 1;
-                content: "";
+                content: '';
               }
 
               @media screen and (max-width: 1200px) {
@@ -706,11 +593,13 @@ export default {
                 flex-basis: 80px;
                 width: 80px;
               }
+
               img {
                 max-height: 100%;
                 max-width: 100%;
               }
             }
+
             .headerSwitch {
               flex: 0 0 auto;
               padding: 8px 0 4px;
@@ -721,6 +610,7 @@ export default {
           }
         }
       }
+
       .eventAdditionalInfo__section {
         flex: 1 0 100%;
         display: grid;
@@ -730,6 +620,7 @@ export default {
         &.opened {
           grid-template-rows: 1fr;
         }
+
         .additionalSection__content {
           display: flex;
           flex-wrap: wrap;
@@ -750,14 +641,18 @@ export default {
                 display: table-cell;
                 white-space: nowrap;
               }
+
               .role {
               }
+
               .name {
               }
+
               .category {
               }
             }
           }
+
           .technicalInfo__wrapper {
             flex: 0 0 auto;
             display: flex;
@@ -768,6 +663,7 @@ export default {
             @media screen and (max-width: 720px) {
               margin-left: 0;
             }
+
             .trackParameters__wrapper {
               flex: 0 0 auto;
               display: table;
@@ -781,6 +677,7 @@ export default {
                 }
               }
             }
+
             .conditions__wrapper {
               flex: 0 0 auto;
               display: table;
@@ -788,12 +685,14 @@ export default {
 
               .conditions__item {
                 display: table-row;
+
                 .conditions__item__value {
                   display: table-cell;
                 }
               }
             }
           }
+
           .forerunners__wrapper {
             flex: 0 1 100%;
             padding: 8px;
@@ -801,15 +700,18 @@ export default {
             .forerunners__header {
               margin-bottom: 4px;
             }
+
             .forerunners__body {
               display: flex;
               flex-wrap: wrap;
               align-items: center;
               gap: 12px;
+
               .forerunners__item {
               }
             }
           }
+
           .eventFiles__wrapper {
             flex: 0 0 auto;
             display: flex;
@@ -820,6 +722,7 @@ export default {
             .eventFiles__title {
               margin-left: 1.25rem;
             }
+
             .eventFiles__list {
               display: flex;
               align-items: center;
@@ -828,6 +731,7 @@ export default {
 
               .eventFile__item {
                 flex: 0 0 auto;
+
                 .eventFile__item__link {
                   display: flex;
                   align-items: center;
@@ -839,6 +743,7 @@ export default {
                     height: 1.15rem;
                     margin-right: 0.25rem;
                   }
+
                   &:hover {
                     color: var(--accent);
                   }
@@ -857,7 +762,8 @@ export default {
 
       font-size: 1.25rem;
       background: var(--background--card);
-      backdrop-filter: blur(8px);
+      box-shadow: var(--container-shadow-m);
+      border: 1px solid var(--border-container);
       border-radius: 4px;
     }
   }

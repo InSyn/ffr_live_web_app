@@ -1,13 +1,13 @@
-import ExcelJS from "exceljs";
-import { translateField } from "@/utils/formFields-translator";
+import ExcelJS from 'exceljs';
+import { translateField } from '@/utils/formFields-translator';
 
 export const saveExcelData = (data, type) => {
   if (!data.length) {
-    console.error("No data to save");
+    console.error('No data to save');
   }
 
   const workbook = new ExcelJS.Workbook();
-  const worksheet = workbook.addWorksheet("Stats");
+  const worksheet = workbook.addWorksheet('Stats');
 
   const formattedData = prepareData(data, type);
 
@@ -24,14 +24,12 @@ export const saveExcelData = (data, type) => {
 
   workbook.xlsx.writeBuffer().then((buffer) => {
     const blob = new Blob([buffer], {
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     });
 
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `stats-${translateField(
-      type
-    )}-${new Date().toLocaleDateString()}.xlsx`;
+    link.download = `stats-${translateField(type)}-${new Date().toLocaleDateString()}.xlsx`;
     link.click();
   });
 };
@@ -48,71 +46,104 @@ const prepareData = (data, type) => {
   });
 };
 const fieldMapping = {
-  events: [
-    "title",
-    "start_at",
-    "sport",
-    "discipline",
-    "country",
-    "region",
-    "location",
-    "season",
-    "organization",
-    "timing_provider",
-    "contacts",
-  ],
+  events: ['title', 'start_at', 'sport', 'discipline', 'country', 'region', 'location', 'season', 'organization', 'timing_provider', 'contacts'],
   athletes: [
-    "rus_code",
-    "lastname",
-    "name",
-    "gender",
-    "birth_date",
-    "country",
-    "regions",
-    "sport",
-    "disciplines",
-    "category",
-    "is_national_team",
-    "trainer",
-    "socials",
+    'rus_code',
+    'lastname',
+    'name',
+    'gender',
+    'birth_date',
+    'country',
+    'regions',
+    'sport',
+    'disciplines',
+    'category',
+    'is_national_team',
+    'trainer',
+    'socials',
   ],
-  jury: [
-    "jury_code",
-    "lastname",
-    "name",
-    "gender",
-    "birth_date",
-    "country",
-    "region",
-    "jury_category",
-    "sport",
-    "disciplines",
-    "socials",
-  ],
+  jury: ['jury_code', 'lastname', 'name', 'gender', 'birth_date', 'country', 'region', 'jury_category', 'sport', 'disciplines', 'socials'],
   trainers: [
-    "trainer_id",
-    "fullname",
-    "gender",
-    "birth_date",
-    "country",
-    "region",
-    "sport",
-    "disciplines",
-    "trainer_category",
-    "rank",
-    "position",
-    "is_national_team",
-    "socials",
+    'trainer_id',
+    'fullname',
+    'gender',
+    'birth_date',
+    'country',
+    'region',
+    'sport',
+    'disciplines',
+    'trainer_category',
+    'rank',
+    'position',
+    'is_national_team',
+    'socials',
   ],
-  organizations: ["title", "country", "region", "sport", "contacts", "socials"],
-  seminars: [
-    "title",
-    "sport",
-    "disciplines",
-    "format",
-    "country",
-    "region",
-    "location",
-    "date",
-  ],
+  organizations: ['title', 'country', 'region', 'sport', 'contacts', 'socials'],
+  seminars: ['title', 'sport', 'disciplines', 'format', 'country', 'region', 'location', 'date'],
+};
+
+export const exportRegistrationApplicationAthletesToExcel = async (application, multiple = false) => {
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet('Athletes');
+
+  worksheet.columns = [
+    { header: 'First Name', key: 'name', width: 20 },
+    { header: 'Last Name', key: 'lastname', width: 20 },
+    { header: 'Birth Date', key: 'birth_date', width: 15 },
+    { header: 'Gender', key: 'gender', width: 10 },
+    { header: 'Category', key: 'category', width: 15 },
+    { header: 'Country', key: 'country', width: 15 },
+    { header: 'Regions', key: 'regions', width: 30 },
+    { header: 'Disciplines', key: 'disciplines', width: 30 },
+    { header: 'National Team', key: 'is_national_team', width: 15 },
+    { header: 'RUS Code', key: 'rus_code', width: 15 },
+    { header: 'Sport', key: 'sport', width: 15 },
+    { header: 'Trainer', key: 'trainer', width: 20 },
+  ];
+
+  const athletes = (() => {
+    if (multiple) {
+      const athletes = application
+        .map((applications) => applications.athletes)
+        .flat()
+        .map((athlete) => athlete.athlete);
+      return athletes;
+    }
+    return application.athletes.map((athlete) => athlete.athlete);
+  })();
+
+  athletes.forEach((athlete) => {
+    worksheet.addRow({
+      name: athlete.name,
+      lastname: athlete.lastname,
+      birth_date: athlete.birth_date,
+      gender: athlete.gender,
+      category: athlete.category,
+      country: athlete.country,
+      regions: athlete.regions.join(', '),
+      disciplines: athlete.disciplines.join(', '),
+      is_national_team: athlete.is_national_team ? 'Yes' : 'No',
+      rus_code: athlete.rus_code,
+      sport: athlete.sport,
+      trainer: athlete.trainer ? `${athlete.trainer.trainer_id}: ${athlete.trainer.fullname}` : '',
+    });
+  });
+
+  worksheet.getRow(1).eachCell((cell) => {
+    cell.font = { bold: true };
+    cell.alignment = { vertical: 'middle', horizontal: 'center' };
+  });
+
+  const buffer = await workbook.xlsx.writeBuffer();
+
+  const blob = new Blob([buffer], { type: 'application/octet-stream' });
+
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'Athletes.xlsx';
+
+  document.body.appendChild(link);
+  link.click();
+
+  document.body.removeChild(link);
 };

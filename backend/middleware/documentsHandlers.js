@@ -1,5 +1,5 @@
-import { removeOldFile } from "../file-storage/fileStorage.js";
-import { join } from "path";
+import { removeOldFile } from '../file-storage/fileStorage.js';
+import { join } from 'path';
 
 export const parseDocuments = (reqBody) => {
   return reqBody.documents ? JSON.parse(reqBody.documents) : [];
@@ -9,7 +9,7 @@ export const extractDocumentFiles = (reqFiles) => {
   const documentFiles = {};
   if (reqFiles) {
     for (const fileKey in reqFiles) {
-      if (fileKey.startsWith("document")) {
+      if (fileKey.startsWith('document')) {
         const file = reqFiles[fileKey][0];
         documentFiles[fileKey] = {
           url: `/uploads/documents/${file.filename}`,
@@ -25,10 +25,10 @@ export const createEntityDocuments = (documents, documentFiles) => {
     const fileKey = `document${idx}`;
     const documentFile = documentFiles[fileKey] || {};
     return {
-      title: doc.title || "",
+      title: doc.title || '',
       created_at: new Date(),
       file: {
-        url: documentFile.url || "",
+        url: documentFile.url || '',
       },
     };
   });
@@ -48,11 +48,11 @@ export const updateDocuments = async (documents, documentFiles) => {
         }
 
         if (documentFile.url && doc.file && doc.file.url) {
-          await removeOldFile(join(__dirname, "..", doc.file.url));
+          await removeOldFile(join(__dirname, '..', doc.file.url));
         }
 
         return {
-          title: doc.title || "",
+          title: doc.title || '',
           created_at: doc.created_at ? new Date(doc.created_at) : new Date(),
           file: {
             url: fileUrl,

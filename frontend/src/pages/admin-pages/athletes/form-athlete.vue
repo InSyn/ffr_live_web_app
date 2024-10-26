@@ -6,145 +6,71 @@
     </div>
 
     <div class="formBody">
-      <div
-        class="imageUpload__wrapper"
-        v-for="athletePhoto in ['photo_url', 'photo_tv_url']"
-        :key="athletePhoto"
-      >
+      <div class="imageUpload__wrapper" v-for="athletePhoto in ['photo_url', 'photo_tv_url']" :key="athletePhoto">
         <div v-if="imagePreview[athletePhoto]" class="imagePreview">
           <img :src="imagePreview[athletePhoto]" alt="Selected Image" />
         </div>
         <div v-else class="imageFiller">
-          <athlete-photo-filler-icon
-            class="athletePhotoFiller__icon"
-            :gender="athlete.gender"
-          ></athlete-photo-filler-icon>
+          <athlete-photo-filler-icon class="athletePhotoFiller__icon" :gender="athlete.gender"></athlete-photo-filler-icon>
         </div>
 
         <div class="imageInput__wrapper">
           <div class="imageInput__title">
             {{ translateField(athletePhoto) }}
           </div>
-          <input
-            @change="onFileChange($event, athletePhoto)"
-            type="file"
-            class="formControl-image"
-            :id="athletePhoto"
-            :name="athletePhoto"
-          />
+          <input @change="onFileChange($event, athletePhoto)" type="file" class="formControl-image" :id="athletePhoto" :name="athletePhoto" />
         </div>
       </div>
 
-      <div
-        v-for="(_, key) in athlete"
-        v-show="key !== 'country_code' && key !== 'region_code'"
-        :key="key"
-        class="formGroup"
-      >
+      <div v-for="(_, key) in athlete" v-show="key !== 'country_code' && key !== 'region_code'" :key="key" class="formGroup">
         <label :for="key" class="formLabel">{{ translateField(key) }}</label>
 
-        <select
-          v-if="key === 'gender'"
-          :id="key"
-          class="formControl"
-          v-model="athlete[key]"
-        >
+        <select v-if="key === 'gender'" :id="key" class="formControl" v-model="athlete[key]">
           <option selected disabled value="">Выбрать пол...</option>
           <option v-for="option in ['М', 'Ж']" :key="option">
             {{ capitalizeString(option) }}
           </option>
         </select>
 
-        <select
-          v-else-if="key === 'sport'"
-          :id="key"
-          class="formControl"
-          v-model="athlete[key]"
-        >
+        <select v-else-if="key === 'sport'" :id="key" class="formControl" v-model="athlete[key]">
           <option selected disabled value="">Выбрать вид спорта...</option>
-          <option
-            v-for="sport in sports"
-            :key="sport.code"
-            class="formControl-option"
-          >
+          <option v-for="sport in sports" :key="sport.code" class="formControl-option">
             {{ capitalizeString(sport.name_rus) }}
           </option>
         </select>
         <div class="select__wrapper" v-else-if="key === 'disciplines'">
-          <div
-            class="formControl__wrapper"
-            v-for="(_, dsc_idx) in athlete[key]"
-            :key="dsc_idx"
-          >
+          <div class="formControl__wrapper" v-for="(_, dsc_idx) in athlete[key]" :key="dsc_idx">
             <select
-              @change="
-                setFieldValue('disciplines', $event.target.value, dsc_idx)
-              "
+              @change="setFieldValue('disciplines', $event.target.value, dsc_idx)"
               :id="key"
               data-new-region="false"
               class="formControl"
               :value="athlete[key][dsc_idx]"
             >
-              <option
-                v-for="discipline in getDisciplines(athlete['sport'])"
-                :key="discipline.code"
-              >
+              <option v-for="discipline in getDisciplines(athlete['sport'])" :key="discipline.code">
                 {{ discipline.name_rus }}
               </option>
             </select>
-            <span
-              @click="removeFieldValue('disciplines', dsc_idx)"
-              class="removeOption__button"
-            >
-            </span>
+            <span @click="removeFieldValue('disciplines', dsc_idx)" class="removeOption__button"> </span>
           </div>
-          <select
-            @change="addFieldValue('disciplines', $event)"
-            class="formControl"
-            :id="key"
-            data-new-region="true"
-            :disabled="!athlete['sport']"
-          >
+          <select @change="addFieldValue('disciplines', $event)" class="formControl" :id="key" data-new-region="true" :disabled="!athlete['sport']">
             <option selected disabled value="">Выбрать дисциплину...</option>
-            <option
-              v-for="discipline in getDisciplines(athlete['sport'])"
-              :key="discipline.code"
-            >
+            <option v-for="discipline in getDisciplines(athlete['sport'])" :key="discipline.code">
               {{ discipline.name_rus }}
             </option>
           </select>
         </div>
 
-        <select
-          @change="setFieldValue('category', $event.target.value)"
-          v-else-if="key === 'category'"
-          :id="key"
-          class="formControl"
-          :value="athlete[key]"
-        >
+        <select @change="setFieldValue('category', $event.target.value)" v-else-if="key === 'category'" :id="key" class="formControl" :value="athlete[key]">
           <option selected disabled value="">Выбрать категорию...</option>
-          <option
-            v-for="rank in getAthletesRanksList()"
-            :key="rank"
-            class="formControl-option"
-          >
+          <option v-for="rank in getAthletesRanksList()" :key="rank" class="formControl-option">
             {{ rank }}
           </option>
         </select>
 
-        <select
-          v-else-if="key === 'country'"
-          :id="key"
-          class="formControl"
-          :value="athlete[key]"
-          @change="setFieldValue('country', $event.target.value)"
-        >
+        <select v-else-if="key === 'country'" :id="key" class="formControl" :value="athlete[key]" @change="setFieldValue('country', $event.target.value)">
           <option selected disabled value="">Выбрать страну...</option>
-          <option
-            v-for="country in countries"
-            :key="country.country_code"
-            class="formControl-option"
-          >
+          <option v-for="country in countries" :key="country.country_code" class="formControl-option">
             {{ country.country_name }}
           </option>
         </select>
@@ -160,12 +86,7 @@
             :placeholder="!athlete['country'] && 'Указать страну...'"
           />
 
-          <div
-            v-else-if="getCountryCode(athlete['country']) === 'RU'"
-            class="formControl__wrapper"
-            v-for="(_, r_idx) in athlete[key]"
-            :key="r_idx"
-          >
+          <div v-else-if="getCountryCode(athlete['country']) === 'RU'" class="formControl__wrapper" v-for="(_, r_idx) in athlete[key]" :key="r_idx">
             <select
               @change="setFieldValue('regions', $event.target.value, r_idx)"
               :id="key"
@@ -178,11 +99,7 @@
                 {{ region.fullname }}
               </option>
             </select>
-            <span
-              @click="removeFieldValue('regions', r_idx)"
-              class="removeOption__button"
-            >
-            </span>
+            <span @click="removeFieldValue('regions', r_idx)" class="removeOption__button"> </span>
           </div>
           <select
             v-show="getCountryCode(athlete['country']) === 'RU'"
@@ -198,46 +115,22 @@
           </select>
         </div>
 
-        <div
-          class="select__wrapper"
-          v-else-if="
-            key === 'organizations' || key === 'hobbies' || key === 'equipment'
-          "
-        >
-          <div
-            class="formControl__wrapper"
-            v-for="(_, org_idx) in athlete[key]"
-            :key="org_idx"
-          >
-            <input
-              @change="setFieldValue(key, $event.target.value.trim(), org_idx)"
-              :id="key"
-              class="formControl"
-              :value="athlete[key][org_idx]"
-            />
-            <span
-              @click="removeFieldValue(key, org_idx)"
-              class="removeOption__button"
-            >
-            </span>
+        <div class="select__wrapper" v-else-if="key === 'organizations' || key === 'hobbies' || key === 'equipment'">
+          <div class="formControl__wrapper" v-for="(_, org_idx) in athlete[key]" :key="org_idx">
+            <input @change="setFieldValue(key, $event.target.value.trim(), org_idx)" :id="key" class="formControl" :value="athlete[key][org_idx]" />
+            <span @click="removeFieldValue(key, org_idx)" class="removeOption__button"> </span>
           </div>
           <input
             @change="addFieldValue(key, $event)"
             :id="key"
             class="formControl"
             :placeholder="
-              (key === 'organizations' && 'Добавьте организацию') ||
-              (key === 'hobbies' && 'Добавьте хобби') ||
-              (key === 'equipment' && 'Добавьте оборудование')
+              (key === 'organizations' && 'Добавьте организацию') || (key === 'hobbies' && 'Добавьте хобби') || (key === 'equipment' && 'Добавьте оборудование')
             "
           />
         </div>
 
-        <select
-          v-else-if="key === 'trainer'"
-          @input="setFieldValue('trainer', $event.target.value)"
-          class="formControl"
-        >
+        <select v-else-if="key === 'trainer'" @input="setFieldValue('trainer', $event.target.value)" class="formControl">
           <option selected disabled value="">Выбрать тренера...</option>
           <option
             v-for="trainer in getTrainersList"
@@ -257,71 +150,30 @@
         <div class="select__wrapper" v-else-if="key === 'socials'">
           <div class="formControl__wrapper">
             <span>vk</span>
-            <input
-              :id="`${key}_vk`"
-              class="formControl"
-              v-model="athlete[key]['vk']"
-            />
+            <input :id="`${key}_vk`" class="formControl" v-model="athlete[key]['vk']" />
           </div>
           <div class="formControl__wrapper">
             <span>telegram</span>
-            <input
-              :id="`${key}_tg`"
-              class="formControl"
-              v-model="athlete[key]['telegram']"
-            />
+            <input :id="`${key}_tg`" class="formControl" v-model="athlete[key]['telegram']" />
           </div>
         </div>
 
         <div class="select__wrapper" v-else-if="key === 'sponsors'">
-          <div
-            class="sponsorInput__wrapper"
-            v-for="(sponsor, idx) in athlete.sponsors"
-            :key="sponsor.sponsor_link + idx"
-          >
+          <div class="sponsorInput__wrapper" v-for="(sponsor, idx) in athlete.sponsors" :key="sponsor.sponsor_link + idx">
             <div class="formControl__wrapper">
               <span>Логотип</span>
-              <div
-                v-if="imagePreview[`sponsor${idx}_logo`]"
-                class="imagePreview"
-              >
-                <img
-                  :src="imagePreview[`sponsor${idx}_logo`]"
-                  alt="Sponsor Logo"
-                />
+              <div v-if="imagePreview[`sponsor${idx}_logo`]" class="imagePreview">
+                <img :src="imagePreview[`sponsor${idx}_logo`]" alt="Sponsor Logo" />
               </div>
-              <input
-                @change="setSponsorUrl($event, idx)"
-                :id="`sponsor_${idx}`"
-                class="formControl-image"
-                type="file"
-                accept="image/*"
-              />
-              <span
-                @click="removeFieldValue('sponsors', idx)"
-                class="removeOption__button"
-              >
-              </span>
+              <input @change="setSponsorUrl($event, idx)" :id="`sponsor_${idx}`" class="formControl-image" type="file" accept="image/*" />
+              <span @click="removeFieldValue('sponsors', idx)" class="removeOption__button"> </span>
             </div>
             <div class="formControl__wrapper">
               <span>Ссылка</span>
-              <input
-                :id="key"
-                class="formControl"
-                v-model="athlete.sponsors[idx].sponsor_link"
-              />
+              <input :id="key" class="formControl" v-model="athlete.sponsors[idx].sponsor_link" />
             </div>
           </div>
-          <v-btn
-            class="addSponsor__button"
-            @click="addSponsor()"
-            v-if="athlete.sponsors.length < 5"
-            color="var(--accent)"
-            small
-            text
-          >
-            Добавить
-          </v-btn>
+          <v-btn class="addSponsor__button" @click="addSponsor()" v-if="athlete.sponsors.length < 5" color="var(--accent)" small text> Добавить </v-btn>
         </div>
 
         <medals-select
@@ -332,56 +184,34 @@
           :athlete-medal-events="athlete.medals"
         ></medals-select>
 
-        <input
-          v-else
-          v-model.trim="athlete[key]"
-          :id="key"
-          :name="key"
-          :type="getInputType(key)"
-          class="formControl"
-        />
+        <input v-else v-model.trim="athlete[key]" :id="key" :name="key" :type="getInputType(key)" class="formControl" />
       </div>
     </div>
 
     <div class="formActions">
-      <v-btn
-        class="actionButton"
-        type="submit"
-        color="var(--text-contrast)"
-        small
-      >
-        {{ action === "create" ? "Создать" : "Обновить" }}
+      <v-btn class="actionButton" type="submit" color="var(--text-contrast)" small>
+        {{ action === 'create' ? 'Создать' : 'Обновить' }}
       </v-btn>
-      <v-btn
-        class="actionButton"
-        v-show="action === 'update'"
-        type="button"
-        color="var(--message-error)"
-        @click="deleteAthlete"
-        text
-        small
-      >
-        Удалить
-      </v-btn>
+      <v-btn class="actionButton" v-show="action === 'update'" type="button" color="var(--message-error)" @click="deleteAthlete" text small> Удалить </v-btn>
     </div>
   </form>
 </template>
 
 <script>
-import AthletePhotoFillerIcon from "@/assets/svg/athletePhotoFiller-icon.vue";
-import { getInputType } from "@/utils/get-input-type";
-import { countries, getCountryCode } from "@/store/data/countries";
-import { getSortedRegions } from "@/store/data/russia-regions";
-import { getDisciplines, sports } from "@/store/data/sports";
-import { capitalizeString } from "@/utils/capitalizeString";
-import { translateField } from "@/utils/formFields-translator";
-import { databaseUrl, uploadsFolderUrl } from "@/store/constants";
-import MedalsSelect from "@/components/ui-components/medals-select.vue";
-import { getAthletesRanksList } from "@/store/data/sport-data-sets";
-import axios from "axios";
+import AthletePhotoFillerIcon from '@/assets/svg/athletePhotoFiller-icon.vue';
+import { getInputType } from '@/utils/get-input-type';
+import { countries, getCountryCode } from '@/store/data/countries';
+import { getSortedRegions } from '@/store/data/russia-regions';
+import { getDisciplines, sports } from '@/store/data/sports';
+import { capitalizeString } from '@/utils/capitalizeString';
+import { translateField } from '@/utils/formFields-translator';
+import { databaseUrl, uploadsFolderUrl } from '@/store/constants';
+import MedalsSelect from '@/components/ui-components/medals-select.vue';
+import { getAthletesRanksList } from '@/store/data/sport-data-sets';
+import axios from 'axios';
 
 export default {
-  name: "athleteForm",
+  name: 'athleteForm',
   props: {
     athlete: Object,
     athleteImages: Object,
@@ -427,33 +257,29 @@ export default {
       }
 
       this.$set(this.selectedFile, imageType, e.target.files[0]);
-      this.previewImage(imageType, "file");
+      this.previewImage(imageType, 'file');
     },
     previewImage(imageType, sourceType) {
-      if (sourceType === "file" && this.selectedFile[imageType]) {
+      if (sourceType === 'file' && this.selectedFile[imageType]) {
         const reader = new FileReader();
         reader.onload = (e) => {
           this.$set(this.imagePreview, imageType, e.target.result);
         };
         reader.readAsDataURL(this.selectedFile[imageType]);
-      } else if (sourceType === "url") {
-        this.$set(
-          this.imagePreview,
-          imageType,
-          uploadsFolderUrl + this.athleteImages[imageType]
-        );
+      } else if (sourceType === 'url') {
+        this.$set(this.imagePreview, imageType, uploadsFolderUrl + this.athleteImages[imageType]);
       }
     },
 
     setFieldValue(field, value, idx) {
       switch (field) {
-        case "country": {
+        case 'country': {
           this.athlete.country = value.trim();
 
           return;
         }
 
-        case "region": {
+        case 'region': {
           this.athlete.region[idx] = value.trim();
 
           return;
@@ -474,26 +300,18 @@ export default {
       const fieldValue = event.target.value.toString().trim();
       this.athlete[field].push(fieldValue);
 
-      event.target.value = "";
+      event.target.value = '';
     },
     removeFieldValue(field, idx) {
-      if (field === "sponsors") {
+      if (field === 'sponsors') {
         this.athlete.sponsors.splice(idx, 1);
         this.$delete(this.imagePreview, `sponsor${idx}_logo`);
         this.$delete(this.selectedFile, `sponsor${idx}_logo`);
 
         for (let i = idx; i < this.athlete.sponsors.length; i++) {
-          this.$set(
-            this.imagePreview,
-            `sponsor${i}_logo`,
-            this.imagePreview[`sponsor${i + 1}_logo`] || null
-          );
+          this.$set(this.imagePreview, `sponsor${i}_logo`, this.imagePreview[`sponsor${i + 1}_logo`] || null);
           this.$delete(this.imagePreview, `sponsor${i + 1}_logo`);
-          this.$set(
-            this.selectedFile,
-            `sponsor${i}_logo`,
-            this.selectedFile[`sponsor${i + 1}_logo`] || null
-          );
+          this.$set(this.selectedFile, `sponsor${i}_logo`, this.selectedFile[`sponsor${i + 1}_logo`] || null);
           this.$delete(this.selectedFile, `sponsor${i + 1}_logo`);
         }
       } else {
@@ -503,8 +321,8 @@ export default {
     addSponsor() {
       const newIdx = this.athlete.sponsors.length;
       this.athlete.sponsors.push({
-        logo_url: "",
-        sponsor_link: "",
+        logo_url: '',
+        sponsor_link: '',
       });
       this.$set(this.imagePreview, `sponsor${newIdx}_logo`, null);
       this.$set(this.selectedFile, `sponsor${newIdx}_logo`, null);
@@ -512,7 +330,7 @@ export default {
     setSponsorUrl(e, idx) {
       if (!e.target.files[0]) {
         this.$set(this.imagePreview, `sponsor${idx}_logo`, null);
-        this.$set(this.athlete.sponsors[idx], "logo_url", null);
+        this.$set(this.athlete.sponsors[idx], 'logo_url', null);
         return;
       }
 
@@ -527,7 +345,7 @@ export default {
       this.$set(this.selectedFile, `sponsor${idx}_logo`, file);
     },
     addMedalsEvent() {
-      this.athlete.medals.push({ name: "", gold: 0, silver: 0, bronze: 0 });
+      this.athlete.medals.push({ name: '', gold: 0, silver: 0, bronze: 0 });
     },
     updateMedalsEvent(eIdx, eventData) {
       this.athlete.medals[eIdx] = { ...eventData };
@@ -548,20 +366,20 @@ export default {
 
     submitForm() {
       switch (this.action) {
-        case "create": {
-          this.$emit("create-athlete", this.selectedFile);
+        case 'create': {
+          this.$emit('create-athlete', this.selectedFile);
           return;
         }
-        case "update": {
-          this.$emit("update-athlete", this.selectedFile);
+        case 'update': {
+          this.$emit('update-athlete', this.selectedFile);
           return;
         }
       }
     },
 
     deleteAthlete() {
-      if (confirm("Вы уверены, что хотите удалить спортсмена?")) {
-        this.$emit("delete-athlete", this.athlete.rus_code);
+      if (confirm('Вы уверены, что хотите удалить спортсмена?')) {
+        this.$emit('delete-athlete', this.athlete.rus_code);
       }
     },
   },
@@ -573,7 +391,7 @@ export default {
         if (!newImages) return;
 
         for (const imgKey in newImages) {
-          if (newImages[imgKey]) this.previewImage(imgKey, "url");
+          if (newImages[imgKey]) this.previewImage(imgKey, 'url');
         }
       },
     },
@@ -593,6 +411,8 @@ form {
   padding: 1rem 1.6rem;
 
   background-color: var(--background--card);
+  box-shadow: var(--container-shadow-m);
+  border: 1px solid var(--border-container);
   border-radius: 4px;
 
   .formHeader {
@@ -625,6 +445,7 @@ form {
           border-radius: 4px;
         }
       }
+
       .imageFiller {
         flex: 0 0 auto;
         display: flex;
@@ -636,6 +457,7 @@ form {
           width: 80px;
         }
       }
+
       .imageInput__wrapper {
         flex: 1 1 0;
         display: flex;
@@ -644,6 +466,7 @@ form {
         .imageInput__title {
           flex: 0 0 auto;
         }
+
         .formControl-image {
           flex: 0 0 auto;
           margin-top: auto;
@@ -659,6 +482,7 @@ form {
 
             cursor: pointer;
           }
+
           &::file-selector-button:hover {
             background-color: var(--background--card-hover);
           }
@@ -676,12 +500,14 @@ form {
       &:focus-within {
         border-bottom: 1px solid var(--text-muted);
       }
+
       .formLabel {
         flex: 0 1 auto;
         width: 9rem;
         margin-right: 1rem;
         padding: 3px 6px;
       }
+
       .select__wrapper {
         flex: 1 1 0;
         display: flex;
@@ -693,6 +519,7 @@ form {
           flex-direction: column;
           gap: 4px;
         }
+
         .formControl__wrapper {
           position: relative;
           display: flex;
@@ -702,6 +529,7 @@ form {
             width: 4rem;
             margin-right: 8px;
           }
+
           .imagePreview {
             flex: 0 1 auto;
             display: flex;
@@ -717,6 +545,7 @@ form {
               max-width: 100%;
             }
           }
+
           .formControl-image {
             font-size: 0.75rem;
 
@@ -731,10 +560,12 @@ form {
 
               cursor: pointer;
             }
+
             &::file-selector-button:hover {
               background-color: var(--background--card-hover);
             }
           }
+
           .removeOption__button {
             display: block;
             position: absolute;
@@ -748,13 +579,14 @@ form {
             opacity: 0.45;
             transition: opacity 64ms;
             cursor: pointer;
-            content: "";
+            content: '';
 
             &:hover {
               opacity: 1;
             }
+
             &::before {
-              content: "";
+              content: '';
               position: absolute;
               display: block;
               height: 3px;
@@ -765,8 +597,9 @@ form {
               top: 50%;
               transform: translate(-50%, -50%) rotate(45deg);
             }
+
             &::after {
-              content: "";
+              content: '';
               position: absolute;
               display: block;
               height: 3px;
@@ -779,10 +612,12 @@ form {
             }
           }
         }
+
         .addSponsor__button {
           align-self: center;
         }
       }
+
       .formControl {
         position: relative;
         flex: 1 1 0;
@@ -797,13 +632,16 @@ form {
         &:focus {
           background-color: var(--background--card-hover);
         }
-        &[data-new-region="true"] {
+
+        &[data-new-region='true'] {
           position: relative;
           border: 1px solid var(--text-muted);
         }
-        &[name="is_national_team"] {
+
+        &[name='is_national_team'] {
           flex: 0 1 auto;
         }
+
         select {
           color: red;
         }

@@ -3,32 +3,20 @@
     <svg
       v-if="gender === 'Ж'"
       xmlns="http://www.w3.org/2000/svg"
-      style="
-        shape-rendering: geometricPrecision;
-        text-rendering: geometricPrecision;
-        image-rendering: optimizeQuality;
-        fill-rule: evenodd;
-        clip-rule: evenodd;
-      "
+      style="shape-rendering: geometricPrecision; text-rendering: geometricPrecision; image-rendering: optimizeQuality; fill-rule: evenodd; clip-rule: evenodd"
       viewBox="0 -12 200 200"
     >
       <g>
         <path
           class="fil0"
-          d="M44 150c-12.13,1.01 -21.77,11.49 -30,17 5.15,7.69 26.98,19.42 36,23 15.27,6.07 29.86,9.39 44.41,10l9.86 0c14.81,-0.62 29.74,-4.06 45.45,-10.28 10.44,-4.14 30.98,-15.8 36.28,-23.72 -4.96,-7.41 -20.69,-14.86 -27,-15 0,-11.46 5,-19.63 5,-27 0,-10.9 -5.06,-25.94 -7.43,-36.57 -2.89,-13 -3.79,-25.22 -6.01,-38.99 -0.53,-3.32 -0.8,-7.01 -1.41,-9.59 -0.93,-3.9 -8.97,-18.56 -11.97,-21.03 -18.4,-15.1 -17.82,-17.51 -28.66,-17.82l-12.71 0 -0.81 0c-17.36,0 -19.89,8.45 -25.25,13.75 -4.3,4.26 -11.69,19.22 -13.65,25.35 -4.08,12.76 -2.24,13.68 -3.68,23.32 -1.2,8.02 0.47,17.21 -0.95,25.05 -2.09,11.52 -4.06,12.86 -7.07,19.93l-2.44 6.56c-1.68,4.5 -3.06,8.45 -2.93,14l4.97 22.04z"
+          d="M 44 150 c -12.13 1.01 -21.77 11.49 -30 17 c 5.15 7.69 26.98 19.42 36 23 c 15.27 6.07 29.86 9.39 44.41 10 l 9.86 0 c 14.81 -0.62 29.74 -4.06 45.45 -10.28 c 10.44 -4.14 30.98 -15.8 36.28 -23.72 c -4.96 -7.41 -20.69 -14.86 -27 -15 c 0 -11.46 4 -18 4 -27 c 1 -11 -5.06 -25.94 -7.43 -36.57 c -2.89 -13 -3.79 -25.22 -6.01 -38.99 c -0.53 -3.32 -0.8 -7.01 -1.41 -9.59 c -0.93 -3.9 -8.97 -18.56 -11.97 -21.03 c -18.4 -15.1 -17.82 -17.51 -28.66 -17.82 l -12.71 0 l -0.81 0 c -17.36 0 -19.89 8.45 -25.25 13.75 c -4.3 4.26 -11.69 19.22 -13.65 25.35 c -4.08 12.76 -2.24 13.68 -3.68 23.32 c -1.2 8.02 0.47 17.21 -0.95 25.05 c -2.09 11.52 -4.06 12.86 -7.07 19.93 l -2.44 6.56 c -1.68 4.5 -3.06 8.45 -1.96 20.04 l 3 17 z"
         />
       </g>
     </svg>
     <svg
       v-else
       xmlns="http://www.w3.org/2000/svg"
-      style="
-        shape-rendering: geometricPrecision;
-        text-rendering: geometricPrecision;
-        image-rendering: optimizeQuality;
-        fill-rule: evenodd;
-        clip-rule: evenodd;
-      "
+      style="shape-rendering: geometricPrecision; text-rendering: geometricPrecision; image-rendering: optimizeQuality; fill-rule: evenodd; clip-rule: evenodd"
       viewBox="0 -12 200 200"
     >
       <g>
@@ -43,11 +31,11 @@
 
 <script>
 export default {
-  name: "athletePhotoFiller-icon",
+  name: 'athletePhotoFiller-icon',
   props: {
     gender: {
       type: String,
-      default: () => "М",
+      default: () => 'М',
     },
   },
 };

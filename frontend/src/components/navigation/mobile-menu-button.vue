@@ -1,12 +1,7 @@
 <template>
   <div class="mobileMenu__button__wrapper">
     <div class="menu-button" @click="toggleMenu">
-      <svg
-        height="50"
-        viewBox="0 0 100 100"
-        width="50"
-        xmlns="http://www.w3.org/2000/svg"
-      >
+      <svg height="50" viewBox="0 0 100 100" width="50" xmlns="http://www.w3.org/2000/svg">
         <g :class="{ 'menu-open': menuState }">
           <line class="line top" x1="20" x2="80" y1="35" y2="35" />
           <line class="line middle" x1="20" x2="80" y1="50" y2="50" />
@@ -19,8 +14,8 @@
 
 <script>
 export default {
-  name: "mobile-menu-button",
-  props: ["menuState"],
+  name: 'mobile-menu-button',
+  props: ['menuState'],
   data() {
     return {
       isOpen: false,
@@ -28,7 +23,7 @@ export default {
   },
   methods: {
     toggleMenu() {
-      this.$emit("toggle-menu");
+      this.$emit('toggle-menu');
     },
   },
 };

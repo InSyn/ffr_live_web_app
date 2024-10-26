@@ -11,12 +11,12 @@
 </template>
 
 <script>
-import { checkUserTheme } from "@/utils/check-theme";
-import AppHeader from "@/components/layout/AppHeader.vue";
-import AppFooter from "@/components/layout/AppFooter.vue";
+import { checkUserTheme } from '@/utils/check-theme';
+import AppHeader from '@/components/layout/AppHeader.vue';
+import AppFooter from '@/components/layout/AppFooter.vue';
 
 export default {
-  name: "Home",
+  name: 'Home',
   components: { AppFooter, AppHeader },
   methods: {
     checkUserTheme,
@@ -42,15 +42,11 @@ export default {
     &::before {
       position: absolute;
       z-index: -1;
-      content: "";
+      content: '';
       height: 100%;
       width: 100%;
       opacity: 0.25;
-      background-image: linear-gradient(
-        to bottom,
-        var(--background--primary),
-        var(--background--secondary)
-      );
+      background-image: linear-gradient(to bottom, var(--background--primary), var(--background--secondary));
     }
   }
 }

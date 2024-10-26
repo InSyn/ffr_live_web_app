@@ -1,22 +1,22 @@
 export const formatLastname = (str) => {
-  if (!str) return "";
+  if (!str) return '';
 
   return str.toString().toUpperCase();
 };
 
 export const formatFullname = (str) => {
-  if (!str && typeof str !== "string") return "";
-  if (str.split(" ").length < 3) return str;
+  if (!str && typeof str !== 'string') return '';
+  if (str.split(' ').length < 3) return str;
 
-  const nameArr = str.split(" ");
+  const nameArr = str.split(' ');
   nameArr[0] = nameArr[0].toUpperCase();
 
-  return nameArr.join(" ");
+  return nameArr.join(' ');
 };
 
 export const getSeason = (dateStr) => {
   const date = new Date(dateStr);
-  if (!date) return "";
+  if (!date) return '';
 
   const year = date.getFullYear();
   const month = date.getMonth();

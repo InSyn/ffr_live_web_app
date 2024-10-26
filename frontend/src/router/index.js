@@ -1,32 +1,34 @@
-import Vue from "vue";
-import VueRouter from "vue-router";
+import Vue from 'vue';
+import VueRouter from 'vue-router';
 
-import { isLoggedIn } from "@/utils/auth-helpers";
+import { isLoggedIn } from '@/utils/auth-helpers';
 
-import Main from "@/views/Main.vue";
+import Main from '@/views/Main.vue';
 
-import results from "@/pages/events/calendar-page/index.vue";
-import authPage from "@/pages/auth/index.vue";
-import userPage from "@/pages/user/index.vue";
-import connectedParticles from "@/components/extra/connected-particles.vue";
-import { athleteRoutes } from "@/router/athlete-routes";
-import { eventRoutes } from "@/router/event-routes";
-import { juryRoutes } from "@/router/jury-routes";
-import { trainersRoutes } from "@/router/trainers-routes";
-import { organizationsRoutes } from "@/router/organizations-routes";
-import { seminarsRoutes } from "@/router/seminars-routes";
+import results from '@/pages/events/calendar-page/index.vue';
+import authPage from '@/pages/auth/index.vue';
+import userPage from '@/pages/user/index.vue';
+import connectedParticles from '@/components/extra/connected-particles.vue';
+import { athleteRoutes } from '@/router/athlete-routes';
+import { eventRoutes } from '@/router/event-routes';
+import { juryRoutes } from '@/router/jury-routes';
+import { trainersRoutes } from '@/router/trainers-routes';
+import { organizationsRoutes } from '@/router/organizations-routes';
+import { seminarsRoutes } from '@/router/seminars-routes';
+import registration from '@/pages/admin-pages/user-registration.vue';
+import registrationListPage from '@/pages/admin-pages/online-registration/registration-list-page.vue';
 
 Vue.use(VueRouter);
 
 const routes = [
   {
-    path: "/",
-    name: "Main",
+    path: '/',
+    name: 'Main',
     component: Main,
     children: [
       {
-        name: "results",
-        path: "calendar",
+        name: 'results',
+        path: 'calendar',
         component: results,
       },
       ...eventRoutes,
@@ -37,20 +39,31 @@ const routes = [
       ...seminarsRoutes,
 
       {
-        name: "auth",
-        path: "auth",
+        name: 'allRegistrations',
+        path: 'all-registrations',
+        component: registrationListPage,
+      },
+      {
+        name: 'registration',
+        path: 'registration',
+        component: registration,
+      },
+
+      {
+        name: 'auth',
+        path: 'auth',
         component: authPage,
       },
       {
-        name: "user-page",
-        path: "user_page",
+        name: 'userPage',
+        path: 'user-page',
         component: userPage,
         meta: { requiresAuth: true },
       },
 
       {
-        name: "particles",
-        path: "chill",
+        name: 'particles',
+        path: 'chill',
         component: connectedParticles,
       },
     ],
@@ -58,15 +71,15 @@ const routes = [
 ];
 
 const router = new VueRouter({
-  mode: "history",
+  mode: 'history',
   base: process.env.BASE_URL,
   routes,
 });
 
 router.beforeEach((to, from, next) => {
-  if (to.matched.some((record) => record.meta["requiresAuth"])) {
+  if (to.matched.some((record) => record.meta['requiresAuth'])) {
     if (!isLoggedIn()) {
-      next({ name: "auth" });
+      next({ name: 'auth' });
     } else {
       next();
     }

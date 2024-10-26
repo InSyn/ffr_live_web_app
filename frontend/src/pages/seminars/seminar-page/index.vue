@@ -13,24 +13,15 @@
         </div>
         <div class="seminar__sport">
           {{ seminar.sport }}
-          <country-flag
-            class="countryFlag"
-            :country-code="getCountryCode(seminar['country'])"
-            height="1rem"
-          ></country-flag>
+          <country-flag class="countryFlag" :country-code="getCountryCode(seminar['country'])" height="1rem"></country-flag>
         </div>
       </div>
       <div class="seminarPage__body">
         <div class="seminarData__wrapper">
           <div v-if="seminar.region" class="seminar__region">
-            <country-flag
-              is-region-flag="true"
-              country-code="RU"
-              :region-code="getRegionCode(seminar.region)"
-              width="calc(8px + 1rem)"
-            ></country-flag>
+            <country-flag is-region-flag="true" country-code="RU" :region-code="getRegionCode(seminar.region)" width="calc(8px + 1rem)"></country-flag>
             &nbsp;
-            {{ [seminar.region, seminar.location].join(", ") }}
+            {{ [seminar.region, seminar.location].join(', ') }}
           </div>
           <div v-if="seminar.date" class="seminar__date">
             {{ formatDate(seminar.date) }}
@@ -42,32 +33,15 @@
         <div v-if="seminar.participants.length" class="participants__wrapper">
           <div class="participants__title">Участники</div>
           <div class="seminarParticipant__list">
-            <div
-              class="seminarParticipant__item"
-              v-for="(participant, idx) in seminar.participants"
-              :key="idx"
-            >
-              {{
-                `${participant.fullname}${
-                  participant.role ? " - " + participant.role : ""
-                }`
-              }}
+            <div class="seminarParticipant__item" v-for="(participant, idx) in seminar.participants" :key="idx">
+              {{ `${participant.fullname}${participant.role ? ' - ' + participant.role : ''}` }}
             </div>
           </div>
         </div>
         <div class="seminarFiles__wrapper">
           <div class="seminarFiles__title">Документы:</div>
-          <div
-            v-for="(document, idx) in seminar.documents"
-            :key="idx"
-            class="seminarFile__item"
-          >
-            <a
-              v-if="document?.file?.url"
-              :href="`${uploadsFolderUrl}${document.file.url}`"
-              target="_blank"
-              class="seminarFile__item__link"
-            >
+          <div v-for="(document, idx) in seminar.documents" :key="idx" class="seminarFile__item">
+            <a v-if="document?.file?.url" :href="`${uploadsFolderUrl}${document.file.url}`" target="_blank" class="seminarFile__item__link">
               <file-icon class="seminarFile__item__icon"></file-icon>
               {{ document.title }}
             </a>
@@ -75,24 +49,13 @@
         </div>
         <div class="seminarContacts__wrapper">
           <div class="seminarContacts__title">Контакты:</div>
-          <div
-            v-for="(contact, idx) in seminar.contacts"
-            :key="idx"
-            class="seminarContact__item"
-          >
+          <div v-for="(contact, idx) in seminar.contacts" :key="idx" class="seminarContact__item">
             {{ contact }}
           </div>
         </div>
       </div>
       <div v-if="isAdmin" class="seminarPage__actions">
-        <v-btn
-          @click="openParticipantsControl"
-          color="var(--accent)"
-          small
-          text
-        >
-          Добавить участников
-        </v-btn>
+        <v-btn @click="openParticipantsControl" color="var(--accent)" small text> Добавить участников </v-btn>
       </div>
     </div>
 
@@ -105,22 +68,22 @@
 </template>
 
 <script>
-import axios from "axios";
-import { databaseUrl, uploadsFolderUrl } from "@/store/constants";
-import CountryFlag from "@/components/ui-components/country-flag.vue";
-import { getCountryCode } from "@/store/data/countries";
-import FileIcon from "@/components/icons/file-icon.vue";
-import { formatDate } from "@/utils/data-formaters";
-import { getDisciplineCode } from "@/store/data/sports";
-import EditButton from "@/components/ui-components/edit-button.vue";
-import { mapGetters } from "vuex";
-import SeminarParticipantsControl from "@/pages/seminars/seminarParticipants-control/index.vue";
-import { getRegionCode } from "@/store/data/russia-regions";
+import axios from 'axios';
+import { databaseUrl, uploadsFolderUrl } from '@/store/constants';
+import CountryFlag from '@/components/ui-components/country-flag.vue';
+import { getCountryCode } from '@/store/data/countries';
+import FileIcon from '@/components/icons/file-icon.vue';
+import { formatDate } from '@/utils/data-formaters';
+import { getDisciplineCode } from '@/store/data/sports';
+import EditButton from '@/components/ui-components/edit-button.vue';
+import { mapGetters } from 'vuex';
+import SeminarParticipantsControl from '@/pages/seminars/seminarParticipants-control/index.vue';
+import { getRegionCode } from '@/store/data/russia-regions';
 
 export default {
-  name: "index",
+  name: 'index',
   components: { SeminarParticipantsControl, EditButton, FileIcon, CountryFlag },
-  props: ["seminar_id"],
+  props: ['seminar_id'],
   data() {
     return {
       seminar: null,
@@ -130,8 +93,8 @@ export default {
     };
   },
   computed: {
-    ...mapGetters("authorization", {
-      isAdmin: "isAdmin",
+    ...mapGetters('authorization', {
+      isAdmin: 'isAdmin',
     }),
 
     uploadsFolderUrl() {
@@ -160,9 +123,9 @@ export default {
       }
     },
     getSeminarDisciplines() {
-      if (!this.seminar.disciplines.length) return "";
+      if (!this.seminar.disciplines.length) return '';
 
-      return this.seminar.disciplines.join(", ");
+      return this.seminar.disciplines.join(', ');
     },
 
     openParticipantsControl() {
@@ -220,11 +183,13 @@ export default {
           display: flex;
           align-items: center;
         }
+
         .seminar__title__disciplines {
           margin-top: 0.5rem;
           font-size: 1.2rem;
         }
       }
+
       .seminar__sport {
         display: flex;
         align-items: center;
@@ -236,6 +201,7 @@ export default {
         }
       }
     }
+
     .seminarPage__body {
       flex: 0 0 auto;
       display: flex;
@@ -256,6 +222,7 @@ export default {
           align-items: center;
           flex-wrap: wrap;
         }
+
         .seminar__format {
           margin-left: auto;
           font-size: 1rem;
@@ -275,6 +242,7 @@ export default {
           flex: 0 0 auto;
           margin-bottom: 0.5rem;
         }
+
         .seminarParticipant__list {
           flex: 0 0 auto;
           display: flex;
@@ -282,6 +250,7 @@ export default {
           gap: 2px;
         }
       }
+
       .seminarFiles__wrapper {
         flex: 0 0 auto;
         display: flex;
@@ -291,6 +260,7 @@ export default {
         .seminarFiles__title {
           margin-left: 1.25rem;
         }
+
         .seminarFile__item {
           flex: 0 0 auto;
 
@@ -307,6 +277,7 @@ export default {
           }
         }
       }
+
       .seminarContacts__wrapper {
         flex: 0 0 auto;
         display: flex;
@@ -320,6 +291,7 @@ export default {
         }
       }
     }
+
     .seminarPage__actions {
       flex: 0 0 auto;
       display: flex;
@@ -327,6 +299,7 @@ export default {
       margin-top: 1rem;
     }
   }
+
   @media screen and (max-width: 640px) {
     flex: 1 1 0;
     margin: 0;
@@ -342,13 +315,16 @@ export default {
 
       .seminarPage__header {
         margin-bottom: auto;
+
         .seminar__title__wrapper {
           font-size: 1.75rem;
         }
+
         .seminar__sport {
           font-size: 1.75rem;
         }
       }
+
       .seminarPage__body {
         flex: 1 1 0;
         gap: 1.2rem;

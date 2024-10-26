@@ -5,18 +5,15 @@
         <span>Пользователь:&nbsp;</span>
         <b>{{ userData.username }}</b>
 
-        <v-btn
-          @click.prevent="logout"
-          class="userPage__actions-exit"
-          color="var(--message-error)"
-          text
-        >
-          Выйти
-        </v-btn>
+        <v-btn @click.prevent="logout" class="userPage__actions-exit" color="var(--message-error)" text> Выйти </v-btn>
       </div>
       <div class="userRole__wrapper">
         <span>Ваша роль:&nbsp;</span>
-        <b>{{ translateRole(userData.role) }}</b>
+        <b>{{ translateField(userData.role) }}</b>
+      </div>
+      <div v-show="userData.role === 'regional_organization'" class="userRole__wrapper">
+        <span>Регион:&nbsp;</span>
+        <b>{{ `${getRegionCode(userData.region)} - ${userData.region}` }}</b>
       </div>
 
       <admin-pages-nav></admin-pages-nav>
@@ -27,37 +24,33 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
-import Statistics from "@/pages/user/statistics/index.vue";
-import AdminPagesNav from "@/pages/user/statistics/admin-pages-nav.vue";
+import { mapActions, mapGetters } from 'vuex';
+import Statistics from '@/pages/user/statistics/index.vue';
+import AdminPagesNav from '@/pages/user/admin-pages-nav.vue';
+import { translateField } from '@/utils/formFields-translator';
+import { getRegionCode } from '@/store/data/russia-regions';
 
 export default {
-  name: "userPage",
+  name: 'userPage',
   components: { AdminPagesNav, Statistics },
   methods: {
-    ...mapActions("authorization", {
-      exitAccount: "EXIT_ACCOUNT",
+    getRegionCode,
+    translateField,
+    ...mapActions('authorization', {
+      exitAccount: 'EXIT_ACCOUNT',
     }),
 
     logout() {
       this.exitAccount();
     },
-    translateRole(role) {
-      const rolesMap = {
-        admin: "Администратор",
-        user: "Пользователь",
-      };
-
-      return rolesMap[role] || role;
-    },
   },
   computed: {
-    ...mapGetters("authorization", {
-      userData: "getUserData",
+    ...mapGetters('authorization', {
+      userData: 'getUserData',
     }),
   },
   beforeUpdate() {
-    if (!this.userData.token) this.$router.push({ name: "auth" });
+    if (!this.userData.token) this.$router.push({ name: 'auth' });
   },
 };
 </script>
@@ -68,7 +61,7 @@ export default {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.75rem;
   overflow-y: auto;
 
   width: 100%;
@@ -83,12 +76,15 @@ export default {
     gap: 8px;
 
     background-color: var(--background--card);
+    box-shadow: var(--container-shadow-m);
+    border: 1px solid var(--border-container);
     border-radius: 4px;
-    font-size: 1.2rem;
+    font-size: 1.15rem;
 
     .username__wrapper {
       flex: 0 0 auto;
       display: flex;
+      align-items: center;
 
       .userPage__actions-exit {
         margin-left: auto;

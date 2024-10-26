@@ -13,10 +13,7 @@
           </div>
           <div class="seminarSport">
             {{ seminar.sport }}
-            <country-flag
-              height="1.1rem"
-              :country-code="getCountryCode(seminar.country)"
-            ></country-flag>
+            <country-flag height="1.1rem" :country-code="getCountryCode(seminar.country)"></country-flag>
           </div>
         </div>
         <div class="jurySeminars__list__item__footer">
@@ -27,7 +24,7 @@
             {{ formatDate(seminar.date) }}
           </div>
           <div v-if="seminar.disciplines.length" class="seminarDisciplines">
-            {{ seminar.disciplines.join(", ") }}
+            {{ seminar.disciplines.join(', ') }}
           </div>
         </div>
       </router-link>
@@ -36,14 +33,14 @@
 </template>
 
 <script>
-import axios from "axios";
-import { databaseUrl } from "@/store/constants";
-import { formatDate } from "@/utils/data-formaters";
-import CountryFlag from "@/components/ui-components/country-flag.vue";
-import { getCountryCode } from "@/store/data/countries";
+import axios from 'axios';
+import { databaseUrl } from '@/store/constants';
+import { formatDate } from '@/utils/data-formaters';
+import CountryFlag from '@/components/ui-components/country-flag.vue';
+import { getCountryCode } from '@/store/data/countries';
 
 export default {
-  name: "jurySeminars-list",
+  name: 'jurySeminars-list',
   components: { CountryFlag },
   props: {
     jury_code: String,
@@ -58,11 +55,9 @@ export default {
     formatDate,
     async getJurySeminars() {
       try {
-        const response = await axios.get(
-          databaseUrl + `/jury/${this.jury_code}/seminars`
-        );
+        const response = await axios.get(databaseUrl + `/jury/${this.jury_code}/seminars`);
         if (response.status === 200) {
-          this.seminars = response.data["seminars"];
+          this.seminars = response.data['seminars'];
         }
       } catch (e) {
         if (e) {
@@ -88,6 +83,7 @@ export default {
   .jurySeminars__list {
     display: flex;
     flex-direction: column;
+
     .jurySeminars__list__item {
       flex: 0 0 auto;
       display: flex;
@@ -97,9 +93,11 @@ export default {
       &.even {
         background-color: var(--background--card-secondary);
       }
+
       &:hover {
         background-color: var(--background--card-hover);
       }
+
       .jurySeminars__list__item__header {
         flex: 0 0 auto;
         display: flex;
@@ -111,6 +109,7 @@ export default {
           flex: 1 1 0;
           font-weight: bold;
         }
+
         .seminarSport {
           flex: 0 0 auto;
           display: flex;
@@ -119,6 +118,7 @@ export default {
           margin-left: 1rem;
         }
       }
+
       .jurySeminars__list__item__footer {
         flex: 0 0 auto;
         display: flex;
@@ -128,9 +128,11 @@ export default {
         .seminarRegion {
           color: var(--text-muted);
         }
+
         .seminarDate {
           color: var(--text-muted);
         }
+
         .seminarDisciplines {
           margin-left: auto;
         }

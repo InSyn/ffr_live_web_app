@@ -1,8 +1,8 @@
-import { dirname, join } from "path";
-import { removeOldFile } from "../file-storage/fileStorage.js";
-import { Organization } from "../models/organization-model.js";
-import { Athlete } from "../models/athlete-model.js";
-import { fileURLToPath } from "url";
+import { dirname, join } from 'path';
+import { removeOldFile } from '../file-storage/fileStorage.js';
+import { Organization } from '../models/organization-model.js';
+import { Athlete } from '../models/athlete-model.js';
+import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -13,13 +13,13 @@ export const getAllOrganizations = async (req, res) => {
       title: 1,
     });
     res.status(200).json({
-      status: "success",
+      status: 'success',
       organizations,
     });
   } catch (e) {
     res.status(404).json({
-      status: "Err",
-      data: "Organizations not found",
+      status: 'Err',
+      data: 'Organizations not found',
       err: e,
     });
   }
@@ -36,19 +36,19 @@ export const searchOrganizations = async (req, res) => {
       query.sport = req.query.sport;
     }
     if (req.query.region) {
-      query.region = new RegExp(req.query.region, "i");
+      query.region = new RegExp(req.query.region, 'i');
     }
 
     const organizations = await Organization.find(query).sort({ title: 1 });
     res.status(200).json({
-      status: "success",
+      status: 'success',
       results: organizations.length,
       organizations,
     });
   } catch (e) {
     res.status(404).json({
-      status: "Err",
-      data: "Organizations not found",
+      status: 'Err',
+      data: 'Organizations not found',
       err: e,
     });
   }
@@ -56,9 +56,7 @@ export const searchOrganizations = async (req, res) => {
 
 export const addNewOrganization = async (req, res) => {
   try {
-    const logoUrl = req.files["logo_url"]
-      ? `/uploads/images/${req.files["logo_url"][0].filename}`
-      : "";
+    const logoUrl = req.files['logo_url'] ? `/uploads/images/${req.files['logo_url'][0].filename}` : '';
 
     const organization = new Organization({
       logo_url: logoUrl,
@@ -73,13 +71,13 @@ export const addNewOrganization = async (req, res) => {
     await organization.save();
 
     res.status(201).json({
-      status: "success",
+      status: 'success',
       organization,
     });
   } catch (e) {
-    console.error("ADD ERR", e);
+    console.error('ADD ERR', e);
     res.status(404).json({
-      status: "Err",
+      status: 'Err',
       data: "Organization wasn't added",
       err: e,
     });
@@ -91,16 +89,14 @@ export const updateOrganization = async (req, res) => {
     const organization = await Organization.findById(req.params.id);
     if (!organization) {
       return res.status(404).json({
-        status: "Err",
-        data: "Организация не найдена",
+        status: 'Err',
+        data: 'Организация не найдена',
       });
     }
 
     const originalLogoUrl = organization.logo_url;
 
-    const logoUrl = req.files["logo_url"]
-      ? `/uploads/images/${req.files["logo_url"][0].filename}`
-      : organization.logo_url;
+    const logoUrl = req.files['logo_url'] ? `/uploads/images/${req.files['logo_url'][0].filename}` : organization.logo_url;
 
     organization.logo_url = logoUrl;
 
@@ -109,28 +105,24 @@ export const updateOrganization = async (req, res) => {
     organization.country = req.body.country || organization.country;
     organization.region = req.body.region || organization.region;
     organization.sport = req.body.sport || organization.sport;
-    organization.contacts = req.body.contacts
-      ? JSON.parse(req.body.contacts)
-      : organization.contacts;
-    organization.socials = req.body.socials
-      ? JSON.parse(req.body.socials)
-      : organization.socials;
+    organization.contacts = req.body.contacts ? JSON.parse(req.body.contacts) : organization.contacts;
+    organization.socials = req.body.socials ? JSON.parse(req.body.socials) : organization.socials;
 
     await organization.save();
 
     if (logoUrl !== originalLogoUrl && originalLogoUrl) {
-      await removeOldFile(join(__dirname, "..", originalLogoUrl));
+      await removeOldFile(join(__dirname, '..', originalLogoUrl));
     }
 
     res.status(200).json({
-      status: "success",
+      status: 'success',
       organization,
     });
   } catch (e) {
-    console.error("UPDATE ERR", e);
+    console.error('UPDATE ERR', e);
     res.status(500).json({
-      status: "Err",
-      data: "Не удалось обновить данные организации",
+      status: 'Err',
+      data: 'Не удалось обновить данные организации',
       err: e.message,
     });
   }
@@ -141,13 +133,13 @@ export const getOrganization = async (req, res) => {
     const organization = await Organization.findById(req.params.id);
 
     res.status(200).json({
-      status: "success",
+      status: 'success',
       organization,
     });
   } catch (e) {
     res.status(404).json({
-      status: "Err",
-      data: "Organization not found",
+      status: 'Err',
+      data: 'Organization not found',
       err: e,
     });
   }
@@ -159,31 +151,31 @@ export const deleteOrganization = async (req, res) => {
 
     if (!organization) {
       return res.status(404).json({
-        status: "Err",
-        data: "Организация не найдена",
+        status: 'Err',
+        data: 'Организация не найдена',
       });
     }
 
-    if (organization["logo_url"]) {
-      const fullPath = join(__dirname, "..", organization["logo_url"]);
+    if (organization['logo_url']) {
+      const fullPath = join(__dirname, '..', organization['logo_url']);
       try {
         await removeOldFile(fullPath);
       } catch (err) {
-        console.error("Failed to delete file:", err);
+        console.error('Failed to delete file:', err);
       }
     }
 
     await Organization.deleteOne({ _id: req.params.id });
 
     res.status(200).json({
-      status: "success",
-      data: "Организация была успешно удалена",
+      status: 'success',
+      data: 'Организация была успешно удалена',
     });
   } catch (e) {
-    console.error("DELETE ERR", e);
+    console.error('DELETE ERR', e);
     res.status(500).json({
-      status: "Err",
-      data: "Не удалось удалить организацию",
+      status: 'Err',
+      data: 'Не удалось удалить организацию',
       err: e.message,
     });
   }
@@ -195,25 +187,22 @@ export const getAthletesByOrganizationRegion = async (req, res) => {
 
     if (!organization) {
       return res.status(404).json({
-        status: "error",
-        message: "Organization not found.",
+        status: 'error',
+        message: 'Organization not found.',
       });
     }
 
-    const athletes = await Athlete.find(
-      { regions: organization.region },
-      {}
-    ).sort({ lastname: 1, name: 1 });
+    const athletes = await Athlete.find({ regions: organization.region }, {}).sort({ lastname: 1, name: 1 });
 
     res.status(200).json({
-      status: "success",
+      status: 'success',
       athletes,
     });
   } catch (error) {
-    console.error("Error fetching athletes by organization region:", error);
+    console.error('Error fetching athletes by organization region:', error);
     res.status(500).json({
-      status: "error",
-      message: "Failed to fetch athletes.",
+      status: 'error',
+      message: 'Failed to fetch athletes.',
       error: error.message,
     });
   }

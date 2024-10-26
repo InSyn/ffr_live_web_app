@@ -5,10 +5,7 @@
     <div v-if="!loading" class="statistics__body">
       <div class="statistics__list">
         <div
-          :class="[
-            'statistics__item',
-            selectedFilter === key ? 'activeFilter' : '',
-          ]"
+          :class="['statistics__item', selectedFilter === key ? 'activeFilter' : '']"
           @click="selectFilters(key)"
           v-for="(_, key) in stats_overall"
           :key="key"
@@ -17,15 +14,10 @@
             {{ menuTranslationMap[key] }}
           </div>
           <div class="statistics__item__count">
-            {{ stats_overall[key] ? stats_overall[key] : "" }}
+            {{ stats_overall[key] ? stats_overall[key] : '' }}
           </div>
 
-          <v-btn
-            @click.stop="downloadStats(key)"
-            class="downloadStats__button"
-            small
-            icon
-          >
+          <v-btn @click.stop="downloadStats(key)" class="downloadStats__button" small icon>
             <v-icon class="downloadStats__icon">
               {{ icons.mdiDownload }}
             </v-icon>
@@ -40,25 +32,25 @@
 </template>
 
 <script>
-import axios from "axios";
-import { mdiDownload } from "@mdi/js";
-import { databaseUrl } from "@/store/constants";
-import LoaderSpinner from "@/components/ui-components/loader-spinner.vue";
-import { saveExcelData } from "@/utils/excel-data-saver";
-import StatFilters from "@/pages/user/statistics/stat-filters.vue";
+import axios from 'axios';
+import { mdiDownload } from '@mdi/js';
+import { databaseUrl } from '@/store/constants';
+import LoaderSpinner from '@/components/ui-components/loader-spinner.vue';
+import { saveExcelData } from '@/utils/excel-data-saver';
+import StatFilters from '@/pages/user/statistics/stat-filters.vue';
 
 export default {
-  name: "statistics",
+  name: 'statistics',
   components: { StatFilters, LoaderSpinner },
   data() {
     return {
       menuTranslationMap: {
-        events: "События",
-        athletes: "Спортсмены",
-        jury: "Судьи",
-        trainers: "Тренеры",
-        organizations: "Организации",
-        seminars: "Семинары",
+        events: 'События',
+        athletes: 'Спортсмены',
+        jury: 'Судьи',
+        trainers: 'Тренеры',
+        organizations: 'Организации',
+        seminars: 'Семинары',
       },
       stats_overall: {
         events: null,
@@ -68,7 +60,7 @@ export default {
         organizations: null,
         seminars: null,
       },
-      selectedFilter: "",
+      selectedFilter: '',
       filters: {
         events: {},
         athletes: {},
@@ -89,7 +81,7 @@ export default {
       this.loading = true;
 
       try {
-        const response = await axios.get(databaseUrl + "/stats/overall");
+        const response = await axios.get(databaseUrl + '/stats/overall');
         if (response.status === 200) {
           const stats = response.data.statistics;
 
@@ -108,7 +100,7 @@ export default {
       }
     },
     selectFilters(filter) {
-      if (filter === this.selectedFilter) this.selectedFilter = "";
+      if (filter === this.selectedFilter) this.selectedFilter = '';
       else this.selectedFilter = filter;
     },
     async downloadStats(dataKey) {
@@ -140,12 +132,14 @@ export default {
   padding: 1rem 2rem 2rem;
 
   background-color: var(--background--card);
-  backdrop-filter: blur(4px);
+  box-shadow: var(--container-shadow-s);
+  border: 1px solid var(--border-container);
   border-radius: 4px;
 
   .statistics__header {
     font-size: 1.2rem;
   }
+
   .statistics__body {
     display: flex;
     flex-direction: column;
@@ -174,22 +168,22 @@ export default {
         &:hover {
           border-color: var(--text-hovered);
           background-color: var(--background--card-hover);
-
-          .statistics__item__name {
-            font-weight: bold;
-          }
         }
+
         &.activeFilter {
           background-color: var(--background--card-hover);
           border-color: var(--accent);
         }
+
         .statistics__item__count {
           flex: 0 0 auto;
           font-weight: bold;
         }
+
         .statistics__item__name {
           flex: 0 0 auto;
         }
+
         .downloadStats__button {
           margin-left: auto;
           color: var(--text-depressed);

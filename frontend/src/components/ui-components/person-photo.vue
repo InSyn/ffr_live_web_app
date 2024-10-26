@@ -1,18 +1,8 @@
 <template>
   <div class="personPhoto__wrapper">
     <div class="imageBorder">
-      <img
-        v-if="person.photo_url"
-        class="athleteInfo__image"
-        :src="uploadsFolderUrl + person.photo_url"
-        alt="img"
-        loading="lazy"
-      />
-      <athlete-photo-filler-icon
-        v-else
-        class="athletePhotoFiller__icon"
-        :gender="person.gender"
-      ></athlete-photo-filler-icon>
+      <img v-if="person.photo_url" class="athleteInfo__image" :src="uploadsFolderUrl + person.photo_url" alt="img" loading="lazy" />
+      <athlete-photo-filler-icon v-else class="athletePhotoFiller__icon" :gender="person.gender"></athlete-photo-filler-icon>
     </div>
 
     <div
@@ -20,9 +10,7 @@
       class="personRegionFlags__wrapper"
       :style="
         person.regions.length > 1 && {
-          transform: `translate(-${2 * person.regions.length}px, -${
-            person.regions.length * 4
-          }px)`,
+          transform: `translate(-${2 * person.regions.length}px, -${person.regions.length * 4}px)`,
         }
       "
     >
@@ -55,14 +43,14 @@
 </template>
 
 <script>
-import CountryFlag from "@/components/ui-components/country-flag.vue";
-import AthletePhotoFillerIcon from "@/assets/svg/athletePhotoFiller-icon.vue";
-import { uploadsFolderUrl } from "@/store/constants";
-import { getRegionCode } from "@/store/data/russia-regions";
-import { getCountryCode } from "@/store/data/countries";
+import CountryFlag from '@/components/ui-components/country-flag.vue';
+import AthletePhotoFillerIcon from '@/assets/svg/athletePhotoFiller-icon.vue';
+import { uploadsFolderUrl } from '@/store/constants';
+import { getRegionCode } from '@/store/data/russia-regions';
+import { getCountryCode } from '@/store/data/countries';
 
 export default {
-  name: "person-photo",
+  name: 'person-photo',
   methods: { getCountryCode, getRegionCode },
   props: {
     person: { type: Object, required: true },

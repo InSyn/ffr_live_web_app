@@ -9,7 +9,7 @@
 
 <script>
 export default {
-  name: "edit-icon",
+  name: 'edit-icon',
 };
 </script>
 

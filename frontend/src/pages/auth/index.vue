@@ -10,60 +10,44 @@
 
       <div class="authorizationForm__inputWrapper">
         <label for="pwd">Пароль:&nbsp;</label>
-        <input
-          v-model="authorizationData.password"
-          id="pwd"
-          :type="showPassword ? 'text' : 'password'"
-        />
+        <input v-model="authorizationData.password" id="pwd" :type="showPassword ? 'text' : 'password'" />
 
-        <v-btn
-          @click="showPassword = !showPassword"
-          class="showPassword__button"
-          :color="showPassword ? '#b6b9c1' : '#2c3e50'"
-          x-small
-          icon
-        >
+        <v-btn @click="showPassword = !showPassword" class="showPassword__button" :color="showPassword ? '#b6b9c1' : '#2c3e50'" x-small icon>
           <v-icon small>{{ passwordVisibilityIcon }}</v-icon>
         </v-btn>
       </div>
 
       <div class="authorizeUser__button__wrapper">
-        <v-btn class="authorizeUser__button" type="submit" color="#029fe2" text>
-          Войти
-        </v-btn>
+        <v-btn class="authorizeUser__button" type="submit" color="#029fe2" text> Войти </v-btn>
       </div>
     </form>
 
-    <message-container
-      :messages="messages"
-      :errors="errors"
-    ></message-container>
+    <message-container :messages="messages" :errors="errors"></message-container>
   </div>
 </template>
 
 <script>
-import { mdiEye } from "@mdi/js";
-import axios from "axios";
-import { databaseUrl } from "@/store/constants";
-import { mapActions, mapGetters } from "vuex";
-import MessageContainer from "@/components/ui-components/message-container.vue";
+import { mdiEye } from '@mdi/js';
+import axios from 'axios';
+import { databaseUrl } from '@/store/constants';
+import { mapActions, mapGetters } from 'vuex';
+import MessageContainer from '@/components/ui-components/message-container.vue';
 
 export default {
-  name: "authPage",
+  name: 'authPage',
   components: { MessageContainer },
   mounted() {
     if (this.userData.token) {
-      this.$router.push({ name: "user-page" });
+      this.$router.push({ name: 'userPage' });
     }
   },
   methods: {
-    ...mapActions("authorization", {
-      updateUserData: "CHECK_STORED_DATA",
+    ...mapActions('authorization', {
+      updateUserData: 'CHECK_STORED_DATA',
     }),
 
     addError(errMessage) {
-      if (!this.errors.some((err) => err === errMessage))
-        this.errors.push(errMessage);
+      if (!this.errors.some((err) => err === errMessage)) this.errors.push(errMessage);
 
       setTimeout(() => {
         const errIndex = this.errors.indexOf(errMessage).toString();
@@ -72,8 +56,7 @@ export default {
       }, 2048);
     },
     addMessage(message) {
-      if (!this.messages.some((msg) => msg === message))
-        this.messages.push(message);
+      if (!this.messages.some((msg) => msg === message)) this.messages.push(message);
 
       setTimeout(() => {
         const msgIdx = this.messages.indexOf(message).toString();
@@ -83,31 +66,28 @@ export default {
     },
     async authorizeUser() {
       if (!this.authorizationData.username) {
-        this.addError("Введите логин");
+        this.addError('Введите логин');
         return;
       }
       if (!this.authorizationData.password) {
-        this.addError("Введите пароль");
+        this.addError('Введите пароль');
         return;
       }
 
       try {
-        const authResponse = await axios.post(
-          databaseUrl + "/auth/login",
-          this.authorizationData
-        );
+        const authResponse = await axios.post(databaseUrl + '/auth/login', this.authorizationData);
         if (authResponse.status === 200) {
           const userData = {
             ...this.authorizationData,
             token: authResponse.data.token,
             role: authResponse.data.role,
+            region: authResponse.data.region,
           };
-          localStorage.setItem("authorizationData", JSON.stringify(userData));
+          localStorage.setItem('authorizationData', JSON.stringify(userData));
           this.addMessage(`Добрый день, ${userData.username}!`);
 
           setTimeout(() => {
-            if (this.$route.name !== "results")
-              this.$router.push({ name: "results" });
+            if (this.$route.name !== 'results') this.$router.push({ name: 'results' });
 
             this.updateUserData();
           }, 1536);
@@ -120,8 +100,8 @@ export default {
   data() {
     return {
       authorizationData: {
-        username: "",
-        password: "",
+        username: '',
+        password: '',
       },
       showPassword: false,
 
@@ -132,8 +112,8 @@ export default {
     };
   },
   computed: {
-    ...mapGetters("authorization", {
-      userData: "getUserData",
+    ...mapGetters('authorization', {
+      userData: 'getUserData',
     }),
   },
 };
@@ -147,7 +127,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 0 auto;
+  margin: 3.75rem auto;
   padding: 32px;
 
   .authorizationForm {
@@ -157,7 +137,8 @@ export default {
 
     padding: 0.75rem 2rem;
     background-color: var(--background--card);
-    backdrop-filter: blur(8px);
+    box-shadow: var(--container-shadow-s);
+    border: 1px solid var(--border-container);
     border-radius: 4px;
 
     .authorizationForm__header {
@@ -166,6 +147,7 @@ export default {
       font-weight: bold;
       text-align: center;
     }
+
     .authorizationForm__inputWrapper {
       position: relative;
       display: flex;
@@ -177,10 +159,12 @@ export default {
       &:focus-within {
         border-bottom: 1px solid var(--text-muted);
       }
+
       label {
         width: 6rem;
         font-weight: bold;
       }
+
       input {
         width: 12rem;
         padding: 3px 6px;
@@ -193,6 +177,7 @@ export default {
           background-color: var(--background--card-hover);
         }
       }
+
       .showPassword__button {
         position: absolute;
         right: calc(1rem + 4px);

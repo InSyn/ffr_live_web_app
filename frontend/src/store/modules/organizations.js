@@ -1,5 +1,5 @@
-import axios from "axios";
-import { databaseUrl } from "@/store/constants";
+import axios from 'axios';
+import { databaseUrl } from '@/store/constants';
 
 export default {
   namespaced: true,
@@ -16,17 +16,17 @@ export default {
   },
   actions: {
     SET_ORGANIZATIONS: ({ commit }, payload) => {
-      commit("setOrganizations", payload);
+      commit('setOrganizations', payload);
     },
     LOAD_ORGANIZATIONS: async (store) => {
       try {
-        const response = await axios.get(databaseUrl + "/organizations");
+        const response = await axios.get(databaseUrl + '/organizations');
         if (response.status === 200) {
-          store.commit("setOrganizations", response.data.organizations);
+          store.commit('setOrganizations', response.data.organizations);
         }
       } catch (err) {
         if (err) {
-          setTimeout(() => store.dispatch("LOAD_ORGANIZATIONS"), 2000);
+          setTimeout(() => store.dispatch('LOAD_ORGANIZATIONS'), 2000);
         }
       }
     },

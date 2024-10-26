@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 export const resultSchema = new mongoose.Schema({
   race_id: String,

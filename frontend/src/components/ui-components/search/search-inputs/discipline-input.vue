@@ -7,32 +7,24 @@
     ref="selectInput"
   >
     <option :data-cancel-option="!!elemValue" value="">
-      {{ elemValue ? "Очистить" : "Выбрать дисциплину..." }}
+      {{ elemValue ? 'Очистить' : 'Выбрать дисциплину...' }}
     </option>
-    <option
-      v-for="discipline in disciplinesList"
-      :key="discipline"
-      :value="discipline"
-    >
+    <option v-for="discipline in disciplinesList" :key="discipline" :value="discipline">
       {{ discipline }}
     </option>
   </select>
 </template>
 
 <script>
-import { sports, getDisciplines } from "@/store/data/sports";
+import { sports, getDisciplines } from '@/store/data/sports';
 
 export default {
-  name: "discipline-input",
+  name: 'discipline-input',
   computed: {
     disciplinesList() {
       const sportsList = sports.map((sportObj) => sportObj.name_rus);
 
-      const allDisciplines = new Set(
-        sportsList.flatMap((sport) =>
-          getDisciplines(sport).map((disciplineObj) => disciplineObj.name_rus)
-        )
-      );
+      const allDisciplines = new Set(sportsList.flatMap((sport) => getDisciplines(sport).map((disciplineObj) => disciplineObj.name_rus)));
 
       return Array.from(allDisciplines).sort((a, b) => a.localeCompare(b));
     },
@@ -44,5 +36,5 @@ export default {
 </script>
 
 <style scoped>
-@import "search-input-style.css";
+@import 'search-input-style.css';
 </style>

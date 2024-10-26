@@ -11,10 +11,10 @@ export const extractSponsorFields = (req, res, next) => {
       });
     }
 
-    console.log("Sponsor fields:", req.sponsorImages);
+    console.log('Sponsor fields:', req.sponsorImages);
     next();
   } catch (error) {
-    console.error("Error parsing sponsor fields:", error);
-    res.status(400).json({ status: "Err", data: "Invalid sponsors format" });
+    console.error('Error parsing sponsor fields:', error);
+    res.status(400).json({ status: 'Err', data: 'Invalid sponsors format' });
   }
 };

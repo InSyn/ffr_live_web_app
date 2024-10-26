@@ -1,32 +1,22 @@
 <template>
   <div class="eventsPage__wrapper">
-    <search
-      @search-loading="setLoadingState"
-      @search-results-loaded="showSearchResults"
-      mode="events"
-    ></search>
+    <search @search-loading="setLoadingState" @search-results-loaded="showSearchResults" mode="events"></search>
 
     <div class="eventsList__wrapper">
-      <calendar-carousel
-        @set-calendar-date="setCalendarDate"
-        :calendar-date-prop="calendarDate"
-        :events="eventsList"
-      ></calendar-carousel>
+      <calendar-carousel @set-calendar-date="setCalendarDate" :calendar-date-prop="calendarDate" :events="eventsList"></calendar-carousel>
 
-      <competition-list-item
+      <router-link
         v-for="(event, idx) in getFilteredEvents"
         :key="event._id"
-        :event="event"
-        :index="idx"
-        :date-match="matchEventDate(event['start_at'])"
-      ></competition-list-item>
-
-      <span
-        class="emptySearchResults"
-        v-if="getFilteredEvents.length === 0 && !loading"
+        :to="{
+          name: 'eventPage',
+          params: { event_id: event['event_id'] },
+        }"
       >
-        События не найдены
-      </span>
+        <competition-list-item :event="event" :index="idx" :date-match="matchEventDate(event['start_at'])"></competition-list-item
+      ></router-link>
+
+      <span class="emptySearchResults" v-if="getFilteredEvents.length === 0 && !loading"> События не найдены </span>
 
       <loader-spinner v-if="loading" class="loading__spinner"></loader-spinner>
     </div>
@@ -34,17 +24,17 @@
 </template>
 
 <script>
-import axios from "axios";
-import { mapActions, mapGetters } from "vuex";
-import Search from "@/components/ui-components/search/index.vue";
-import LoaderSpinner from "@/components/ui-components/loader-spinner.vue";
-import { databaseUrl, uploadsFolderUrl } from "@/store/constants";
-import { mdiImage } from "@mdi/js";
-import CalendarCarousel from "@/components/ui-components/calendar-carousel.vue";
-import CompetitionListItem from "@/pages/events/calendar-page/competition-list-item.vue";
+import axios from 'axios';
+import { mapActions, mapGetters } from 'vuex';
+import Search from '@/components/ui-components/search/index.vue';
+import LoaderSpinner from '@/components/ui-components/loader-spinner.vue';
+import { databaseUrl, uploadsFolderUrl } from '@/store/constants';
+import { mdiImage } from '@mdi/js';
+import CalendarCarousel from '@/components/ui-components/calendar-carousel.vue';
+import CompetitionListItem from '@/pages/events/calendar-page/competition-list-item.vue';
 
 export default {
-  name: "calendarPage",
+  name: 'calendarPage',
   data() {
     return {
       calendarDate: new Date().toISOString().substring(0, 10),
@@ -57,16 +47,15 @@ export default {
     };
   },
   computed: {
-    ...mapGetters("events", {
-      eventsList: "getEvents",
+    ...mapGetters('events', {
+      eventsList: 'getEvents',
     }),
     uploadsFolderUrl() {
       return uploadsFolderUrl;
     },
 
     getFilteredEvents() {
-      const events =
-        this.searchResults === null ? this.eventsList : this.searchResults;
+      const events = this.searchResults === null ? this.eventsList : this.searchResults;
 
       return events.sort((a, b) => {
         const aMatch = this.matchEventDate(a.start_at);
@@ -79,9 +68,9 @@ export default {
     },
   },
   methods: {
-    ...mapActions("events", {
-      fetchEvents: "LOAD_EVENTS",
-      setEvents: "SET_EVENTS",
+    ...mapActions('events', {
+      fetchEvents: 'LOAD_EVENTS',
+      setEvents: 'SET_EVENTS',
     }),
     setCalendarDate(date) {
       this.calendarDate = date;
@@ -105,19 +94,14 @@ export default {
       this.setLoadingState(true);
 
       try {
-        const response = await axios.get(
-          databaseUrl + "/events/date-search/" + date
-        );
+        const response = await axios.get(databaseUrl + '/events/date-search/' + date);
         if (response.status === 200) {
           this.searchResults = [...response.data.events];
           this.setLoadingState(false);
         }
       } catch (e) {
         if (e) {
-          console.error(
-            "Error fetching events:",
-            e.response?.data?.message || e.message
-          );
+          console.error('Error fetching events:', e.response?.data?.message || e.message);
         }
       } finally {
         this.setLoadingState(false);
@@ -171,6 +155,8 @@ export default {
   flex-direction: column;
   overflow-y: auto;
   background-color: var(--background--card);
+  box-shadow: var(--container-shadow-l);
+  border: 1px solid var(--border-container);
   border-radius: 4px;
 
   .emptySearchResults {

@@ -1,9 +1,9 @@
-import { Event } from "../models/event-model.js";
-import { Athlete } from "../models/athlete-model.js";
-import { Jury } from "../models/jury-model.js";
-import { Trainer } from "../models/trainer-model.js";
-import { Organization } from "../models/organization-model.js";
-import { Seminar } from "../models/seminar-model.js";
+import { Event } from '../models/event-model.js';
+import { Athlete } from '../models/athlete-model.js';
+import { Jury } from '../models/jury-model.js';
+import { Trainer } from '../models/trainer-model.js';
+import { Organization } from '../models/organization-model.js';
+import { Seminar } from '../models/seminar-model.js';
 
 export const getOverallDbStats = async (req, res) => {
   try {
@@ -21,7 +21,7 @@ export const getOverallDbStats = async (req, res) => {
     const seminarsCount = seminars.length;
 
     res.status(200).json({
-      status: "success",
+      status: 'success',
       statistics: {
         events: eventsCount,
         athletes: athletesCount,
@@ -33,8 +33,8 @@ export const getOverallDbStats = async (req, res) => {
     });
   } catch (e) {
     res.status(404).json({
-      status: "Err",
-      data: "Statistics not found ",
+      status: 'Err',
+      data: 'Statistics not found ',
       err: e,
     });
   }

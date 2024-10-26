@@ -1,5 +1,5 @@
-import axios from "axios";
-import { databaseUrl } from "@/store/constants";
+import axios from 'axios';
+import { databaseUrl } from '@/store/constants';
 
 export default {
   namespaced: true,
@@ -16,13 +16,13 @@ export default {
   },
   actions: {
     SET_ATHLETES: ({ commit }, payload) => {
-      commit("setAthletes", payload);
+      commit('setAthletes', payload);
     },
     LOAD_ATHLETES: async (store) => {
       try {
-        const response = await axios.get(databaseUrl + "/athletes");
+        const response = await axios.get(databaseUrl + '/athletes');
         if (response.status === 200) {
-          store.commit("setAthletes", response.data.athletes);
+          store.commit('setAthletes', response.data.athletes);
         }
       } catch (err) {
         if (err) {

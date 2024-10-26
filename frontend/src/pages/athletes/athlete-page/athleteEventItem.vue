@@ -8,67 +8,48 @@
     :class="!(index % 2) && 'isOddItem'"
   >
     <div class="athleteCompetition__item__image__container">
-      <img
-        v-if="event['logo_image_url']"
-        class="athleteCompetition__item__image"
-        :src="uploadsFolderUrl() + event['logo_image_url']"
-        alt="Event Logo"
-      />
-      <competition-image-filler-icon
-        v-else
-        class="competitionImage__imageFiller__icon"
-      ></competition-image-filler-icon>
+      <img v-if="event['logo_image_url']" class="athleteCompetition__item__image" :src="uploadsFolderUrl() + event['logo_image_url']" alt="Event Logo" />
+      <competition-image-filler-icon v-else class="competitionImage__imageFiller__icon"></competition-image-filler-icon>
     </div>
 
     <div class="athleteCompetition__item__competitionInfo">
       <div class="athleteCompetition__item__title">
-        {{ event["title"] }}
+        {{ event['title'] }}
       </div>
 
       <div class="athleteCompetition__item__sportInfo">
-        <country-flag
-          class="countryFlag"
-          v-if="event.country_code"
-          :country-code="event.country_code"
-          width="1.25rem"
-        ></country-flag>
+        <country-flag class="countryFlag" v-if="event.country_code" :country-code="event.country_code" width="1.25rem"></country-flag>
         <div class="athleteCompetition__item__sportInfo__sport">
-          {{ event["sport"] || "-" }}
+          {{ event['sport'] || '-' }}
         </div>
 
         <div class="athleteCompetition__item__sportInfo__discipline">
-          {{ event["discipline"] || "-" }}
+          {{ event['discipline'] || '-' }}
         </div>
       </div>
 
       <div class="athleteCompetition__item__info">
         <div class="athleteCompetition__item__sportInfo__date">
-          {{ formatDate(event["start_at"]) || "-" }}
+          {{ formatDate(event['start_at']) || '-' }}
         </div>
 
         <div class="athleteCompetition__item__sportInfo__region">
-          {{ event["region"] || "-" }}
+          {{ event['region'] || '-' }}
         </div>
         <div class="athleteCompetition__item__sportInfo__location">
-          {{ event["location"] || "-" }}
+          {{ event['location'] || '-' }}
         </div>
       </div>
     </div>
 
     <div class="eventResults__wrapper">
-      <div
-        v-for="result in getEventResults(event['event_id']).filter(
-          (totalResult) => !!totalResult
-        )"
-        :key="result['id']"
-        class="eventResults__item"
-      >
+      <div v-for="result in getEventResults(event['event_id']).filter((totalResult) => !!totalResult)" :key="result['id']" class="eventResults__item">
         <div class="competitionResult__wrapper__info">
-          {{ result["competition"]["stage"] }}
+          {{ result['competition']['stage'] }}
         </div>
         <div class="competitionResult__wrapper__result">
           Место:&nbsp;
-          <b>{{ result["rank"] || "-" }} </b>
+          <b>{{ result['rank'] || '-' }} </b>
         </div>
       </div>
     </div>
@@ -76,38 +57,34 @@
 </template>
 
 <script>
-import CompetitionImageFillerIcon from "@/assets/svg/competitionImageFiller-icon.vue";
-import { formatDate } from "@/utils/data-formaters";
-import { uploadsFolderUrl } from "@/store/constants";
-import CountryFlag from "@/components/ui-components/country-flag.vue";
+import CompetitionImageFillerIcon from '@/assets/svg/competitionImageFiller-icon.vue';
+import { formatDate } from '@/utils/data-formaters';
+import { uploadsFolderUrl } from '@/store/constants';
+import CountryFlag from '@/components/ui-components/country-flag.vue';
 
 export default {
-  name: "athleteEventItem",
+  name: 'athleteEventItem',
   components: { CountryFlag, CompetitionImageFillerIcon },
-  props: ["athleteCode", "event", "competitions", "index"],
+  props: ['athleteCode', 'event', 'competitions', 'index'],
   methods: {
     uploadsFolderUrl() {
       return uploadsFolderUrl;
     },
     formatDate,
     getEventResults(event_id) {
-      const event = this.competitions.find(
-        (event) => event["event_id"] === event_id
-      );
+      const event = this.competitions.find((event) => event['event_id'] === event_id);
       if (!event) return [];
 
-      const athleteResults = event["competitions"].map((competition) => {
-        return competition["total_results"].find((result) => {
+      const athleteResults = event['competitions'].map((competition) => {
+        return competition['total_results'].find((result) => {
           if (!result) return;
 
-          const athleteLocalObj = competition["competitors"].find(
-            (competitor) => competitor["rus_code"] === this.athleteCode
-          );
+          const athleteLocalObj = competition['competitors'].find((competitor) => competitor['rus_code'] === this.athleteCode);
           if (!athleteLocalObj) return;
 
-          result["competitor"] = athleteLocalObj;
-          result["competition"] = { stage: competition.stage };
-          return result["competitor_id"] === athleteLocalObj["local_id"];
+          result['competitor'] = athleteLocalObj;
+          result['competition'] = { stage: competition.stage };
+          return result['competitor_id'] === athleteLocalObj['local_id'];
         });
       });
 
@@ -130,6 +107,7 @@ export default {
   &.isOddItem {
     background-color: var(--background--card-secondary);
   }
+
   &:hover,
   &:focus {
     background-color: var(--background--primary-hover);
@@ -150,11 +128,13 @@ export default {
       max-width: 100%;
       max-height: 100%;
     }
+
     .competitionImage__imageFiller__icon {
       height: 100%;
       width: 100%;
       color: #7c7f87;
     }
+
     @media screen and (max-width: 720px) {
       height: 60px;
     }
@@ -173,6 +153,7 @@ export default {
       font-weight: bold;
       font-size: 0.9rem;
     }
+
     .athleteCompetition__item__sportInfo {
       flex: 0 0 auto;
       display: flex;
@@ -186,6 +167,7 @@ export default {
         display: block;
       }
     }
+
     .athleteCompetition__item__info {
       flex: 0 0 auto;
       display: flex;
@@ -213,6 +195,7 @@ export default {
       padding: 8px;
     }
   }
+
   @media screen and (max-width: 720px) {
     flex-wrap: wrap;
   }

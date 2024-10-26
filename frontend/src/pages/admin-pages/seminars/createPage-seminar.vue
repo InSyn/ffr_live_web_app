@@ -1,39 +1,32 @@
 <template>
   <div class="createSeminarPage__wrapper">
-    <seminar-form
-      @create-seminar="createSeminar"
-      :seminar="seminar"
-      action="create"
-    ></seminar-form>
+    <seminar-form @create-seminar="createSeminar" :seminar="seminar" action="create"></seminar-form>
 
-    <message-container
-      :messages="messages"
-      :errors="errors"
-    ></message-container>
+    <message-container :messages="messages" :errors="errors"></message-container>
   </div>
 </template>
 
 <script>
-import MessageContainer from "@/components/ui-components/message-container.vue";
-import { databaseUrl } from "@/store/constants";
-import SeminarForm from "@/pages/admin-pages/seminars/form-seminar.vue";
-import axios from "axios";
-import { mapGetters } from "vuex";
+import MessageContainer from '@/components/ui-components/message-container.vue';
+import { databaseUrl } from '@/store/constants';
+import SeminarForm from '@/pages/admin-pages/seminars/form-seminar.vue';
+import axios from 'axios';
+import { mapGetters } from 'vuex';
 
 export default {
-  name: "createOrganization-Page",
+  name: 'createOrganization-Page',
   components: { SeminarForm, MessageContainer },
   data() {
     return {
       seminar: {
-        title: "",
-        date: "",
-        sport: "",
+        title: '',
+        date: '',
+        sport: '',
         disciplines: [],
-        country: "",
-        region: "",
-        location: "",
-        format: "",
+        country: '',
+        region: '',
+        location: '',
+        format: '',
         contacts: [],
         documents: [],
       },
@@ -43,8 +36,8 @@ export default {
     };
   },
   computed: {
-    ...mapGetters("authorization", {
-      userData: "getUserData",
+    ...mapGetters('authorization', {
+      userData: 'getUserData',
     }),
   },
   methods: {
@@ -54,9 +47,9 @@ export default {
       Object.keys(this.seminar).forEach((key) => {
         const value = this.seminar[key];
 
-        if (key === "documents") return;
+        if (key === 'documents') return;
 
-        if (Array.isArray(value) || typeof value === "object") {
+        if (Array.isArray(value) || typeof value === 'object') {
           formData.append(key, JSON.stringify(value));
         } else if (value !== undefined && value !== null) {
           formData.append(key, value);
@@ -66,12 +59,10 @@ export default {
       if (this.seminar.documents.length) {
         const documents = this.seminar.documents.filter((doc) => doc.file);
 
-        const filteredDocuments = documents.filter(
-          (doc) => doc.file?.url || doc.file?.newFile
-        );
+        const filteredDocuments = documents.filter((doc) => doc.file?.url || doc.file?.newFile);
 
         formData.append(
-          "documents",
+          'documents',
           JSON.stringify(
             filteredDocuments.map((doc) => {
               const file = doc.file?.newFile ? {} : doc.file;
@@ -91,32 +82,26 @@ export default {
       }
 
       try {
-        const response = await axios.post(
-          `${databaseUrl}/seminars/`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-              authorization: `Bearer ${this.userData.token}`,
-            },
-          }
-        );
+        const response = await axios.post(`${databaseUrl}/seminars/`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            authorization: `Bearer ${this.userData.token}`,
+          },
+        });
 
         if (response.status === 201) {
-          this.messages.push("Семинар создан успешно");
+          this.messages.push('Семинар создан успешно');
 
           setTimeout(() => {
             this.$router.push({
-              name: "seminarPage",
+              name: 'seminarPage',
               params: { seminar_id: this.seminar._id },
             });
           }, 2000);
         }
       } catch (error) {
-        console.error("Error submitting form:", error);
-        const errorMessage =
-          error.response?.data?.message ||
-          "Не удалось создать семинар. Пожалуйста, попробуйте еще раз.";
+        console.error('Error submitting form:', error);
+        const errorMessage = error.response?.data?.message || 'Не удалось создать семинар. Пожалуйста, попробуйте еще раз.';
         this.errors.push(errorMessage);
       }
     },

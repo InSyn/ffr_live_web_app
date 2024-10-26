@@ -7,56 +7,53 @@
       :athlete-images="athleteImages"
       action="update"
     ></athlete-form>
-    <message-container
-      :messages="messages"
-      :errors="errors"
-    ></message-container>
+    <message-container :messages="messages" :errors="errors"></message-container>
   </div>
 </template>
 
 <script>
-import MessageContainer from "@/components/ui-components/message-container.vue";
-import AthleteForm from "@/pages/admin-pages/athletes/form-athlete.vue";
-import axios from "axios";
-import { databaseUrl } from "@/store/constants";
-import { mapGetters } from "vuex";
+import MessageContainer from '@/components/ui-components/message-container.vue';
+import AthleteForm from '@/pages/admin-pages/athletes/form-athlete.vue';
+import axios from 'axios';
+import { databaseUrl } from '@/store/constants';
+import { mapActions, mapGetters } from 'vuex';
 
 export default {
-  name: "editAthletePage",
-  props: ["athlete_code"],
+  name: 'editAthletePage',
+  props: ['athlete_code'],
   components: { AthleteForm, MessageContainer },
   data() {
     return {
       athlete: {
-        rus_code: "",
-        gender: "",
-        lastname: "",
-        name: "",
-        birth_date: "",
-        category: "",
-        country: "",
-        country_code: "",
+        rus_code: '',
+        gender: '',
+        lastname: '',
+        name: '',
+        birth_date: '',
+        category: '',
+        country: '',
+        country_code: '',
         regions: [],
-        region_code: "",
-        sport: "",
+        region_code: '',
+        sport: '',
         disciplines: [],
         organizations: [],
-        trainer: "",
-        education: "",
+        trainer: '',
+        education: '',
         sponsors: [],
         socials: {
-          vk: "",
-          telegram: "",
+          vk: '',
+          telegram: '',
         },
         equipment: [],
         hobbies: [],
-        athleteAbout: "",
+        athleteAbout: '',
         medals: [],
         is_national_team: false,
       },
       athleteImages: {
-        photo_url: "",
-        photo_tv_url: "",
+        photo_url: '',
+        photo_tv_url: '',
       },
 
       messages: [],
@@ -64,16 +61,17 @@ export default {
     };
   },
   computed: {
-    ...mapGetters("authorization", {
-      userData: "getUserData",
+    ...mapGetters('authorization', {
+      userData: 'getUserData',
     }),
   },
   methods: {
+    ...mapActions('athletes', {
+      fetchAthletes: 'LOAD_ATHLETES',
+    }),
     async loadAthleteData() {
       try {
-        const response = await axios.get(
-          `${databaseUrl}/athletes/${this.athlete_code}`
-        );
+        const response = await axios.get(`${databaseUrl}/athletes/${this.athlete_code}`);
         if (response.status === 200) {
           const athleteData = response.data.data;
           Object.keys(this.athlete).forEach((key) => {
@@ -104,10 +102,7 @@ export default {
       const formData = new FormData();
 
       Object.keys(this.athlete).forEach((key) => {
-        if (
-          Array.isArray(this.athlete[key]) ||
-          typeof this.athlete[key] === "object"
-        ) {
+        if (Array.isArray(this.athlete[key]) || typeof this.athlete[key] === 'object') {
           formData.append(key, JSON.stringify(this.athlete[key]));
         } else {
           formData.append(key, this.athlete[key]);
@@ -119,24 +114,21 @@ export default {
       }
 
       try {
-        const response = await axios.patch(
-          `${databaseUrl}/athletes/${this.athlete_code}`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-              authorization: `Bearer ${this.userData.token}`,
-            },
-          }
-        );
+        const response = await axios.patch(`${databaseUrl}/athletes/${this.athlete_code}`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            authorization: `Bearer ${this.userData.token}`,
+          },
+        });
 
         if (response.status === 200) {
-          this.messages.push("Информация о спортсмене успешно обновлена");
+          this.messages.push('Информация о спортсмене успешно обновлена');
+          await this.fetchAthletes();
 
           setTimeout(() => {
-            if (this.$route.name === "editAthletePage") {
+            if (this.$route.name === 'editAthletePage') {
               this.$router.push({
-                name: "athletePage",
+                name: 'athletePage',
                 params: { athlete_code: this.athlete_code },
               });
             }
@@ -144,39 +136,32 @@ export default {
         }
       } catch (err) {
         if (err) {
-          this.errors.push(
-            `Информация о спортсмене не обновлена: ${
-              err.response?.data?.data || err.message
-            }`
-          );
+          this.errors.push(`Информация о спортсмене не обновлена: ${err.response?.data?.data || err.message}`);
         }
       }
     },
     async deleteAthlete() {
       try {
-        const response = await axios.delete(
-          `${databaseUrl}/athletes/${this.athlete_code}`,
-          {
-            headers: {
-              authorization: `Bearer ${this.userData.token}`,
-            },
-          }
-        );
-        if (response.data.status === "success") {
-          this.messages.push("Спортсмен был успешно удалён");
+        const response = await axios.delete(`${databaseUrl}/athletes/${this.athlete_code}`, {
+          headers: {
+            authorization: `Bearer ${this.userData.token}`,
+          },
+        });
+        if (response.data.status === 'success') {
+          this.messages.push('Спортсмен был успешно удалён');
+          await this.fetchAthletes();
 
           setTimeout(() => {
-            if (this.$route.name === "editAthletePage") {
+            if (this.$route.name === 'editAthletePage') {
               this.$router.push({
-                name: "athletePage",
-                params: { athlete_code: this.athlete_code },
+                name: 'allAthletes',
               });
             }
           }, 2000);
         }
       } catch (e) {
-        console.error("Failed to delete athlete:", e);
-        this.errors.push("Не удалось удалить спортсмена");
+        console.error('Failed to delete athlete:', e);
+        this.errors.push('Не удалось удалить спортсмена');
       }
     },
   },

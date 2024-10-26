@@ -8,22 +8,19 @@
       action="update"
     ></organization-form>
 
-    <message-container
-      :messages="messages"
-      :errors="errors"
-    ></message-container>
+    <message-container :messages="messages" :errors="errors"></message-container>
   </div>
 </template>
 
 <script>
-import MessageContainer from "@/components/ui-components/message-container.vue";
-import { mapGetters } from "vuex";
-import axios from "axios";
-import { databaseUrl } from "@/store/constants";
-import OrganizationForm from "@/pages/admin-pages/organizations/form-organization.vue";
+import MessageContainer from '@/components/ui-components/message-container.vue';
+import { mapGetters } from 'vuex';
+import axios from 'axios';
+import { databaseUrl } from '@/store/constants';
+import OrganizationForm from '@/pages/admin-pages/organizations/form-organization.vue';
 
 export default {
-  name: "editOrganization-page",
+  name: 'editOrganization-page',
   components: { OrganizationForm, MessageContainer },
   props: {
     org_id: String,
@@ -31,18 +28,18 @@ export default {
   data() {
     return {
       organization: {
-        title: "",
-        country: "",
-        region: "",
-        sport: "",
+        title: '',
+        country: '',
+        region: '',
+        sport: '',
         contacts: [],
         socials: {
-          vk: "",
-          telegram: "",
+          vk: '',
+          telegram: '',
         },
       },
       organizationImages: {
-        logo_url: "",
+        logo_url: '',
       },
 
       messages: [],
@@ -50,16 +47,14 @@ export default {
     };
   },
   computed: {
-    ...mapGetters("authorization", {
-      userData: "getUserData",
+    ...mapGetters('authorization', {
+      userData: 'getUserData',
     }),
   },
   methods: {
     async loadOrganizationData() {
       try {
-        const response = await axios.get(
-          `${databaseUrl}/organizations/${this.org_id}`
-        );
+        const response = await axios.get(`${databaseUrl}/organizations/${this.org_id}`);
         if (response.status === 200) {
           const organizationData = response.data.organization;
           Object.keys(this.organization).forEach((key) => {
@@ -82,10 +77,7 @@ export default {
       const formData = new FormData();
 
       Object.keys(this.organization).forEach((key) => {
-        if (
-          Array.isArray(this.organization[key]) ||
-          typeof this.organization[key] === "object"
-        ) {
+        if (Array.isArray(this.organization[key]) || typeof this.organization[key] === 'object') {
           formData.append(key, JSON.stringify(this.organization[key]));
         } else {
           formData.append(key, this.organization[key]);
@@ -97,24 +89,20 @@ export default {
       }
 
       try {
-        const response = await axios.patch(
-          `${databaseUrl}/organizations/${this.org_id}`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-              authorization: `Bearer ${this.userData.token}`,
-            },
-          }
-        );
+        const response = await axios.patch(`${databaseUrl}/organizations/${this.org_id}`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            authorization: `Bearer ${this.userData.token}`,
+          },
+        });
 
         if (response.status === 200) {
-          this.messages.push("Информация о судье успешно обновлена");
+          this.messages.push('Информация о судье успешно обновлена');
 
           setTimeout(() => {
-            if (this.$route.name === "editOrganizationPage") {
+            if (this.$route.name === 'editOrganizationPage') {
               this.$router.push({
-                name: "organizationPage",
+                name: 'organizationPage',
                 params: { org_id: this.org_id },
               });
             }
@@ -122,39 +110,32 @@ export default {
         }
       } catch (err) {
         if (err) {
-          this.errors.push(
-            `Информация об организации не была обновлена: ${
-              err.response?.data?.data || err.message
-            }`
-          );
+          this.errors.push(`Информация об организации не была обновлена: ${err.response?.data?.data || err.message}`);
         }
       }
     },
     async deleteOrganization() {
       try {
-        const response = await axios.delete(
-          `${databaseUrl}/organizations/${this.org_id}`,
-          {
-            headers: {
-              authorization: `Bearer ${this.userData.token}`,
-            },
-          }
-        );
-        if (response.data.status === "success") {
-          this.messages.push("Организация была успешно удалёна");
+        const response = await axios.delete(`${databaseUrl}/organizations/${this.org_id}`, {
+          headers: {
+            authorization: `Bearer ${this.userData.token}`,
+          },
+        });
+        if (response.data.status === 'success') {
+          this.messages.push('Организация была успешно удалёна');
 
           setTimeout(() => {
-            if (this.$route.name === "editOrganizationPage") {
+            if (this.$route.name === 'editOrganizationPage') {
               this.$router.push({
-                name: "organizationPage",
+                name: 'organizationPage',
                 params: { org_id: this.org_id },
               });
             }
           }, 2000);
         }
       } catch (e) {
-        console.error("Не удалось удалить организацию:", e);
-        this.errors.push("Не удалось удалить организацию");
+        console.error('Не удалось удалить организацию:', e);
+        this.errors.push('Не удалось удалить организацию');
       }
     },
   },

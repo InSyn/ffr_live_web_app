@@ -1,97 +1,62 @@
 <template>
   <div class="seminarsPage__wrapper">
-    <search
-      @search-loading="setLoadingState"
-      @search-results-loaded="showSearchResults"
-      mode="seminars"
-    ></search>
+    <search @search-loading="setLoadingState" @search-results-loaded="showSearchResults" mode="seminars"></search>
 
     <div class="seminars__list__wrapper">
-      <calendar-carousel
-        @set-calendar-date="setCalendarDate"
-        :calendar-date-prop="calendarDate"
-        :events="seminarsList"
-      ></calendar-carousel>
+      <calendar-carousel @set-calendar-date="setCalendarDate" :calendar-date-prop="calendarDate" :events="seminarsList"></calendar-carousel>
 
       <div class="seminars__list">
-        <router-link
-          v-for="(seminar, idx) in getSeminarsList"
-          :key="seminar._id"
-          :to="'/seminar_page/' + seminar._id"
-        >
-          <div
-            :class="[
-              'seminar__item__wrapper',
-              idx % 2 === 0 && 'isEven',
-              matchCalendarDate(seminar.date) && 'calendarDate-match',
-            ]"
-          >
+        <router-link v-for="(seminar, idx) in getSeminarsList" :key="seminar._id" :to="{ name: 'seminarPage', params: { seminar_id: seminar._id } }">
+          <div :class="['seminar__item__wrapper', idx % 2 === 0 && 'isEven', matchCalendarDate(seminar.date) && 'calendarDate-match']">
             <div class="seminar__item__header">
               <div class="seminar__item title">
-                {{ seminar["title"] }}
+                {{ seminar['title'] }}
               </div>
               <div class="seminar__item sport">
-                {{ seminar["sport"] }}
+                {{ seminar['sport'] }}
 
-                <country-flag
-                  class="countryFlag"
-                  :country-code="getCountryCode(seminar['country'])"
-                  height="1rem"
-                ></country-flag>
+                <country-flag class="countryFlag" :country-code="getCountryCode(seminar['country'])" height="1rem"></country-flag>
               </div>
             </div>
 
             <div class="seminar__item__footer">
               <div class="seminar__item region">
-                <country-flag
-                  is-region-flag="true"
-                  country-code="RU"
-                  :region-code="getRegionCode(seminar.region)"
-                  width="calc(4px + 1rem)"
-                ></country-flag>
-                {{ seminar["region"] }}
+                <country-flag is-region-flag="true" country-code="RU" :region-code="getRegionCode(seminar.region)" width="calc(4px + 1rem)"></country-flag>
+                {{ seminar['region'] }}
               </div>
               <div class="seminar__item date">
-                {{ formatDate(seminar["date"]) }}
+                {{ formatDate(seminar['date']) }}
               </div>
               <div class="seminar__item disciplines">
-                {{ seminar.disciplines.join(", ") }}
+                {{ seminar.disciplines.join(', ') }}
               </div>
             </div>
           </div>
         </router-link>
 
-        <span
-          class="emptySearchResults"
-          v-if="getSeminarsList.length === 0 && !loading"
-        >
-          Семинары не найдены
-        </span>
+        <span class="emptySearchResults" v-if="getSeminarsList.length === 0 && !loading"> Семинары не найдены </span>
 
-        <loader-spinner
-          v-if="loading"
-          class="loading__spinner"
-        ></loader-spinner>
+        <loader-spinner v-if="loading" class="loading__spinner"></loader-spinner>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import Search from "@/components/ui-components/search/index.vue";
-import { getDisciplineCode } from "@/store/data/sports";
-import { getRegionCode } from "@/store/data/russia-regions";
-import { formatDate } from "@/utils/data-formaters";
-import CountryFlag from "@/components/ui-components/country-flag.vue";
-import { getCountryCode } from "@/store/data/countries";
-import { mapActions, mapGetters } from "vuex";
-import LoaderSpinner from "@/components/ui-components/loader-spinner.vue";
-import CalendarCarousel from "@/components/ui-components/calendar-carousel.vue";
-import axios from "axios";
-import { databaseUrl } from "@/store/constants";
+import Search from '@/components/ui-components/search/index.vue';
+import { getDisciplineCode } from '@/store/data/sports';
+import { getRegionCode } from '@/store/data/russia-regions';
+import { formatDate } from '@/utils/data-formaters';
+import CountryFlag from '@/components/ui-components/country-flag.vue';
+import { getCountryCode } from '@/store/data/countries';
+import { mapActions, mapGetters } from 'vuex';
+import LoaderSpinner from '@/components/ui-components/loader-spinner.vue';
+import CalendarCarousel from '@/components/ui-components/calendar-carousel.vue';
+import axios from 'axios';
+import { databaseUrl } from '@/store/constants';
 
 export default {
-  name: "seminarsPage",
+  name: 'seminarsPage',
   components: {
     CalendarCarousel,
     LoaderSpinner,
@@ -106,19 +71,17 @@ export default {
     };
   },
   computed: {
-    ...mapGetters("seminars", {
-      seminarsList: "getSeminars",
+    ...mapGetters('seminars', {
+      seminarsList: 'getSeminars',
     }),
     getSeminarsList() {
-      return this.searchResults === null
-        ? this.seminarsList
-        : this.searchResults;
+      return this.searchResults === null ? this.seminarsList : this.searchResults;
     },
   },
   methods: {
-    ...mapActions("seminars", {
-      fetchSeminars: "LOAD_SEMINARS",
-      setSeminars: "SET_SEMINARS",
+    ...mapActions('seminars', {
+      fetchSeminars: 'LOAD_SEMINARS',
+      setSeminars: 'SET_SEMINARS',
     }),
     getCountryCode,
     formatDate,
@@ -142,19 +105,14 @@ export default {
       this.setLoadingState(true);
 
       try {
-        const response = await axios.get(
-          databaseUrl + "/seminars/date-search/" + date
-        );
+        const response = await axios.get(databaseUrl + '/seminars/date-search/' + date);
         if (response.status === 200) {
           this.searchResults = [...response.data.seminars];
           this.setLoadingState(false);
         }
       } catch (e) {
         if (e) {
-          console.error(
-            "Error fetching events:",
-            e.response?.data?.message || e.message
-          );
+          console.error('Error fetching events:', e.response?.data?.message || e.message);
         }
       } finally {
         this.setLoadingState(false);
@@ -193,7 +151,6 @@ export default {
   flex-wrap: nowrap;
   max-width: var(--desktop-small);
   width: 100%;
-  overflow-y: auto;
   margin: 0 auto;
   padding: var(--padd-page);
 
@@ -205,6 +162,8 @@ export default {
     overflow-y: auto;
 
     background-color: var(--background--card);
+    box-shadow: var(--container-shadow-l);
+    border: 1px solid var(--border-container);
     border-radius: 4px;
 
     .seminars__list {
@@ -220,34 +179,38 @@ export default {
         &.isEven {
           background-color: var(--background--diff);
         }
+
         &.calendarDate-match {
           padding-left: 6px;
           border-left: 4px solid var(--text-muted);
         }
+
         &:hover {
           background-color: var(--background--card-hover);
         }
+
         .seminar__item__header {
           flex: 0 0 auto;
           display: flex;
           flex-wrap: nowrap;
           align-items: flex-start;
           gap: 0.5rem 1rem;
+          font-size: 1.15rem;
 
           .seminar__item.title {
             flex: 1 1 0;
-            font-size: 1.25rem;
             font-weight: bold;
           }
+
           .seminar__item.sport {
             flex: 0 0 auto;
-            font-size: 1.25rem;
 
             .countryFlag {
               margin-left: 0.5rem;
             }
           }
         }
+
         .seminar__item__footer {
           flex: 0 0 auto;
           display: flex;
@@ -261,9 +224,11 @@ export default {
             align-items: center;
             gap: 0.75rem;
           }
+
           .seminar__item.date {
             flex: 0 0 auto;
           }
+
           .seminar__item.disciplines {
             display: flex;
             justify-content: flex-end;
@@ -271,6 +236,7 @@ export default {
             margin-left: auto;
           }
         }
+
         .seminar__item {
           display: flex;
           align-items: center;
@@ -278,6 +244,7 @@ export default {
         }
       }
     }
+
     .emptySearchResults {
       align-self: center;
       display: inline-block;

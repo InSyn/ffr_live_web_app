@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 export const totalResultSchema = new mongoose.Schema({
   competition_id: String,

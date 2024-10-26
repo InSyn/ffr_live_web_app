@@ -1,16 +1,7 @@
 <template>
   <div class="navBar__wrapper">
-    <router-link
-      v-for="menu_item in appMenu()"
-      :key="menu_item.title"
-      v-slot="{ navigate, isActive }"
-      custom
-      :to="{ name: menu_item.link }"
-    >
-      <button
-        @click="navigate"
-        :class="['navBar__button', isActive && 'isActive']"
-      >
+    <router-link v-for="menu_item in appMenu()" :key="menu_item.title" v-slot="{ navigate, isActive }" custom :to="{ name: menu_item.link }">
+      <button @click="navigate" :class="['navBar__button', isActive && 'isActive']">
         {{ menu_item.title }}
       </button>
     </router-link>
@@ -18,23 +9,21 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters } from 'vuex';
 
 export default {
-  name: "navBar",
+  name: 'navBar',
   methods: {
     appMenu() {
-      return this.userData.role === "admin"
-        ? this.menu
-        : this.menu.filter((menuItem) => !menuItem.adminOnly);
+      return this.userData.role === 'admin' ? this.menu : this.menu.filter((menuItem) => !menuItem.adminOnly);
     },
   },
   computed: {
-    ...mapGetters("authorization", {
-      userData: "getUserData",
+    ...mapGetters('authorization', {
+      userData: 'getUserData',
     }),
-    ...mapGetters("menu", {
-      menu: "getMenu",
+    ...mapGetters('menu', {
+      menu: 'getMenu',
     }),
   },
 };
@@ -56,6 +45,8 @@ export default {
     display: flex;
     align-items: center;
     padding: 8px;
+
+    background-image: linear-gradient(to top, var(--text-card-contrast) 60%, transparent);
     font-size: 16px;
     text-decoration: none;
     text-transform: uppercase;
@@ -64,9 +55,10 @@ export default {
     &:hover {
       color: var(--text-contrast-hovered);
     }
+
     &::after {
       position: absolute;
-      content: "";
+      content: '';
       left: 50%;
       transform: translateX(-50%);
       bottom: 0;
@@ -75,11 +67,13 @@ export default {
       background: var(--ffr-brand);
       transition: width 92ms ease-out;
     }
+
     /*noinspection CssUnusedSymbol*/
     &.isActive::after {
       width: 100%;
     }
   }
+
   @media screen and (max-width: 1200px) {
     padding-left: 280px;
   }

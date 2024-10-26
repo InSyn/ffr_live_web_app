@@ -1,40 +1,23 @@
 <template>
   <div class="stringMulti_control__wrapper">
-    <div
-      class="stringMulti_control__updateValue__wrapper"
-      v-for="(_, idx) in target[target_key]"
-      :key="idx"
-    >
+    <div class="stringMulti_control__updateValue__wrapper" v-for="(_, idx) in target[target_key]" :key="idx">
       <input
         @change="setFieldValue(target, target_key, $event.target.value, idx)"
         :id="target_key"
         class="stringMulti_control__updateValue__input"
         :value="target[target_key][idx]"
       />
-      <span
-        @click="removeFieldValue(target, target_key, idx)"
-        class="stringMulti_control__removeValue__button"
-      >
-      </span>
+      <span @click="removeFieldValue(target, target_key, idx)" class="stringMulti_control__removeValue__button"> </span>
     </div>
-    <input
-      @change="addFieldValue(target, target_key, $event)"
-      :id="target_key"
-      class="stringMulti_control__newValue__input"
-      :placeholder="placeholder"
-    />
+    <input @change="addFieldValue(target, target_key, $event)" :id="target_key" class="stringMulti_control__newValue__input" :placeholder="placeholder" />
   </div>
 </template>
 
 <script>
-import {
-  addFieldValue,
-  removeFieldValue,
-  setFieldValue,
-} from "@/utils/form-data-helpers";
+import { addFieldValue, removeFieldValue, setFieldValue } from '@/utils/form-data-helpers';
 
 export default {
-  name: "multiple-string-control",
+  name: 'multiple-string-control',
   props: {
     target: {
       type: Object,
@@ -70,6 +53,7 @@ export default {
 
     .stringMulti_control__updateValue__input {
     }
+
     .stringMulti_control__removeValue__button {
       position: absolute;
       top: 50%;
@@ -84,13 +68,14 @@ export default {
       opacity: 0.45;
       transition: opacity 64ms;
       cursor: pointer;
-      content: "";
+      content: '';
 
       &:hover {
         opacity: 1;
       }
+
       &::before {
-        content: "";
+        content: '';
         position: absolute;
         display: block;
         height: 3px;
@@ -101,8 +86,9 @@ export default {
         top: 50%;
         transform: translate(-50%, -50%) rotate(45deg);
       }
+
       &::after {
-        content: "";
+        content: '';
         position: absolute;
         display: block;
         height: 3px;
@@ -115,9 +101,11 @@ export default {
       }
     }
   }
+
   .stringMulti_control__newValue__input {
     flex: 0 0 auto;
   }
+
   input {
     min-width: 0;
     width: 100%;
