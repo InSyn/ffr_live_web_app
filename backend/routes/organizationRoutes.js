@@ -2,7 +2,6 @@ import express from 'express';
 import * as organizationController from '../controllers/organizations-controller.js';
 import { authenticateToken, isAdmin } from '../middleware/authentication.js';
 import { createMulterMiddleware } from '../file-storage/fileStorage.js';
-import { getOrganizationIdByRegion } from '../controllers/organizations-controller.js';
 
 export const organizationRouter = express.Router();
 

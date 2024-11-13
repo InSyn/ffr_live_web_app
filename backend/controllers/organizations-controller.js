@@ -261,6 +261,56 @@ export const deleteReport = async (req, res) => {
     });
   }
 };
+export const updateReport = async (req, res) => {
+  try {
+    const { id, reportId } = req.params;
+
+    const organization = await Organization.findById(id);
+    if (!organization) {
+      return res.status(404).json({
+        status: 'Err',
+        message: 'Организация не найдена',
+      });
+    }
+
+    const report = await OrganizationReport.findById(reportId);
+    if (!report) {
+      return res.status(404).json({
+        status: 'Err',
+        message: 'Отчёт не был найден',
+      });
+    }
+
+    report.title = req.body.title || report.title;
+    report.content = req.body.content || report.content;
+    report.report_date = req.body.report_date || report.report_date;
+
+    const newFiles = req.files['files'];
+    if (newFiles && newFiles.length > 0) {
+      if (report.files && report.files.length > 0) {
+        for (const file of report.files) {
+          await deleteFileIfExists(file.url);
+        }
+      }
+      report.files = newFiles.map((file) => ({ url: `/uploads/images/${file.filename}` }));
+    }
+
+    await report.save();
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Report updated successfully',
+      data: { report },
+    });
+  } catch (error) {
+    console.error('Error updating report:', error);
+    res.status(500).json({
+      status: 'Err',
+      message: `Error updating report: ${error.message}`,
+      error: error.message,
+    });
+  }
+};
 
 export const getAthletesByOrganizationRegion = async (req, res) => {
   try {

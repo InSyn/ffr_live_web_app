@@ -15,18 +15,26 @@ export const authenticateToken = (req, res, next) => {
   });
 };
 
-export const isAdmin = (req, res, next) => {
-  const token = req.headers.authorization.split(' ')[1];
-  const decoded = jwt.verify(token, JWT_SECRET);
-  if (decoded.role !== 'admin') return res.status(403).send({ message: 'Недостаточно прав для совершения операции' });
+export const hasRole =
+  (...roles) =>
+  (req, res, next) => {
+    try {
+      const token = req.headers.authorization.split(' ')[1];
+      const decoded = jwt.verify(token, JWT_SECRET);
 
-  next();
-};
+      if (!roles.includes(decoded.role)) {
+        return res.status(403).json({ status: 'Err', message: 'Недостаточно прав для совершения операции' });
+      }
 
-export const isSecretary = (req, res, next) => {
-  const token = req.headers.authorization.split(' ')[1];
-  const decoded = jwt.verify(token, JWT_SECRET);
-  if (decoded.role !== 'secretary' && decoded.role !== 'admin') return res.status(403).send({ message: 'Недостаточно прав для совершения операции' });
+      req.user = decoded;
+      next();
+    } catch (e) {
+      console.log(`Ошибка при проверке роли пользователя: ${e}`);
+      res.status(500).json({ status: 'Err', message: `Не удалось проверить роль пользователя: ${e}` });
+    }
+  };
 
-  next();
-};
+export const isAdmin = hasRole('admin');
+export const isSecretary = hasRole('secretary');
+export const isOrganization = hasRole('regional_organization');
+export const isTrainer = hasRole('trainer');
