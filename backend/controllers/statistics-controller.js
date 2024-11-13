@@ -34,7 +34,7 @@ export const getOverallDbStats = async (req, res) => {
   } catch (e) {
     res.status(404).json({
       status: 'Err',
-      data: 'Statistics not found ',
+      message: 'Statistics not found ',
       err: e,
     });
   }

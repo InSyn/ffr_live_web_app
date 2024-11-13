@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import { uploadsFolderUrl } from '@/store/constants';
+import { backendRootUrl } from '@/constants';
 
 export default {
   name: 'documents-select-control',
@@ -36,7 +36,7 @@ export default {
   },
   computed: {
     uploadsFolderUrl() {
-      return uploadsFolderUrl;
+      return backendRootUrl;
     },
   },
   methods: {
@@ -94,10 +94,6 @@ export default {
     button {
       align-self: flex-end;
     }
-
-    input {
-    }
-
     .existingFile {
       align-self: flex-start;
       margin-bottom: 0.5rem;
@@ -110,7 +106,6 @@ export default {
         box-shadow: 0 0 0 1px var(--text-hovered) inset;
       }
     }
-
     .control__wrapper {
       display: flex;
       align-items: center;
@@ -129,9 +124,6 @@ export default {
         outline: transparent;
       }
     }
-  }
-
-  button {
   }
 }
 </style>

@@ -9,11 +9,11 @@
 import MessageContainer from '@/components/ui-components/message-container.vue';
 import { translateField } from '@/utils/formFields-translator';
 import axios from 'axios';
-import { databaseUrl } from '@/store/constants';
+import { apiUrl } from '@/constants';
 import { capitalizeString } from '@/utils/capitalizeString';
 import { getDisciplines } from '@/store/data/sports';
-import { getInputType } from '@/utils/get-input-type';
-import { mapGetters } from 'vuex';
+import { getInputType } from '@/utils/inputType-util';
+import { mapActions, mapGetters } from 'vuex';
 import { getJuryCategoriesList } from '@/store/data/sport-data-sets';
 import JuryForm from '@/pages/admin-pages/jury/form-jury.vue';
 
@@ -52,6 +52,9 @@ export default {
     }),
   },
   methods: {
+    ...mapActions('jury', {
+      fetchJury: 'LOAD_JURY',
+    }),
     getJuryCategoriesList,
     getDisciplines,
     getInputType,
@@ -74,7 +77,7 @@ export default {
       }
 
       try {
-        const response = await axios.post(databaseUrl + '/jury/', formData, {
+        const response = await axios.post(apiUrl + '/jury/', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
             authorization: `Bearer ${this.userData.token}`,
@@ -83,18 +86,16 @@ export default {
 
         if (response.status === 200) {
           this.messages.push('Судья успешно добавлен в базу данных');
+          await this.fetchJury();
 
           setTimeout(() => {
-            this.$router.push({
-              name: 'juryPage',
-              params: { jury_code: this.jury.jury_code },
-            });
-          }, 2000);
+            if (this.$route.name === 'createJuryPage') this.$router.push({ name: 'juryPage', params: { jury_code: response.data.jury.jury_code } });
+          }, 1280);
         }
       } catch (err) {
         if (err) {
           console.log(err);
-          this.errors.push('Судья не был добавлен: ' + err.response?.data?.data);
+          this.errors.push('Судья не был добавлен: ' + err.response?.data?.message);
         }
       }
     },

@@ -27,11 +27,11 @@ export default {
   methods: {
     toggleTheme() {
       if (this.appTheme === 'dark') {
-        document.getElementById('app').classList.remove('theme-dark');
+        document.documentElement.classList.remove('dark');
         localStorage.setItem('app-theme', 'light');
         this.appTheme = 'light';
       } else {
-        document.getElementById('app').classList.add('theme-dark');
+        document.documentElement.classList.add('dark');
         localStorage.setItem('app-theme', 'dark');
         this.appTheme = 'dark';
       }
@@ -106,7 +106,7 @@ export default {
   }
 }
 
-.theme-dark .toggle__wrapper {
+.dark .toggle__wrapper {
   .toggle__thumb {
     left: calc(100% - 18px);
 

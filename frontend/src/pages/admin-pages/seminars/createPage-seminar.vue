@@ -8,10 +8,10 @@
 
 <script>
 import MessageContainer from '@/components/ui-components/message-container.vue';
-import { databaseUrl } from '@/store/constants';
+import { apiUrl } from '@/constants';
 import SeminarForm from '@/pages/admin-pages/seminars/form-seminar.vue';
 import axios from 'axios';
-import { mapGetters } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 
 export default {
   name: 'createOrganization-Page',
@@ -41,6 +41,10 @@ export default {
     }),
   },
   methods: {
+    ...mapActions('seminars', {
+      fetchSeminars: 'LOAD_SEMINARS',
+    }),
+
     async createSeminar() {
       const formData = new FormData();
 
@@ -82,7 +86,7 @@ export default {
       }
 
       try {
-        const response = await axios.post(`${databaseUrl}/seminars/`, formData, {
+        const response = await axios.post(`${apiUrl}/seminars/`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
             authorization: `Bearer ${this.userData.token}`,
@@ -91,12 +95,10 @@ export default {
 
         if (response.status === 201) {
           this.messages.push('Семинар создан успешно');
+          await this.fetchSeminars();
 
           setTimeout(() => {
-            this.$router.push({
-              name: 'seminarPage',
-              params: { seminar_id: this.seminar._id },
-            });
+            if (this.$route.name === 'createSeminarPage') this.$router.push({ name: 'seminarPage', params: { seminar_id: response.data.seminar._id } });
           }, 2000);
         }
       } catch (error) {
@@ -115,5 +117,6 @@ export default {
   display: flex;
   flex-direction: column;
   padding: 2rem;
+  overflow-y: auto;
 }
 </style>

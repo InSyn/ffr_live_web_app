@@ -15,13 +15,9 @@
 
             <div class="juryInfo__wrapper">
               <div class="juryInfo__header">
-                <div class="federation__wrapper" v-if="jury['sport'] && jury['sport'].toLowerCase() === 'фристайл'">
+                <div class="federation__wrapper">
                   <img src="../../../assets/logo/FFR_logo_mini.png" alt="FFR_logo" />
                   <span>Федерация фристайла России</span>
-                </div>
-                <div class="federation__wrapper" v-if="jury['sport'] && jury['sport'].toLowerCase() === 'сноуборд'">
-                  <img src="../../../assets/logo/FSR_logo_mini.png" alt="FSR_logo" />
-                  <span>Федерация сноуборда России</span>
                 </div>
 
                 <div class="jurySport">
@@ -112,7 +108,7 @@ import AthletePhotoFillerIcon from '@/assets/svg/athletePhotoFiller-icon.vue';
 import EditButton from '@/components/ui-components/edit-button.vue';
 import CountryFlag from '@/components/ui-components/country-flag.vue';
 import axios from 'axios';
-import { databaseUrl, uploadsFolderUrl } from '@/store/constants';
+import { apiUrl, backendRootUrl } from '@/constants';
 import { getRegionCode } from '@/store/data/russia-regions';
 import { getDisciplineCode } from '@/store/data/sports';
 import { mdiImage } from '@mdi/js';
@@ -155,7 +151,7 @@ export default {
     getRegionCode,
     async getJuryByCode(id) {
       try {
-        const data = await axios.get(databaseUrl + '/jury/' + id);
+        const data = await axios.get(apiUrl + '/jury/' + id);
 
         if (data.status === 200) {
           const juryData = data.data.jury;
@@ -173,7 +169,7 @@ export default {
   },
   computed: {
     uploadsFolderUrl() {
-      return uploadsFolderUrl;
+      return backendRootUrl;
     },
   },
 

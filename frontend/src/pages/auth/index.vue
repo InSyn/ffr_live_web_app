@@ -29,7 +29,7 @@
 <script>
 import { mdiEye } from '@mdi/js';
 import axios from 'axios';
-import { databaseUrl } from '@/store/constants';
+import { apiUrl } from '@/constants';
 import { mapActions, mapGetters } from 'vuex';
 import MessageContainer from '@/components/ui-components/message-container.vue';
 
@@ -75,13 +75,14 @@ export default {
       }
 
       try {
-        const authResponse = await axios.post(databaseUrl + '/auth/login', this.authorizationData);
+        const authResponse = await axios.post(apiUrl + '/auth/login', this.authorizationData);
         if (authResponse.status === 200) {
           const userData = {
-            ...this.authorizationData,
+            username: this.authorizationData.username,
             token: authResponse.data.token,
             role: authResponse.data.role,
             region: authResponse.data.region,
+            ffr_id: authResponse.data.ffr_id,
           };
           localStorage.setItem('authorizationData', JSON.stringify(userData));
           this.addMessage(`Добрый день, ${userData.username}!`);
@@ -121,13 +122,12 @@ export default {
 
 <style scoped lang="scss">
 .authorizationPage__wrapper {
-  z-index: 1;
   isolation: isolate;
   flex: 0 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 3.75rem auto;
+  margin: 10vh auto;
   padding: 32px;
 
   .authorizationForm {
@@ -147,7 +147,6 @@ export default {
       font-weight: bold;
       text-align: center;
     }
-
     .authorizationForm__inputWrapper {
       position: relative;
       display: flex;
@@ -159,12 +158,10 @@ export default {
       &:focus-within {
         border-bottom: 1px solid var(--text-muted);
       }
-
       label {
         width: 6rem;
         font-weight: bold;
       }
-
       input {
         width: 12rem;
         padding: 3px 6px;
@@ -177,7 +174,6 @@ export default {
           background-color: var(--background--card-hover);
         }
       }
-
       .showPassword__button {
         position: absolute;
         right: calc(1rem + 4px);

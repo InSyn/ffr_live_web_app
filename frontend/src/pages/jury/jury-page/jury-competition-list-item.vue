@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import { uploadsFolderUrl } from '@/store/constants';
+import { backendRootUrl } from '@/constants';
 import CompetitionImageFillerIcon from '@/assets/svg/competitionImageFiller-icon.vue';
 import CountryFlag from '@/components/ui-components/country-flag.vue';
 import { getCountryCode } from '@/store/data/countries';
@@ -59,7 +59,7 @@ export default {
   components: { CountryFlag, CompetitionImageFillerIcon },
   computed: {
     uploadsFolderUrl() {
-      return uploadsFolderUrl;
+      return backendRootUrl;
     },
   },
   props: {

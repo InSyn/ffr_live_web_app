@@ -7,7 +7,7 @@
 
 <script>
 import axios from 'axios';
-import { databaseUrl } from '@/store/constants';
+import { apiUrl } from '@/constants';
 import { mapActions, mapGetters } from 'vuex';
 import MessageContainer from '@/components/ui-components/message-container.vue';
 import AthleteForm from '@/pages/admin-pages/athletes/form-athlete.vue';
@@ -74,7 +74,7 @@ export default {
       }
 
       try {
-        const response = await axios.post(`${databaseUrl}/athletes/`, formData, {
+        const response = await axios.post(`${apiUrl}/athletes/`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
             authorization: `Bearer ${this.userData.token}`,
@@ -92,11 +92,11 @@ export default {
                 params: { athlete_code: response.data.athlete.rus_code },
               });
             }
-          }, 2000);
+          }, 1280);
         }
       } catch (err) {
         if (err) {
-          this.errors.push(`Error: ${err.response?.data?.message || err.message}`);
+          this.errors.push(`Error ${err.response?.data?.message || err.message}`);
         }
       }
     },
@@ -110,5 +110,6 @@ export default {
   display: flex;
   flex-direction: column;
   padding: 2rem;
+  overflow-y: auto;
 }
 </style>

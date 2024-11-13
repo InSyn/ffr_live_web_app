@@ -2,7 +2,7 @@ export const checkUserTheme = () => {
   if (!localStorage.getItem('app-theme')) {
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
       localStorage.setItem('app-theme', 'dark');
-      document.getElementById('app').classList.add('theme-dark');
+      document.documentElement.classList.add('dark');
 
       return 'dark';
     }
@@ -10,7 +10,7 @@ export const checkUserTheme = () => {
 
     return 'light';
   } else {
-    if (localStorage.getItem('app-theme') === 'dark') document.getElementById('app').classList.add('theme-dark');
+    if (localStorage.getItem('app-theme') === 'dark') document.documentElement.classList.add('dark');
 
     return localStorage.getItem('app-theme');
   }

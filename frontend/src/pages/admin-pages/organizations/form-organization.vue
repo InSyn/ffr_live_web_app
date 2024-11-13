@@ -26,29 +26,17 @@
           {{ translateField(field_key) }}
         </label>
 
-        <select
+        <country-select-control
           v-if="field_key === 'country'"
-          :id="field_key"
-          class="formControl"
           :value="organization[field_key]"
-          @change="setFieldValue(organization, 'country', $event.target.value)"
-        >
-          <option v-for="country in countries" :key="country.country_code" class="formControl-option">
-            {{ country.country_name }}
-          </option>
-        </select>
-        <select
-          v-else-if="field_key === 'region' && getCountryCode(organization['country']) === 'RU'"
-          :id="field_key"
-          class="formControl"
+          @input="setFieldValue(organization, 'country', $event)"
+        ></country-select-control>
+        <region-select-control
+          v-else-if="field_key === 'region'"
           :value="organization[field_key]"
-          @change="setFieldValue(organization, 'region', $event.target.value)"
-        >
-          <option selected disabled value="">Выберите регион</option>
-          <option v-for="region in getSortedRegions()" :key="region.code">
-            {{ region.fullname }}
-          </option>
-        </select>
+          :country="organization['country']"
+          @input="setFieldValue(organization, 'region', $event)"
+        ></region-select-control>
 
         <select
           @change="setFieldValue(organization, 'sport', $event.target.value)"
@@ -124,19 +112,21 @@
 </template>
 
 <script>
-import { getInputType } from '@/utils/get-input-type';
+import { getInputType } from '@/utils/inputType-util';
 import { getDisciplines, sports } from '@/store/data/sports';
 import { capitalizeString } from '@/utils/capitalizeString';
 import { getSortedRegions } from '@/store/data/russia-regions';
 import { countries, getCountryCode } from '@/store/data/countries';
 import { translateField } from '@/utils/formFields-translator';
-import { addFieldValue, removeFieldValue, setFieldValue } from '@/utils/form-data-helpers';
-import { uploadsFolderUrl } from '@/store/constants';
+import { addFieldValue, removeFieldValue, setFieldValue } from '@/utils/formData-helpers';
+import { backendRootUrl } from '@/constants';
 import CompetitionImageFillerIcon from '@/assets/svg/competitionImageFiller-icon.vue';
+import CountrySelectControl from '@/components/ui-components/custom-controls/country-select-control.vue';
+import RegionSelectControl from '@/components/ui-components/custom-controls/region-select-control.vue';
 
 export default {
   name: 'organization-form',
-  components: { CompetitionImageFillerIcon },
+  components: { RegionSelectControl, CountrySelectControl, CompetitionImageFillerIcon },
   props: {
     organization: Object,
     organizationImages: Object,
@@ -184,7 +174,7 @@ export default {
         };
         reader.readAsDataURL(this.selectedFile[imageType]);
       } else if (sourceType === 'url') {
-        this.$set(this.imagePreview, imageType, uploadsFolderUrl + this.organizationImages[imageType]);
+        this.$set(this.imagePreview, imageType, backendRootUrl + this.organizationImages[imageType]);
       }
     },
 
@@ -225,7 +215,7 @@ export default {
 
 <style scoped lang="scss">
 form {
-  flex: 0 1 0;
+  flex: 0 1 auto;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -249,12 +239,11 @@ form {
   }
 
   .formBody {
-    flex: 1 1 0;
+    flex: 0 1 auto;
     display: flex;
     flex-direction: column;
-    flex-wrap: wrap;
-    gap: 8px;
-    max-height: 50vh;
+    gap: 0.75rem 1.25rem;
+    overflow-y: auto;
 
     @media screen and (max-width: 900px) {
       max-height: none;
@@ -326,7 +315,6 @@ form {
     .formGroup {
       flex: 0 0 auto;
       display: flex;
-      align-items: flex-start;
       padding: 0 0 0.25rem;
       border-bottom: 1px solid var(--background--card-hover);
       transition: border-bottom 92ms;
@@ -428,6 +416,7 @@ form {
   .formActions {
     display: flex;
     justify-content: flex-end;
+    gap: 1.25rem;
     margin-top: 1.75rem;
 
     .actionButton {

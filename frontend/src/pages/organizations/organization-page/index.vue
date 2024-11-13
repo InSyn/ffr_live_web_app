@@ -58,9 +58,15 @@
             </div>
           </div>
           <div class="organization__menu">
-            <button class="organization__menu__item" type="button" @click.prevent="bottomPage = 'team'">Команда</button>
-            <button class="organization__menu__item" type="button" :disabled="!getRegistrationAccess" @click.prevent="bottomPage = 'eventsWithRegistration'">
-              Заявки
+            <button
+              v-for="page in subPages"
+              :key="page.name"
+              class="organization__menu__item"
+              type="button"
+              :disabled="page.authCheck ? !getRegistrationAccess : false"
+              @click.prevent="bottomPage = page.name"
+            >
+              {{ translateField(page.title) }}
             </button>
           </div>
         </div>
@@ -68,42 +74,41 @@
     </div>
 
     <div class="organizationCard__bottom">
-      <div v-if="bottomPage === 'team'" class="organizationTeam__wrapper">
-        <div class="organizationTeam__header">Команда</div>
-        <div class="organizationTeam__list">
-          <athlete-list-item v-for="(athlete, idx) in team" :key="idx" :athlete="athlete" :idx="idx"></athlete-list-item>
-        </div>
-      </div>
+      <organization-team-list v-if="bottomPage === 'team'" :team="team"></organization-team-list>
+      <reports-list v-if="bottomPage === 'reports'"></reports-list>
       <events-with-registration-list v-if="bottomPage === 'eventsWithRegistration'"></events-with-registration-list>
     </div>
   </div>
 </template>
 
 <script>
+import axios from 'axios';
+import { apiUrl, backendRootUrl } from '@/constants';
+import { formatBirthDate, getAgeFromBirthdate, getAthleteName } from '@/utils/data-formaters';
+import { getCountryCode } from '@/store/data/countries';
+import { getDisciplineCode } from '@/store/data/sports';
+import { getRegionCode } from '@/store/data/russia-regions';
+import { mapGetters } from 'vuex';
 import SocialsVkIcon from '@/components/icons/socials-vk-icon.vue';
 import CountryFlag from '@/components/ui-components/country-flag.vue';
 import SocialsTelegramIcon from '@/components/icons/socials-telegram-icon.vue';
 import EditButton from '@/components/ui-components/edit-button.vue';
 import { mdiImage } from '@mdi/js';
-import { formatBirthDate, getAgeFromBirthdate, getAthleteName } from '@/utils/data-formaters';
-import { getCountryCode } from '@/store/data/countries';
-import { getDisciplineCode } from '@/store/data/sports';
-import { getRegionCode } from '@/store/data/russia-regions';
-import axios from 'axios';
-import { databaseUrl, uploadsFolderUrl } from '@/store/constants';
 import CompetitionImageFillerIcon from '@/assets/svg/competitionImageFiller-icon.vue';
-import AthleteListItem from '@/pages/athletes/athlete-listItem.vue';
 import BgMountains from '@/assets/riv/bg-mountains.vue';
 import EventsWithRegistrationList from '@/pages/organizations/organization-page/events-with-registration-list.vue';
-import { mapGetters } from 'vuex';
+import OrganizationTeamList from '@/pages/organizations/organization-page/organization-team-list.vue';
+import ReportsList from '@/pages/organizations/organization-page/reports-list.vue';
+import { translateField } from '@/utils/formFields-translator';
 
 export default {
   name: 'index',
   props: ['org_id'],
   components: {
+    ReportsList,
+    OrganizationTeamList,
     EventsWithRegistrationList,
     BgMountains,
-    AthleteListItem,
     CompetitionImageFillerIcon,
     EditButton,
     SocialsTelegramIcon,
@@ -115,12 +120,16 @@ export default {
       organization: null,
       team: [],
 
+      subPages: [
+        { name: 'team', title: 'Команда', authCheck: false },
+        { name: 'reports', title: 'Отчёты', authCheck: false },
+        { name: 'eventsWithRegistration', title: 'Заявки', authCheck: true },
+      ],
       bottomPage: 'team',
 
-      loadingState: false,
-      updateTimeoutId: null,
-
       imageFillerIcon: mdiImage,
+
+      loadingState: false,
     };
   },
   computed: {
@@ -128,7 +137,7 @@ export default {
       userData: 'getUserData',
     }),
     uploadsFolderUrl() {
-      return uploadsFolderUrl;
+      return backendRootUrl;
     },
 
     getRegistrationAccess() {
@@ -136,6 +145,7 @@ export default {
     },
   },
   methods: {
+    translateField,
     getAthleteName,
     formatBirthDate,
     getAgeFromBirthdate,
@@ -144,7 +154,7 @@ export default {
     getRegionCode,
     async getOrganizationById(id) {
       try {
-        const response = await axios.get(`${databaseUrl}/organizations/${id}`);
+        const response = await axios.get(`${apiUrl}/organizations/${id}`);
 
         if (response.status === 200) {
           const organizationData = response.data['organization'];
@@ -163,7 +173,7 @@ export default {
     },
     async getOrganizationTeam(id) {
       try {
-        const response = await axios.get(`${databaseUrl}/organizations/${id}/athletes`);
+        const response = await axios.get(`${apiUrl}/organizations/${id}/athletes`);
 
         if (response.status === 200) {
           const organizationTeam = response.data['athletes'];
@@ -437,38 +447,9 @@ export default {
     margin: 2rem auto 1rem;
     padding: 0 2rem;
 
-    .organizationTeam__wrapper {
-      display: flex;
-      flex-direction: column;
-      overflow-y: auto;
-      height: 100%;
-      background-color: var(--background--card);
-      backdrop-filter: blur(3px);
-      border-radius: 4px;
-
-      .organizationTeam__header {
-        flex: 0 0 auto;
-        padding: 8px 12px;
-        font-size: 1.1rem;
-        font-weight: bold;
-      }
-
-      .organizationTeam__list {
-        flex: 1 1 200px;
-        display: flex;
-        flex-direction: column;
-        overflow-y: auto;
-        border-radius: 2px;
-      }
-    }
-
     @media screen and (max-width: 720px) {
       margin: 0;
       padding: 0;
-
-      .organizationTeam__wrapper {
-        border-radius: 0;
-      }
     }
   }
 }

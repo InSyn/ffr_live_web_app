@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { databaseUrl } from '@/store/constants';
+import { apiUrl } from '@/constants';
 
 export default {
   namespaced: true,
@@ -20,7 +20,7 @@ export default {
     },
     LOAD_JURY: async (store) => {
       try {
-        const response = await axios.get(databaseUrl + '/jury');
+        const response = await axios.get(apiUrl + '/jury');
         if (response.status === 200) {
           store.commit('setJury', response.data.jury);
         }
@@ -30,9 +30,9 @@ export default {
         }
       }
     },
-    LOAD_JURY_BY_ROLE: async (store, payload) => {
+    LOAD_SECRETARIES: async () => {
       try {
-        const response = await axios.get(databaseUrl + '/jury', { params: { role: payload } });
+        const response = await axios.get(apiUrl + '/jury/secretaries');
         if (response.status === 200) {
           return response.data.jury;
         }

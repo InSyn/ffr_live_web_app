@@ -68,12 +68,7 @@
           </option>
         </select>
 
-        <select v-else-if="key === 'country'" :id="key" class="formControl" :value="athlete[key]" @change="setFieldValue('country', $event.target.value)">
-          <option selected disabled value="">Выбрать страну...</option>
-          <option v-for="country in countries" :key="country.country_code" class="formControl-option">
-            {{ country.country_name }}
-          </option>
-        </select>
+        <country-select-control v-else-if="key === 'country'" :value="athlete[key]" @input="setFieldValue('country', $event)"></country-select-control>
         <div class="select__wrapper" v-else-if="key === 'regions'">
           <input
             v-if="getCountryCode(athlete['country']) !== 'RU'"
@@ -199,16 +194,17 @@
 
 <script>
 import AthletePhotoFillerIcon from '@/assets/svg/athletePhotoFiller-icon.vue';
-import { getInputType } from '@/utils/get-input-type';
+import { getInputType } from '@/utils/inputType-util';
 import { countries, getCountryCode } from '@/store/data/countries';
 import { getSortedRegions } from '@/store/data/russia-regions';
 import { getDisciplines, sports } from '@/store/data/sports';
 import { capitalizeString } from '@/utils/capitalizeString';
 import { translateField } from '@/utils/formFields-translator';
-import { databaseUrl, uploadsFolderUrl } from '@/store/constants';
+import { apiUrl, backendRootUrl } from '@/constants';
 import MedalsSelect from '@/components/ui-components/medals-select.vue';
 import { getAthletesRanksList } from '@/store/data/sport-data-sets';
 import axios from 'axios';
+import CountrySelectControl from '@/components/ui-components/custom-controls/country-select-control.vue';
 
 export default {
   name: 'athleteForm',
@@ -217,7 +213,7 @@ export default {
     athleteImages: Object,
     action: String,
   },
-  components: { MedalsSelect, AthletePhotoFillerIcon },
+  components: { CountrySelectControl, MedalsSelect, AthletePhotoFillerIcon },
   data() {
     return {
       trainersList: [],
@@ -267,7 +263,7 @@ export default {
         };
         reader.readAsDataURL(this.selectedFile[imageType]);
       } else if (sourceType === 'url') {
-        this.$set(this.imagePreview, imageType, uploadsFolderUrl + this.athleteImages[imageType]);
+        this.$set(this.imagePreview, imageType, backendRootUrl + this.athleteImages[imageType]);
       }
     },
 
@@ -355,7 +351,7 @@ export default {
     },
     async loadTrainersList() {
       try {
-        const response = await axios.get(`${databaseUrl}/trainers`);
+        const response = await axios.get(`${apiUrl}/trainers`);
         if (response.status === 200) {
           this.trainersList = response.data.trainers;
         }
@@ -622,6 +618,7 @@ form {
         position: relative;
         flex: 1 1 0;
         min-width: 0;
+        max-width: 32ch;
         padding: 3px 6px;
         color: var(--text-default);
         background-color: var(--background--card-secondary);
@@ -656,6 +653,7 @@ form {
   .formActions {
     display: flex;
     justify-content: flex-end;
+    gap: 1.25rem;
     margin-top: 1.75rem;
 
     .actionButton {

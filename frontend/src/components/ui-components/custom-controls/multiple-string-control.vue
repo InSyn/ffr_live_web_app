@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { addFieldValue, removeFieldValue, setFieldValue } from '@/utils/form-data-helpers';
+import { addFieldValue, removeFieldValue, setFieldValue } from '@/utils/formData-helpers';
 
 export default {
   name: 'multiple-string-control',
@@ -50,9 +50,6 @@ export default {
   .stringMulti_control__updateValue__wrapper {
     position: relative;
     flex: 0 0 auto;
-
-    .stringMulti_control__updateValue__input {
-    }
 
     .stringMulti_control__removeValue__button {
       position: absolute;

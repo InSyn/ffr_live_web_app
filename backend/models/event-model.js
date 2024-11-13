@@ -43,6 +43,7 @@ export const eventSchema = new mongoose.Schema({
   documents: [documentSchema],
   contacts: [String],
 
+  is_public: { type: Boolean, default: true },
   registration_status: { type: Boolean, default: false },
   allow_registration_by_trainer: { type: Boolean, default: true },
   allow_registration_by_organization: { type: Boolean, default: true },

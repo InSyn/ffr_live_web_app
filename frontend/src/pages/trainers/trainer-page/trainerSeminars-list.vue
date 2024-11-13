@@ -24,7 +24,7 @@
             {{ formatDate(seminar.date) }}
           </div>
           <div v-if="seminar.disciplines.length" class="seminarDisciplines">
-            {{ seminar.disciplines.join(', ') }}
+            {{ concatStringsWithComma(seminar.disciplines) }}
           </div>
         </div>
       </router-link>
@@ -34,8 +34,8 @@
 
 <script>
 import axios from 'axios';
-import { databaseUrl } from '@/store/constants';
-import { formatDate } from '@/utils/data-formaters';
+import { apiUrl } from '@/constants';
+import { concatStringsWithComma, formatDate } from '@/utils/data-formaters';
 import CountryFlag from '@/components/ui-components/country-flag.vue';
 import { getCountryCode } from '@/store/data/countries';
 
@@ -51,11 +51,12 @@ export default {
     };
   },
   methods: {
+    concatStringsWithComma,
     getCountryCode,
     formatDate,
     async getTrainerSeminars() {
       try {
-        const response = await axios.get(databaseUrl + `/trainers/${this.trainer_id}/seminars`);
+        const response = await axios.get(apiUrl + `/trainers/${this.trainer_id}/seminars`);
         if (response.status === 200) {
           this.seminars = response.data['seminars'];
         }

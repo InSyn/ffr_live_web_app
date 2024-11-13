@@ -25,6 +25,7 @@ const translationMap = new Map([
   ['timing_provider', 'Сервис'],
   ['calendar_code', 'Код ЕКП'],
   ['international', 'Международное'],
+  ['is_public', 'Видят все'],
   ['translation_url', 'Ссылка трансляции'],
   //-------------------------------------//
 

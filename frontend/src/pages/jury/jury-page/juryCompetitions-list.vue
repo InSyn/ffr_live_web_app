@@ -15,7 +15,7 @@
 
 <script>
 import axios from 'axios';
-import { databaseUrl } from '@/store/constants';
+import { apiUrl } from '@/constants';
 import { formatDate } from '@/utils/data-formaters';
 import JuryCompetitionListItem from '@/pages/jury/jury-page/jury-competition-list-item.vue';
 
@@ -34,7 +34,7 @@ export default {
     formatDate,
     async getJuryCompetitions() {
       try {
-        const response = await axios.get(databaseUrl + `/jury/${this.jury_code}/competitions`);
+        const response = await axios.get(apiUrl + `/jury/${this.jury_code}/competitions`);
         if (response.status === 200) {
           this.events = response.data.events;
         }

@@ -11,29 +11,17 @@
           {{ translateField(field_key) }}
         </label>
 
-        <select
+        <country-select-control
           v-if="field_key === 'country'"
-          :id="field_key"
-          class="formControl"
           :value="seminar[field_key]"
-          @change="setFieldValue(seminar, 'country', $event.target.value)"
-        >
-          <option v-for="country in countries" :key="country.country_code" class="formControl-option">
-            {{ country.country_name }}
-          </option>
-        </select>
-        <select
-          v-else-if="field_key === 'region' && getCountryCode(seminar['country']) === 'RU'"
-          :id="field_key"
-          class="formControl"
+          @input="setFieldValue(seminar, 'country', $event)"
+        ></country-select-control>
+        <region-select-control
+          v-else-if="field_key === 'region'"
           :value="seminar[field_key]"
-          @change="setFieldValue(seminar, 'region', $event.target.value)"
-        >
-          <option selected disabled value="">Выберите регион</option>
-          <option v-for="region in getSortedRegions()" :key="region.code">
-            {{ region.fullname }}
-          </option>
-        </select>
+          :country="seminar['country']"
+          @input="setFieldValue(seminar, 'region', $event)"
+        ></region-select-control>
 
         <select
           @change="setFieldValue(seminar, 'sport', $event.target.value)"
@@ -99,13 +87,15 @@
 
 <script>
 import DocumentsSelectControl from '@/components/ui-components/custom-controls/documents-select-control.vue';
-import { addFieldValue, removeFieldValue, setFieldValue } from '@/utils/form-data-helpers';
+import { addFieldValue, removeFieldValue, setFieldValue } from '@/utils/formData-helpers';
 import { getDisciplines, sports } from '@/store/data/sports';
 import { capitalizeString } from '@/utils/capitalizeString';
 import { getSortedRegions } from '@/store/data/russia-regions';
 import { countries, getCountryCode } from '@/store/data/countries';
 import { translateField } from '@/utils/formFields-translator';
-import { getInputType } from '@/utils/get-input-type';
+import { getInputType } from '@/utils/inputType-util';
+import CountrySelectControl from '@/components/ui-components/custom-controls/country-select-control.vue';
+import RegionSelectControl from '@/components/ui-components/custom-controls/region-select-control.vue';
 
 export default {
   name: 'seminar-form',
@@ -113,7 +103,7 @@ export default {
     seminar: Object,
     action: String,
   },
-  components: { DocumentsSelectControl },
+  components: { RegionSelectControl, CountrySelectControl, DocumentsSelectControl },
   computed: {
     countries() {
       return countries;
@@ -299,6 +289,7 @@ form {
   .formActions {
     display: flex;
     justify-content: flex-end;
+    gap: 1.25rem;
     margin-top: 1.75rem;
 
     .actionButton {

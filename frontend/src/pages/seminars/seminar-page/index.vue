@@ -69,7 +69,7 @@
 
 <script>
 import axios from 'axios';
-import { databaseUrl, uploadsFolderUrl } from '@/store/constants';
+import { apiUrl, backendRootUrl } from '@/constants';
 import CountryFlag from '@/components/ui-components/country-flag.vue';
 import { getCountryCode } from '@/store/data/countries';
 import FileIcon from '@/components/icons/file-icon.vue';
@@ -98,7 +98,7 @@ export default {
     }),
 
     uploadsFolderUrl() {
-      return uploadsFolderUrl;
+      return backendRootUrl;
     },
   },
   methods: {
@@ -108,17 +108,16 @@ export default {
     getCountryCode,
     async getSeminarById(id) {
       try {
-        const data = await axios.get(`${databaseUrl}/seminars/${id}`);
+        const data = await axios.get(`${apiUrl}/seminars/${id}`);
         if (data.status === 200) {
           const seminarData = data.data.seminar;
           if (seminarData) this.seminar = { ...seminarData };
         }
-
-        this.loading = false;
       } catch (err) {
         if (err) {
           console.error(err);
         }
+      } finally {
         this.loading = false;
       }
     },
@@ -268,11 +267,18 @@ export default {
             display: flex;
             align-items: center;
             color: var(--text-muted);
+            font-size: 1.1rem;
 
             .seminarFile__item__icon {
-              color: var(--accent);
-              height: 1rem;
+              color: var(--ffr-brand);
+              height: 1.1rem;
               margin-right: 0.25rem;
+            }
+            &:hover {
+              text-decoration: underline;
+              .seminarFile__item__icon {
+                opacity: 0.75;
+              }
             }
           }
         }

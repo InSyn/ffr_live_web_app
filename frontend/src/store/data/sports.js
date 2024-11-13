@@ -17,24 +17,24 @@ export const sports = [
       { code: 'RE', name_rus: 'Рэйл' },
     ],
   },
-  {
-    code: 'SB',
-    name: 'Snowboard',
-    name_rus: 'Сноуборд',
-    disciplines: [
-      { code: 'HP', name_rus: 'Хаф-пайп' },
-      { code: 'SS', name_rus: 'Слоуп-стайл' },
-      { code: 'BA', name_rus: 'Биг-эйр' },
-      { code: 'RE', name_rus: 'Рэйл' },
-      { code: 'PSL', name_rus: 'Параллельный слалом' },
-      { code: 'PGS', name_rus: 'Параллельный слалом гигант' },
-      { code: 'PRT', name_rus: 'Командный параллельный слалом' },
-      { code: 'GS', name_rus: 'Слалом гигант' },
-      { code: 'SL', name_rus: 'Слалом' },
-      { code: 'SBX', name_rus: 'Сноуборд-кросс' },
-      { code: 'BXT', name_rus: 'Командный сноуборд-кросс' },
-    ],
-  },
+  // {
+  //   code: 'SB',
+  //   name: 'Snowboard',
+  //   name_rus: 'Сноуборд',
+  //   disciplines: [
+  //     { code: 'HP', name_rus: 'Хаф-пайп' },
+  //     { code: 'SS', name_rus: 'Слоуп-стайл' },
+  //     { code: 'BA', name_rus: 'Биг-эйр' },
+  //     { code: 'RE', name_rus: 'Рэйл' },
+  //     { code: 'PSL', name_rus: 'Параллельный слалом' },
+  //     { code: 'PGS', name_rus: 'Параллельный слалом гигант' },
+  //     { code: 'PRT', name_rus: 'Командный параллельный слалом' },
+  //     { code: 'GS', name_rus: 'Слалом гигант' },
+  //     { code: 'SL', name_rus: 'Слалом' },
+  //     { code: 'SBX', name_rus: 'Сноуборд-кросс' },
+  //     { code: 'BXT', name_rus: 'Командный сноуборд-кросс' },
+  //   ],
+  // },
 ];
 
 export const getDisciplines = (athleteSport) => {

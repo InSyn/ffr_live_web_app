@@ -49,7 +49,7 @@
 
 <script>
 import axios from 'axios';
-import { databaseUrl } from '@/store/constants';
+import { apiUrl } from '@/constants';
 import { mapGetters } from 'vuex';
 import MessageContainer from '@/components/ui-components/message-container.vue';
 import DbPersonalList from '@/pages/seminars/seminarParticipants-control/db-personal-list.vue';
@@ -87,7 +87,7 @@ export default {
       await Promise.all(
         ['athletes', 'jury', 'trainers'].map(async (type) => {
           try {
-            const response = await axios.get(`${databaseUrl}/${type}`);
+            const response = await axios.get(`${apiUrl}/${type}`);
             if (response.status === 200) {
               this.dbPersonal[type] = response.data[type];
             }
@@ -143,7 +143,7 @@ export default {
     async updatePersonal() {
       try {
         const response = await axios.patch(
-          `${databaseUrl}/seminars/${this.seminar._id}/participants`,
+          `${apiUrl}/seminars/${this.seminar._id}/participants`,
           { participants: JSON.stringify(this.personal) },
           {
             headers: {
@@ -198,7 +198,7 @@ export default {
 
     max-width: var(--desktop-small);
     width: 100%;
-    margin: 2rem auto;
+    margin: 5.25rem auto 1.25rem;
 
     .databasePersonal__wrapper {
       flex: 5 1 0;
@@ -250,7 +250,7 @@ export default {
     }
 
     .personal__list__wrapper {
-      flex: 6 1 0;
+      flex: 4 1 0;
       display: flex;
       flex-direction: column;
       padding: 0.5rem 1rem;
@@ -315,8 +315,8 @@ export default {
 
     .closeButton {
       position: absolute;
-      top: 0.5rem;
-      right: 0.5rem;
+      top: 3.25rem;
+      right: 1.25rem;
       height: 2.75rem;
       padding: 0 1rem !important;
       color: var(--text-default);

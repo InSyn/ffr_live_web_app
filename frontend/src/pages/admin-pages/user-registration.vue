@@ -1,6 +1,6 @@
 ﻿<script>
 import axios from 'axios';
-import { databaseUrl } from '@/store/constants';
+import { apiUrl } from '@/constants';
 import { mapGetters } from 'vuex';
 import { translateField } from '@/utils/formFields-translator';
 import MessageContainer from '@/components/ui-components/message-container.vue';
@@ -17,8 +17,10 @@ export default {
 
       role: '',
       availableRoles: ['athlete', 'jury', 'trainer', 'regional_organization', 'admin'],
+      dbRoles: ['athlete', 'jury', 'trainer'],
 
       region: '',
+      ffr_id: '',
 
       messages: [],
       errors: [],
@@ -28,6 +30,9 @@ export default {
     ...mapGetters('authorization', {
       userData: 'getUserData',
     }),
+    getAvailableRoles() {
+      return this.userData['role'] === 'admin' ? this.availableRoles : this.availableRoles.filter((role) => role !== 'admin');
+    },
   },
   methods: {
     getSortedRegions,
@@ -35,8 +40,8 @@ export default {
     async createUser() {
       try {
         const response = await axios.post(
-          databaseUrl + '/auth/registerNewUser',
-          { username: this.username, email: this.email, password: this.password, role: this.role, region: this.region },
+          apiUrl + '/auth/registerNewUser',
+          { username: this.username, email: this.email, password: this.password, role: this.role, region: this.region, ffr_id: this.ffr_id },
           {
             headers: {
               'Content-Type': 'application/json',
@@ -81,15 +86,19 @@ export default {
         <label for="role">Роль:&nbsp;</label>
         <select v-model="role" id="role" class="input-select" type="text">
           <option selected disabled value="">Выберите роль</option>
-          <option v-for="role in availableRoles" :key="role" :value="role">{{ translateField(role) }}</option>
+          <option v-for="role in getAvailableRoles" :key="role" :value="role">{{ translateField(role) }}</option>
         </select>
       </div>
-      <div v-show="role === 'regional_organization'" class="input__wrapper">
+      <div v-show="dbRoles.includes(role) || role === 'regional_organization'" class="input__wrapper">
         <label for="regional_organization">Регион:&nbsp;</label>
         <select v-model="region" id="regional_organization" class="input-select" type="text">
           <option selected disabled value="">Выберите регион</option>
           <option v-for="region in getSortedRegions()" :key="region.code" :value="region.fullname">{{ region.fullname }}</option>
         </select>
+      </div>
+      <div v-show="dbRoles.includes(role)" class="input__wrapper">
+        <label for="ffr_id">FFR-ID:&nbsp;</label>
+        <input v-model="ffr_id" id="ffr_id" class="input-text" type="text" placeholder="FFR-ID" />
       </div>
     </form>
 
@@ -97,9 +106,7 @@ export default {
       <button class="actionButton" type="button" @click.prevent="createUser">Создать</button>
     </div>
 
-    <div class="messages__wrapper">
-      <message-container :messages="messages" :errors="errors"></message-container>
-    </div>
+    <message-container :messages="messages" :errors="errors"></message-container>
   </div>
 </template>
 
@@ -148,14 +155,6 @@ export default {
     display: flex;
     justify-content: flex-end;
     padding: 1.25rem 2rem 0.5rem;
-  }
-  .messages__wrapper {
-    max-width: 100%;
-    flex: 0 0 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    width: 100%;
   }
 }
 </style>

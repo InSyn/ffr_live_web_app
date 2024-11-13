@@ -27,7 +27,7 @@
 
 <script>
 import axios from 'axios';
-import { databaseUrl } from '@/store/constants';
+import { apiUrl } from '@/constants';
 import { translateField } from '@/utils/formFields-translator';
 import DisciplineInput from '@/components/ui-components/search/search-inputs/discipline-input.vue';
 import SportInput from '@/components/ui-components/search/search-inputs/sport-input.vue';
@@ -62,7 +62,7 @@ export default {
         }
         const queryString = searchParams.toString();
 
-        const response = await axios.get(`${databaseUrl}/${this.mode}/find${queryString ? '?' + queryString : ''}`);
+        const response = await axios.get(`${apiUrl}/${this.mode}/find${queryString ? '?' + queryString : ''}`);
         if (response.status === 200) {
           this.$emit('search-results-loaded', response.data[this.mode]);
           this.$emit('search-loading', false);

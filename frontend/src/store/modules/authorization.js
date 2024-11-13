@@ -14,6 +14,10 @@ export default {
     getUserName: (state) => state.userData.username,
     isAuthorized: (state) => !!state.userData.token,
     isAdmin: (state) => state.userData.token && state.userData.role === 'admin',
+    isSecretary: (state) => {
+      if (!state.userData.token) return;
+      return state.userData.role === 'secretary' || state.userData.role === 'admin';
+    },
   },
   mutations: {
     updateUserData: (state, userData) => {

@@ -15,7 +15,7 @@
 import MessageContainer from '@/components/ui-components/message-container.vue';
 import AthleteForm from '@/pages/admin-pages/athletes/form-athlete.vue';
 import axios from 'axios';
-import { databaseUrl } from '@/store/constants';
+import { apiUrl } from '@/constants';
 import { mapActions, mapGetters } from 'vuex';
 
 export default {
@@ -71,7 +71,7 @@ export default {
     }),
     async loadAthleteData() {
       try {
-        const response = await axios.get(`${databaseUrl}/athletes/${this.athlete_code}`);
+        const response = await axios.get(`${apiUrl}/athletes/${this.athlete_code}`);
         if (response.status === 200) {
           const athleteData = response.data.data;
           Object.keys(this.athlete).forEach((key) => {
@@ -114,7 +114,7 @@ export default {
       }
 
       try {
-        const response = await axios.patch(`${databaseUrl}/athletes/${this.athlete_code}`, formData, {
+        const response = await axios.patch(`${apiUrl}/athletes/${this.athlete_code}`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
             authorization: `Bearer ${this.userData.token}`,
@@ -132,7 +132,7 @@ export default {
                 params: { athlete_code: this.athlete_code },
               });
             }
-          }, 2000);
+          }, 1280);
         }
       } catch (err) {
         if (err) {
@@ -142,7 +142,7 @@ export default {
     },
     async deleteAthlete() {
       try {
-        const response = await axios.delete(`${databaseUrl}/athletes/${this.athlete_code}`, {
+        const response = await axios.delete(`${apiUrl}/athletes/${this.athlete_code}`, {
           headers: {
             authorization: `Bearer ${this.userData.token}`,
           },
@@ -157,7 +157,7 @@ export default {
                 name: 'allAthletes',
               });
             }
-          }, 2000);
+          }, 1280);
         }
       } catch (e) {
         console.error('Failed to delete athlete:', e);
@@ -178,5 +178,6 @@ export default {
   display: flex;
   flex-direction: column;
   padding: 2rem;
+  overflow-y: auto;
 }
 </style>

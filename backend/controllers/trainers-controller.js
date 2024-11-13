@@ -1,13 +1,15 @@
-import { dirname, join } from 'path';
-import { fileURLToPath } from 'url';
-import { removeOldFile } from '../file-storage/fileStorage.js';
 import { Trainer } from '../models/trainer-model.js';
 import { Athlete } from '../models/athlete-model.js';
 import { formatFullname } from '../utils/formatters.js';
 import { Seminar } from '../models/seminar-model.js';
+import { deleteFileIfExists, parseJsonFields } from '../utils/filesUtils.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const getLastTrainerCode = async () => {
+  const lastTrainer = await Trainer.findOne().sort({ _id: -1 });
+  const lastIndex = lastTrainer ? lastTrainer.trainer_id : null;
+
+  return lastIndex ? Number(lastIndex) + 1 : '200001';
+};
 
 export const getAllTrainers = async (req, res) => {
   try {
@@ -19,7 +21,7 @@ export const getAllTrainers = async (req, res) => {
   } catch (e) {
     res.status(404).json({
       status: 'Err',
-      data: 'Trainers not found ',
+      message: 'Тренеры не найдены',
       err: e,
     });
   }
@@ -36,7 +38,7 @@ export const getTrainer = async (req, res) => {
   } catch (e) {
     res.status(404).json({
       status: 'Err',
-      data: 'Trainer not found',
+      message: 'Тренер с таким кодом не найден',
       err: e,
     });
   }
@@ -44,26 +46,14 @@ export const getTrainer = async (req, res) => {
 
 export const searchTrainers = async (req, res) => {
   try {
-    const query = {};
-
-    if (req.query.trainer_id) {
-      query.trainer_id = req.query.trainer_id;
-    }
-    if (req.query.fullname) {
-      query.fullname = new RegExp(req.query.fullname, 'i');
-    }
-    if (req.query.sport) {
-      query.sport = req.query.sport;
-    }
-    if (req.query.discipline) {
-      query.disciplines = req.query.discipline;
-    }
-    if (req.query.gender) {
-      query.gender = req.query.gender;
-    }
-    if (req.query.region) {
-      query.region = new RegExp(req.query.region, 'i');
-    }
+    const query = {
+      ...(req.query.trainer_id && { trainer_id: req.query.trainer_id }),
+      ...(req.query.fullname && { fullname: new RegExp(req.query.fullname, 'i') }),
+      ...(req.query.sport && { sport: req.query.sport }),
+      ...(req.query.discipline && { disciplines: req.query.discipline }),
+      ...(req.query.gender && { gender: req.query.gender }),
+      ...(req.query.region && { region: new RegExp(req.query.region, 'i') }),
+    };
 
     const trainers = await Trainer.find(query).sort({ fullname: 1 });
     res.status(200).json({
@@ -74,7 +64,7 @@ export const searchTrainers = async (req, res) => {
   } catch (e) {
     res.status(404).json({
       status: 'Err',
-      data: `Ошибка во время поиска: ${e.message}`,
+      message: `Ошибка во время поиска: ${e.message}`,
       err: e,
     });
   }
@@ -83,24 +73,20 @@ export const searchTrainers = async (req, res) => {
 export const addNewTrainer = async (req, res) => {
   try {
     const photoUrl = req.files['photo_url'] ? `/uploads/images/${req.files['photo_url'][0].filename}` : '';
+    const parsedFields = parseJsonFields(req.body, ['disciplines', 'rank', 'position', 'socials']);
 
     const trainer = new Trainer({
       photo_url: photoUrl,
-      trainer_id: req.body.trainer_id,
+      trainer_id: req.body.trainer_id || (await getLastTrainerCode()),
       fullname: formatFullname(req.body.fullname),
       birth_date: req.body.birth_date,
       gender: req.body.gender,
       country: req.body.country,
       region: req.body.region,
       sport: req.body.sport,
-      disciplines: req.body.disciplines ? JSON.parse(req.body.disciplines) : [],
-
       trainer_category: req.body.trainer_category,
-      rank: req.body.rank ? JSON.parse(req.body.rank) : [],
-      position: req.body.position ? JSON.parse(req.body.position) : [],
-
       is_national_team: req.body.is_national_team,
-      socials: req.body.socials ? JSON.parse(req.body.socials) : null,
+      ...parsedFields,
     });
 
     await trainer.save();
@@ -113,52 +99,44 @@ export const addNewTrainer = async (req, res) => {
     console.error('ADD ERR', e);
     res.status(404).json({
       status: 'Err',
-      data: `Не удалось добавить тренера: ${e.message}`,
+      message: `Не удалось добавить тренера: ${e.message}`,
       err: e,
     });
   }
 };
 
 export const updateTrainer = async (req, res) => {
-  const trainerId = req.params.code;
-
   try {
-    const trainer = await Trainer.findOne({ trainer_id: trainerId });
+    const trainer = await Trainer.findOne({ trainer_id: req.params.code });
     if (!trainer) {
       return res.status(404).json({
         status: 'Err',
-        data: 'Тренер с таким кодом не найден',
+        message: 'Тренер с таким кодом не найден',
       });
     }
 
     const originalPhotoUrl = trainer.photo_url;
-
     const photoUrl = req.files['photo_url'] ? `/uploads/images/${req.files['photo_url'][0].filename}` : trainer.photo_url;
+    const parsedFields = parseJsonFields(req.body, ['disciplines', 'rank', 'position', 'socials']);
 
-    trainer.photo_url = photoUrl;
-
-    trainer.photo_url = req.body.photo_url || trainer.photo_url;
-    trainer.trainer_id = req.body.trainer_id || trainer.trainer_id;
-    trainer.fullname = req.body.fullname || trainer.fullname;
-    trainer.birth_date = req.body.birth_date || trainer.birth_date;
-    trainer.gender = req.body.gender || trainer.gender;
-    trainer.country = req.body.country || trainer.country;
-    trainer.region = req.body.region || trainer.region;
-    trainer.sport = req.body.sport || trainer.sport;
-    trainer.disciplines = req.body.disciplines ? JSON.parse(req.body.disciplines) : trainer.disciplines;
-
-    trainer.trainer_category = req.body.trainer_category || trainer.trainer_category;
-    trainer.rank = req.body.rank ? JSON.parse(req.body.rank) : trainer.rank;
-    trainer.position = req.body.position ? JSON.parse(req.body.position) : trainer.position;
-
-    trainer.is_national_team = req.body.is_national_team !== undefined ? req.body.is_national_team : trainer.is_national_team;
-
-    trainer.socials = req.body.socials ? JSON.parse(req.body.socials) : trainer.socials;
+    trainer.set({
+      photo_url: photoUrl,
+      trainer_id: req.body.trainer_id || trainer.trainer_id,
+      fullname: req.body.fullname || trainer.fullname,
+      birth_date: req.body.birth_date || trainer.birth_date,
+      gender: req.body.gender || trainer.gender,
+      country: req.body.country || trainer.country,
+      region: req.body.region || trainer.region,
+      sport: req.body.sport || trainer.sport,
+      trainer_category: req.body.trainer_category || trainer.trainer_category,
+      is_national_team: req.body.is_national_team !== undefined ? req.body.is_national_team : trainer.is_national_team,
+      ...parsedFields,
+    });
 
     await trainer.save();
 
     if (photoUrl !== originalPhotoUrl && originalPhotoUrl) {
-      await removeOldFile(join(__dirname, '..', originalPhotoUrl));
+      await deleteFileIfExists(originalPhotoUrl);
     }
 
     res.status(200).json({
@@ -169,37 +147,27 @@ export const updateTrainer = async (req, res) => {
     console.error('UPDATE ERR', e);
     res.status(500).json({
       status: 'Err',
-      data: 'Не удалось обновить данные тренера',
+      message: `Не удалось обновить тренера: ${e.message}`,
       err: e.message,
     });
   }
 };
 
 export const deleteTrainer = async (req, res) => {
-  const trainerId = req.params.code;
-
   try {
-    const trainer = await Trainer.findOne({
-      trainer_id: trainerId,
-    });
-
+    const trainer = await Trainer.findOne({ trainer_id: req.params.code });
     if (!trainer) {
       return res.status(404).json({
         status: 'Err',
-        data: 'Тренер с таким кодом не найден',
+        message: 'Тренер с таким кодом не найден',
       });
     }
 
-    if (trainer['photo_url']) {
-      const fullPath = join(__dirname, '..', trainer['photo_url']);
-      try {
-        await removeOldFile(fullPath);
-      } catch (err) {
-        console.error('Failed to delete file:', err);
-      }
+    if (trainer.photo_url) {
+      await deleteFileIfExists(trainer.photo_url);
     }
 
-    await Trainer.deleteOne({ trainer_id: trainerId });
+    await trainer.deleteOne();
 
     res.status(200).json({
       status: 'success',
@@ -209,7 +177,7 @@ export const deleteTrainer = async (req, res) => {
     console.error('DELETE ERR', e);
     res.status(500).json({
       status: 'Err',
-      data: 'Не удалось удалить тренера',
+      message: 'Не удалось удалить тренера',
       err: e.message,
     });
   }
@@ -217,18 +185,11 @@ export const deleteTrainer = async (req, res) => {
 
 export const getTrainerTeam = async (req, res) => {
   try {
-    if (!parseInt(req.params.code)) {
-      return res.status(404).json({
-        status: 'error',
-        message: 'Invalid trainer ID.',
-      });
-    }
-
     const trainer = await Trainer.findOne({ trainer_id: req.params.code });
     if (!trainer) {
       return res.status(404).json({
-        status: 'error',
-        message: 'Trainer not found.',
+        status: 'Err',
+        message: 'Тренер с таким кодом не найден',
       });
     }
 
@@ -256,36 +217,28 @@ export const getTrainerTeam = async (req, res) => {
       status: 'success',
       athletes,
     });
-  } catch (error) {
-    console.error('Error fetching athletes by trainer ID:', error);
+  } catch (e) {
+    console.error('Error fetching athletes by trainer ID:', e);
     res.status(500).json({
-      status: 'error',
-      message: 'Failed to fetch athletes.',
-      error: error.message,
+      status: 'Err',
+      message: `Не удалось загрузить спортсменов: ${e.message}`,
+      error: e.message,
     });
   }
 };
 
 export const getTrainerSeminars = async (req, res) => {
   try {
-    const seminars = await Seminar.find(
-      {
-        'participants.code': req.params.code,
-      },
-      {
-        participants: 0,
-        contacts: 0,
-      }
-    ).sort({ date: -1 });
+    const seminars = await Seminar.find({ 'participants.code': req.params.code }, { participants: 0, contacts: 0 }).sort({ date: -1 });
 
     res.status(200).json({
       status: 'success',
       seminars,
     });
   } catch (e) {
-    res.status(404).json({
+    res.status(500).json({
       status: 'Err',
-      data: 'Не удалось получить список семинаров тренера',
+      message: `Не удалось получить список семинаров тренера: ${e.message}`,
       err: e,
     });
   }

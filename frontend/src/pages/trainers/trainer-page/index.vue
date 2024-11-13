@@ -15,13 +15,9 @@
 
             <div class="trainerMainInfo__wrapper">
               <div class="trainerMainInfo__header">
-                <div class="federation__wrapper" v-if="trainer['sport'] && trainer['sport'] === capitalizeString(sports[0].name_rus)">
+                <div class="federation__wrapper">
                   <img src="../../../assets/logo/FFR_logo_mini.png" alt="FFR_logo" />
                   <span>Федерация фристайла России</span>
-                </div>
-                <div class="federation__wrapper" v-if="trainer['sport'] && trainer['sport'] === capitalizeString(sports[1].name_rus)">
-                  <img src="../../../assets/logo/FSR_logo_mini.png" alt="FSR_logo" />
-                  <span>Федерация сноуборда России</span>
                 </div>
 
                 <div class="trainerSport">
@@ -40,7 +36,7 @@
                     {{ trainer.trainer_category }}
                   </div>
                   <div class="trainerRank">
-                    {{ trainer.rank.join(', ') }}
+                    {{ concatStringsWithComma(trainer.rank) }}
                   </div>
                 </div>
 
@@ -98,8 +94,11 @@
           </div>
 
           <div class="trainer__menu">
-            <button @click="bottomMenu = 'team'" class="trainer__menu__item" type="button">Команда</button>
-            <button @click="bottomMenu = 'seminars'" class="trainer__menu__item" type="button">Семинары</button>
+            <button class="trainer__menu__item" type="button" @click="bottomMenu = 'team'">Команда</button>
+            <button class="trainer__menu__item" type="button" @click="bottomMenu = 'seminars'">Семинары</button>
+            <button class="trainer__menu__item" type="button" :disabled="!getRegistrationAccess" @click.prevent="bottomMenu = 'eventsWithRegistration'">
+              Заявки
+            </button>
           </div>
         </div>
       </div>
@@ -118,6 +117,7 @@
 
         <trainer-seminars-list :trainer_id="trainer_id"></trainer-seminars-list>
       </div>
+      <events-with-registration-list v-if="bottomMenu === 'eventsWithRegistration'"></events-with-registration-list>
     </div>
   </div>
 </template>
@@ -129,21 +129,24 @@ import CountryFlag from '@/components/ui-components/country-flag.vue';
 import SocialsTelegramIcon from '@/components/icons/socials-telegram-icon.vue';
 import EditButton from '@/components/ui-components/edit-button.vue';
 import { mdiImage } from '@mdi/js';
-import { formatBirthDate, getAgeFromBirthdate, getAthleteName } from '@/utils/data-formaters';
+import { concatStringsWithComma, formatBirthDate, getAgeFromBirthdate, getAthleteName } from '@/utils/data-formaters';
 import { getCountryCode } from '@/store/data/countries';
 import { getDisciplineCode, sports } from '@/store/data/sports';
 import { getRegionCode } from '@/store/data/russia-regions';
 import axios from 'axios';
-import { databaseUrl, uploadsFolderUrl } from '@/store/constants';
+import { apiUrl, backendRootUrl } from '@/constants';
 import AthleteListItem from '@/pages/athletes/athlete-listItem.vue';
 import TrainerSeminarsList from '@/pages/trainers/trainer-page/trainerSeminars-list.vue';
 import { capitalizeString } from '@/utils/capitalizeString';
 import BgMountains from '@/assets/riv/bg-mountains.vue';
+import EventsWithRegistrationList from '@/pages/organizations/organization-page/events-with-registration-list.vue';
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'index',
   props: ['trainer_id'],
   components: {
+    EventsWithRegistrationList,
     BgMountains,
     TrainerSeminarsList,
     AthleteListItem,
@@ -166,14 +169,22 @@ export default {
     };
   },
   computed: {
+    ...mapGetters('authorization', {
+      userData: 'getUserData',
+    }),
     uploadsFolderUrl() {
-      return uploadsFolderUrl;
+      return backendRootUrl;
     },
     sports() {
       return sports;
     },
+
+    getRegistrationAccess() {
+      return this.trainer.trainer_id === this.userData.ffr_id;
+    },
   },
   methods: {
+    concatStringsWithComma,
     capitalizeString,
     getAthleteName,
     formatBirthDate,
@@ -183,7 +194,7 @@ export default {
     getRegionCode,
     async getTrainerByCode(id) {
       try {
-        const response = await axios.get(`${databaseUrl}/trainers/${id}`);
+        const response = await axios.get(`${apiUrl}/trainers/${id}`);
 
         if (response.status === 200) {
           const trainerData = response.data.trainer;
@@ -202,7 +213,7 @@ export default {
     },
     async getTrainerTeam(id) {
       try {
-        const response = await axios.get(`${databaseUrl}/trainers/${id}/athletes`);
+        const response = await axios.get(`${apiUrl}/trainers/${id}/athletes`);
 
         if (response.status === 200) {
           const trainerTeam = response.data['athletes'];
@@ -549,6 +560,10 @@ export default {
             &:hover {
               opacity: 1;
             }
+          }
+          button[disabled] {
+            font-weight: 300;
+            color: var(--text-muted);
           }
         }
       }

@@ -1,17 +1,21 @@
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { User } from '../models/user-model.js';
 
 const JWT_SECRET = process.env.JWTS;
+const dbRoles = ['secretary', 'jury', 'athlete', 'trainer'];
 
 export const register = async (req, res) => {
-  const { username, email, password, role, region } = req.body;
+  const { username, email, password, role, region, ffr_id } = req.body;
 
   const token = req.headers.authorization.split(' ')[1];
   const decoded = jwt.verify(token, JWT_SECRET);
 
   if (decoded.role !== 'admin' && decoded.role !== 'secretary') {
-    return res.status(403).send({ message: 'Нет прав для создания администратора' });
+    return res.status(403).send({ message: 'Нет прав для создания нового пользователя' });
+  }
+  if (dbRoles.includes(role) && !ffr_id) {
+    return res.status(403).send({ message: 'Укажите FFR-ID для создания аккаунта' });
   }
   if (role === 'regional_organization' && !region) {
     return res.status(403).send({ message: 'Для создания аккаунта организации необходимо указать регион' });
@@ -26,6 +30,7 @@ export const register = async (req, res) => {
     if (email) userFields.email = email;
     if (role) userFields.role = role;
     if (region) userFields.region = region;
+    if (ffr_id) userFields.ffr_id = ffr_id;
 
     const user = new User({
       ...userFields,
@@ -52,8 +57,10 @@ export const login = async (req, res) => {
     if (!validPwd) {
       return res.status(400).send({ message: 'Неверный пароль' });
     }
-    const token = jwt.sign({ role: user.role, region: user.region }, JWT_SECRET, { expiresIn: '7d' });
-    res.status(200).send({ token, id: user._id, role: user.role, region: user.region });
+
+    const token = jwt.sign({ role: user.role, region: user.region, ffr_id: user.ffr_id }, JWT_SECRET, { expiresIn: '7d' });
+
+    res.status(200).send({ token, role: user.role, region: user.region, ffr_id: user.ffr_id });
   } catch (err) {
     res.status(400).send({ message: 'Неверное имя пользователя или пароль' });
   }

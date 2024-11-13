@@ -64,7 +64,7 @@ export default {
     display: none;
   }
 }
-.theme-dark .appFooter__info {
+:root.dark .appFooter__info {
   .companyLogo__image.light {
     display: none;
   }

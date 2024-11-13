@@ -29,13 +29,13 @@ export default {
       clearTimeout(this.messageTimeoutId);
       this.messageTimeoutId = setTimeout(() => {
         if (this.messages) this.messages.splice(0, 1);
-      }, 2500);
+      }, 3250);
     },
     'errors.length': function () {
       clearTimeout(this.errorTimeoutId);
       this.errorTimeoutId = setTimeout(() => {
         if (this.errors) this.errors.splice(0, 1);
-      }, 2500);
+      }, 3250);
     },
   },
 };
@@ -43,15 +43,24 @@ export default {
 
 <style lang="scss" scoped>
 .messages__wrapper {
+  position: fixed;
+  z-index: 99;
   display: grid;
   grid-template-rows: 0fr;
   gap: 8px;
-  padding: 0 1.25rem;
+  top: 8vh;
+  left: 50%;
+  transform: translate(-50%, -16px);
   overflow: hidden;
-  max-width: var(--tablet-default);
-  width: 100%;
 
-  transition: opacity 128ms, grid-template-rows 128ms ease-in, padding 256ms;
+  width: 100%;
+  max-width: var(--tablet-small);
+  background-color: var(--text-card-contrast);
+  border: none;
+  border-radius: 6px;
+  opacity: 0;
+
+  transition: opacity 256ms, grid-template-rows 128ms ease-in, padding 128ms, transform 128ms;
 
   .messages__innerWrapper {
     overflow: hidden;
@@ -73,8 +82,10 @@ export default {
 
   &.open {
     grid-template-rows: 1fr;
-    padding: 0.5rem 1.25rem;
+    padding: 0.75rem 1.75rem;
+    border: 1px solid var(--border-container);
     opacity: 1;
+    transform: translate(-50%, 0);
   }
 }
 

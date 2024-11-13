@@ -32,30 +32,17 @@
           </option>
         </select>
 
-        <select
+        <country-select-control
           v-else-if="field_key === 'country'"
-          :id="field_key"
-          class="formControl"
           :value="trainer[field_key]"
-          @change="setFieldValue('country', $event.target.value)"
-        >
-          <option selected disabled value="">Выберите страну</option>
-          <option v-for="country in countries" :key="country.country_code" class="formControl-option">
-            {{ country.country_name }}
-          </option>
-        </select>
-        <select
-          v-else-if="field_key === 'region' && getCountryCode(trainer['country']) === 'RU'"
-          :id="field_key"
-          class="formControl"
+          @input="setFieldValue('country', $event)"
+        ></country-select-control>
+        <region-select-control
+          v-else-if="field_key === 'region'"
           :value="trainer[field_key]"
-          @change="setFieldValue('region', $event.target.value)"
-        >
-          <option selected disabled value="">Выберите регион</option>
-          <option v-for="region in getSortedRegions()" :key="region.code">
-            {{ region.fullname }}
-          </option>
-        </select>
+          :country="trainer['country']"
+          @input="setFieldValue('region', $event)"
+        ></region-select-control>
 
         <select
           @change="setFieldValue('sport', $event.target.value)"
@@ -138,8 +125,8 @@
 
 <script>
 import AthletePhotoFillerIcon from '@/assets/svg/athletePhotoFiller-icon.vue';
-import { uploadsFolderUrl } from '@/store/constants';
-import { getInputType } from '@/utils/get-input-type';
+import { backendRootUrl } from '@/constants';
+import { getInputType } from '@/utils/inputType-util';
 import { countries, getCountryCode } from '@/store/data/countries';
 import { getDisciplines, sports } from '@/store/data/sports';
 import { capitalizeString } from '@/utils/capitalizeString';
@@ -147,10 +134,12 @@ import { getSortedRegions } from '@/store/data/russia-regions';
 import { translateField } from '@/utils/formFields-translator';
 import { trainerCategories } from '@/store/data/sport-data-sets';
 import MultipleStringControl from '@/components/ui-components/custom-controls/multiple-string-control.vue';
+import CountrySelectControl from '@/components/ui-components/custom-controls/country-select-control.vue';
+import RegionSelectControl from '@/components/ui-components/custom-controls/region-select-control.vue';
 
 export default {
   name: 'trainer-form',
-  components: { MultipleStringControl, AthletePhotoFillerIcon },
+  components: { RegionSelectControl, CountrySelectControl, MultipleStringControl, AthletePhotoFillerIcon },
   props: {
     trainer: Object,
     trainerImages: Object,
@@ -198,7 +187,7 @@ export default {
         };
         reader.readAsDataURL(this.selectedFile[imageType]);
       } else if (sourceType === 'url') {
-        this.$set(this.imagePreview, imageType, uploadsFolderUrl + this.trainerImages[imageType]);
+        this.$set(this.imagePreview, imageType, backendRootUrl + this.trainerImages[imageType]);
       }
     },
     addFieldValue(field, event) {
@@ -260,6 +249,8 @@ form {
   position: relative;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  max-width: var(--tablet-default);
 
   margin: auto;
   padding: 1rem 1.6rem;
@@ -282,7 +273,7 @@ form {
   .formBody {
     flex: 0 1 auto;
     display: grid;
-    grid-template-columns: repeat(2, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     grid-auto-rows: min-content;
     gap: 0.75rem 1.25rem;
     overflow-y: auto;
@@ -365,19 +356,23 @@ form {
       }
 
       .formLabel {
-        width: 150px;
+        flex: 0 1 auto;
+        width: 9rem;
         margin-right: 1rem;
+        padding: 3px 6px;
       }
 
       .formControl {
-        flex-grow: 1;
+        position: relative;
+        flex: 1 1 0;
+        min-width: 0;
         max-width: 32ch;
         padding: 3px 6px;
         color: var(--text-default);
         background-color: var(--background--card-secondary);
         border-radius: 2px;
         outline: transparent;
-        transition: background-color 92ms, outline-color 92ms;
+        transition: background-color 92ms;
 
         &[type='checkbox'] {
           flex: 0 0 auto;
@@ -457,6 +452,7 @@ form {
   .formActions {
     display: flex;
     justify-content: flex-end;
+    gap: 1.25rem;
     margin-top: 1.75rem;
 
     .actionButton {

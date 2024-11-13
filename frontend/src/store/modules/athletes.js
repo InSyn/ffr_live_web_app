@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { databaseUrl } from '@/store/constants';
+import { apiUrl } from '@/constants';
 
 export default {
   namespaced: true,
@@ -20,7 +20,7 @@ export default {
     },
     LOAD_ATHLETES: async (store) => {
       try {
-        const response = await axios.get(databaseUrl + '/athletes');
+        const response = await axios.get(apiUrl + '/athletes');
         if (response.status === 200) {
           store.commit('setAthletes', response.data.athletes);
         }

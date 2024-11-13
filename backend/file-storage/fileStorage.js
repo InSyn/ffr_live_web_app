@@ -1,6 +1,5 @@
 import multer from 'multer';
-import path, { resolve } from 'path';
-import fs from 'fs';
+import * as path from 'node:path';
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -37,7 +36,7 @@ const fileFilter = (req, file, cb) => {
   if (allowedMimeTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    const errorMessage = `Unsupported file type: ${file.mimetype}`;
+    const errorMessage = `Неподдерживаемый формат: ${file.mimetype}`;
     console.error(errorMessage);
     cb(new Error(errorMessage), false);
   }
@@ -49,34 +48,4 @@ export const createMulterMiddleware = (fields) => {
     fileFilter: fileFilter,
     limits: { fileSize: 1024 * 1024 * 30 },
   }).fields(fields);
-};
-
-export const removeOldFile = async (oldPath) => {
-  try {
-    await fs.promises.access(oldPath);
-    await fs.promises.unlink(oldPath);
-  } catch (err) {
-    console.error('Failed to delete old file:', err);
-  }
-};
-
-export const flushDocuments = async (target) => {
-  if (target.documents === undefined || !target.documents.length) {
-    return;
-  }
-
-  const deletionPromises = target.documents.map(async (doc) => {
-    const fullPath = resolve(__dirname, '..', doc.file.url);
-    try {
-      await removeOldFile(fullPath);
-    } catch (err) {
-      console.error(`Failed to delete file ${fullPath}:`, err);
-    }
-  });
-
-  try {
-    await Promise.all(deletionPromises);
-  } catch (err) {
-    console.error('Error deleting seminar documents:', err);
-  }
 };

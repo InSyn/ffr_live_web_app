@@ -9,8 +9,8 @@
 <script>
 import MessageContainer from '@/components/ui-components/message-container.vue';
 import axios from 'axios';
-import { databaseUrl } from '@/store/constants';
-import { mapGetters } from 'vuex';
+import { apiUrl } from '@/constants';
+import { mapActions, mapGetters } from 'vuex';
 import OrganizationForm from '@/pages/admin-pages/organizations/form-organization.vue';
 
 export default {
@@ -40,6 +40,10 @@ export default {
     }),
   },
   methods: {
+    ...mapActions('organizations', {
+      fetchOrganizations: 'LOAD_ORGANIZATIONS',
+    }),
+
     async createOrganization(selectedFile) {
       const formData = new FormData();
 
@@ -56,7 +60,7 @@ export default {
       }
 
       try {
-        const response = await axios.post(`${databaseUrl}/organizations/`, formData, {
+        const response = await axios.post(`${apiUrl}/organizations/`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
             authorization: `Bearer ${this.userData.token}`,
@@ -65,13 +69,12 @@ export default {
 
         if (response.status === 201) {
           this.messages.push('Организация создана успешно');
+          await this.fetchOrganizations();
 
           setTimeout(() => {
-            this.$router.push({
-              name: 'organizationPage',
-              params: { org_id: this.organization._id },
-            });
-          }, 2000);
+            if (this.$route.name === 'createOrganizationPage')
+              this.$router.push({ name: 'organizationPage', params: { org_id: response.data.organization._id } });
+          }, 1280);
         }
       } catch (error) {
         console.error('Error submitting form:', error);
@@ -88,5 +91,6 @@ export default {
   display: flex;
   flex-direction: column;
   padding: 2rem;
+  overflow-y: auto;
 }
 </style>

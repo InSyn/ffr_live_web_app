@@ -1,11 +1,6 @@
-import { dirname, join } from 'path';
-import { removeOldFile } from '../file-storage/fileStorage.js';
-import { Organization } from '../models/organization-model.js';
+import { Organization, OrganizationReport } from '../models/organization-model.js';
 import { Athlete } from '../models/athlete-model.js';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+import { deleteFileIfExists, parseJsonFields } from '../utils/filesUtils.js';
 
 export const getAllOrganizations = async (req, res) => {
   try {
@@ -19,7 +14,7 @@ export const getAllOrganizations = async (req, res) => {
   } catch (e) {
     res.status(404).json({
       status: 'Err',
-      data: 'Organizations not found',
+      message: 'Organizations not found',
       err: e,
     });
   }
@@ -28,7 +23,6 @@ export const getAllOrganizations = async (req, res) => {
 export const searchOrganizations = async (req, res) => {
   try {
     const query = {};
-
     if (req.query.title) {
       query.$text = { $search: req.query.title };
     }
@@ -48,7 +42,7 @@ export const searchOrganizations = async (req, res) => {
   } catch (e) {
     res.status(404).json({
       status: 'Err',
-      data: 'Organizations not found',
+      message: 'Organizations not found',
       err: e,
     });
   }
@@ -57,6 +51,7 @@ export const searchOrganizations = async (req, res) => {
 export const addNewOrganization = async (req, res) => {
   try {
     const logoUrl = req.files['logo_url'] ? `/uploads/images/${req.files['logo_url'][0].filename}` : '';
+    const parsedFields = parseJsonFields(req.body, ['contacts', 'socials']);
 
     const organization = new Organization({
       logo_url: logoUrl,
@@ -64,8 +59,7 @@ export const addNewOrganization = async (req, res) => {
       country: req.body.country,
       region: req.body.region,
       sport: req.body.sport,
-      contacts: req.body.contacts ? JSON.parse(req.body.contacts) : [],
-      socials: req.body.socials ? JSON.parse(req.body.socials) : null,
+      ...parsedFields,
     });
 
     await organization.save();
@@ -78,7 +72,7 @@ export const addNewOrganization = async (req, res) => {
     console.error('ADD ERR', e);
     res.status(404).json({
       status: 'Err',
-      data: "Organization wasn't added",
+      message: `Ошибка при создании организации: ${e.message}`,
       err: e,
     });
   }
@@ -90,28 +84,28 @@ export const updateOrganization = async (req, res) => {
     if (!organization) {
       return res.status(404).json({
         status: 'Err',
-        data: 'Организация не найдена',
+        message: 'Организация не найдена',
       });
     }
 
     const originalLogoUrl = organization.logo_url;
-
     const logoUrl = req.files['logo_url'] ? `/uploads/images/${req.files['logo_url'][0].filename}` : organization.logo_url;
 
-    organization.logo_url = logoUrl;
+    const parsedFields = parseJsonFields(req.body, ['contacts', 'socials']);
 
-    organization.logo_url = req.body.logo_url || organization.logo_url;
-    organization.title = req.body.title || organization.title;
-    organization.country = req.body.country || organization.country;
-    organization.region = req.body.region || organization.region;
-    organization.sport = req.body.sport || organization.sport;
-    organization.contacts = req.body.contacts ? JSON.parse(req.body.contacts) : organization.contacts;
-    organization.socials = req.body.socials ? JSON.parse(req.body.socials) : organization.socials;
+    organization.set({
+      logo_url: logoUrl,
+      title: req.body.title || organization.title,
+      country: req.body.country || organization.country,
+      region: req.body.region || organization.region,
+      sport: req.body.sport || organization.sport,
+      ...parsedFields,
+    });
 
     await organization.save();
 
     if (logoUrl !== originalLogoUrl && originalLogoUrl) {
-      await removeOldFile(join(__dirname, '..', originalLogoUrl));
+      await deleteFileIfExists(originalLogoUrl);
     }
 
     res.status(200).json({
@@ -122,7 +116,7 @@ export const updateOrganization = async (req, res) => {
     console.error('UPDATE ERR', e);
     res.status(500).json({
       status: 'Err',
-      data: 'Не удалось обновить данные организации',
+      message: 'Не удалось обновить данные организации',
       err: e.message,
     });
   }
@@ -139,7 +133,7 @@ export const getOrganization = async (req, res) => {
   } catch (e) {
     res.status(404).json({
       status: 'Err',
-      data: 'Organization not found',
+      message: 'Организация не найдена',
       err: e,
     });
   }
@@ -152,20 +146,15 @@ export const deleteOrganization = async (req, res) => {
     if (!organization) {
       return res.status(404).json({
         status: 'Err',
-        data: 'Организация не найдена',
+        message: 'Организация не найдена',
       });
     }
 
-    if (organization['logo_url']) {
-      const fullPath = join(__dirname, '..', organization['logo_url']);
-      try {
-        await removeOldFile(fullPath);
-      } catch (err) {
-        console.error('Failed to delete file:', err);
-      }
+    if (organization.logo_url) {
+      await deleteFileIfExists(organization.logo_url);
     }
 
-    await Organization.deleteOne({ _id: req.params.id });
+    await organization.deleteOne();
 
     res.status(200).json({
       status: 'success',
@@ -175,8 +164,100 @@ export const deleteOrganization = async (req, res) => {
     console.error('DELETE ERR', e);
     res.status(500).json({
       status: 'Err',
-      data: 'Не удалось удалить организацию',
+      message: 'Не удалось удалить организацию',
       err: e.message,
+    });
+  }
+};
+
+export const addReportToOrganization = async (req, res) => {
+  try {
+    const organization = await Organization.findById(req.params.id);
+    if (!organization) {
+      return res.status(404).json({
+        status: 'Err',
+        message: 'Организация не найдена',
+      });
+    }
+
+    const files = req.files['files'];
+    let fileUrls = [];
+    if (files && files.length > 0) {
+      fileUrls = files.map((file) => `/uploads/images/${file.filename}`);
+    }
+    const reportData = {
+      title: req.body.title,
+      content: req.body.content,
+      report_date: req.body.report_date,
+      files: fileUrls.map((url) => ({ url })),
+    };
+
+    const report = new OrganizationReport(reportData);
+    await report.save();
+
+    organization.reports.push(report._id);
+    await organization.save();
+
+    res.status(201).json({
+      status: 'Success',
+      message: 'Отчёт добавлен успешно',
+      data: {
+        report,
+      },
+    });
+  } catch (e) {
+    console.error(`Ошибка при добавлении отчёта: ${e}`);
+    res.status(500).json({
+      status: 'Err',
+      message: `Не удалось добавить отчёт: ${e.message}`,
+      error: e.message,
+    });
+  }
+};
+export const deleteReport = async (req, res) => {
+  try {
+    const { id, reportId } = req.params;
+
+    const organization = await Organization.findById(id);
+    if (!organization) {
+      return res.status(404).json({
+        status: 'Err',
+        message: 'Организация не найдена',
+      });
+    }
+
+    const reportIndex = organization.reports.indexOf(reportId);
+    if (reportIndex === -1) {
+      return res.status(404).json({
+        status: 'Err',
+        message: 'Отчет не найден',
+      });
+    }
+
+    organization.reports.splice(reportIndex, 1);
+    await organization.save();
+
+    const report = await OrganizationReport.findById(reportId);
+    if (report) {
+      if (report.files && report.files.length > 0) {
+        for (const file of report.files) {
+          await deleteFileIfExists(file.url);
+        }
+      }
+
+      await report.deleteOne();
+    }
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Отчет удален',
+    });
+  } catch (error) {
+    console.error('Error deleting report:', error);
+    res.status(500).json({
+      status: 'Err',
+      message: `Ошибка при удалении отчета: ${error.message}`,
+      err: error,
     });
   }
 };
@@ -187,7 +268,7 @@ export const getAthletesByOrganizationRegion = async (req, res) => {
 
     if (!organization) {
       return res.status(404).json({
-        status: 'error',
+        status: 'Err',
         message: 'Organization not found.',
       });
     }
@@ -201,9 +282,35 @@ export const getAthletesByOrganizationRegion = async (req, res) => {
   } catch (error) {
     console.error('Error fetching athletes by organization region:', error);
     res.status(500).json({
-      status: 'error',
+      status: 'Err',
       message: 'Failed to fetch athletes.',
       error: error.message,
+    });
+  }
+};
+
+export const getOrganizationIdByRegion = async (req, res) => {
+  try {
+    const region = req.params.region;
+    const organization = await Organization.findOne({ region });
+
+    if (!organization) {
+      return res.status(404).json({
+        status: 'Err',
+        message: 'Организация не найдена',
+      });
+    }
+
+    res.status(200).json({
+      status: 'success',
+      organizationId: organization._id,
+    });
+  } catch (err) {
+    console.error('Ошибка при получении ID организации:', err);
+    res.status(500).json({
+      status: 'Err',
+      message: 'Не удалось получить ID организации',
+      error: err.message,
     });
   }
 };

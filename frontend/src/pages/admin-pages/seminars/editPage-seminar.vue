@@ -7,11 +7,11 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 import MessageContainer from '@/components/ui-components/message-container.vue';
 import SeminarForm from '@/pages/admin-pages/seminars/form-seminar.vue';
 import axios from 'axios';
-import { databaseUrl } from '@/store/constants';
+import { apiUrl } from '@/constants';
 
 export default {
   name: 'editSeminar-page',
@@ -44,9 +44,13 @@ export default {
     }),
   },
   methods: {
+    ...mapActions('seminars', {
+      fetchSeminars: 'LOAD_SEMINARS',
+    }),
+
     async loadSeminarData() {
       try {
-        const response = await axios.get(`${databaseUrl}/seminars/${this.seminar_id}`);
+        const response = await axios.get(`${apiUrl}/seminars/${this.seminar_id}`);
         if (response.status === 200) {
           const seminarData = response.data.seminar;
           Object.keys(this.seminar).forEach((key) => {
@@ -107,7 +111,7 @@ export default {
       }
 
       try {
-        const response = await axios.patch(`${databaseUrl}/seminars/${this.seminar_id}`, formData, {
+        const response = await axios.patch(`${apiUrl}/seminars/${this.seminar_id}`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
             authorization: `Bearer ${this.userData.token}`,
@@ -116,42 +120,35 @@ export default {
 
         if (response.status === 200) {
           this.messages.push('Семинар обновлен успешно');
+          await this.fetchSeminars();
 
           setTimeout(() => {
-            this.$router.push({
-              name: 'seminarPage',
-              params: { seminar_id: this.seminar_id },
-            });
+            if (this.$route.name === 'editSeminarPage') this.$router.push({ name: 'seminarPage', params: { seminar_id: response.data.seminar.seminar_id } });
           }, 2000);
         }
       } catch (error) {
         console.error('Error updating form:', error);
-        const errorMessage = error.response?.data?.message || 'Не удалось обновить семинар. Пожалуйста, попробуйте еще раз.';
-        this.errors.push(errorMessage);
+        this.errors.push(error.response?.data?.message);
       }
     },
     async deleteSeminar() {
       try {
-        const response = await axios.delete(`${databaseUrl}/seminars/${this.seminar_id}`, {
+        const response = await axios.delete(`${apiUrl}/seminars/${this.seminar_id}`, {
           headers: {
             authorization: `Bearer ${this.userData.token}`,
           },
         });
         if (response.data.status === 'success') {
           this.messages.push('Семинар был успешно удалён');
+          await this.fetchSeminars();
 
           setTimeout(() => {
-            if (this.$route.name === 'editSeminarPage') {
-              this.$router.push({
-                name: 'seminarPage',
-                params: { seminar_id: this.seminar_id },
-              });
-            }
+            if (this.$route.name === 'editSeminarPage') this.$router.push({ name: 'seminarsPage' });
           }, 2000);
         }
       } catch (e) {
         console.error('Не удалось удалить семинар:', e);
-        this.errors.push('Не удалось удалить семинар:' + e?.message);
+        this.errors.push('Не удалось удалить семинар:' + e?.response.data.message);
       }
     },
   },
@@ -168,5 +165,6 @@ export default {
   display: flex;
   flex-direction: column;
   padding: 2rem;
+  overflow-y: auto;
 }
 </style>

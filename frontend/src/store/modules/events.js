@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { databaseUrl } from '@/store/constants';
+import { apiUrl } from '@/constants';
 
 export default {
   namespaced: true,
@@ -15,24 +15,31 @@ export default {
     },
   },
   actions: {
-    SET_EVENTS: ({ commit }, payload) => {
-      commit('setEvents', payload);
-    },
-    LOAD_EVENTS: async (store) => {
+    SET_EVENTS: async ({ dispatch, commit }) => {
       try {
-        const response = await axios.get(databaseUrl + '/events');
+        const events = await dispatch('LOAD_EVENTS');
+        commit('setEvents', events);
+      } catch (err) {
+        if (err) {
+          console.error(err);
+        }
+      }
+    },
+    LOAD_EVENTS: async () => {
+      try {
+        const response = await axios.get(apiUrl + '/events');
         if (response.status === 200) {
-          store.commit('setEvents', response.data.events);
+          return response.data.events;
         }
       } catch (err) {
         if (err) {
-          console.error(err?.response?.data?.message);
+          console.error(err);
         }
       }
     },
     LOAD_EVENT_BY_ID: async (store, payload) => {
       try {
-        const response = await axios.get(databaseUrl + '/events/' + payload);
+        const response = await axios.get(apiUrl + '/events/' + payload);
         if (response.status === 200) {
           return response.data.event ? response.data.event : new Error('Событие с таким ID не найдено');
         }

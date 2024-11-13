@@ -43,7 +43,7 @@ export default {
   },
   methods: {
     ...mapActions('jury', {
-      loadSecretaryJury: 'LOAD_JURY_BY_ROLE',
+      loadSecretaries: 'LOAD_SECRETARIES',
     }),
     addAthletesGroup() {
       this.registrationGroups.push('');
@@ -54,7 +54,7 @@ export default {
 
     async setSecretaryList() {
       try {
-        const jury = await this.loadSecretaryJury('secretary');
+        const jury = await this.loadSecretaries();
         if (jury.length) {
           this.availableSecretaries = jury;
         }
@@ -339,7 +339,6 @@ export default {
       flex: 0 0 auto;
       display: flex;
       flex-direction: column;
-      border-bottom: 1px solid var(--background--primary-hover);
 
       .allowedSecretaries__title {
         display: inline-block;

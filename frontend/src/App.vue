@@ -6,7 +6,7 @@
 
 <script>
 import { mapActions } from 'vuex';
-import { setAppHeight } from '@/utils/mobile-height-resize';
+import { setAppHeight } from '@/utils/mobileHeightResize-util';
 
 export default {
   name: 'App',

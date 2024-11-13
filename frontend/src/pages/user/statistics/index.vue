@@ -34,9 +34,9 @@
 <script>
 import axios from 'axios';
 import { mdiDownload } from '@mdi/js';
-import { databaseUrl } from '@/store/constants';
+import { apiUrl } from '@/constants';
 import LoaderSpinner from '@/components/ui-components/loader-spinner.vue';
-import { saveExcelData } from '@/utils/excel-data-saver';
+import { saveExcelData } from '@/utils/excelData-saver';
 import StatFilters from '@/pages/user/statistics/stat-filters.vue';
 
 export default {
@@ -81,7 +81,7 @@ export default {
       this.loading = true;
 
       try {
-        const response = await axios.get(databaseUrl + '/stats/overall');
+        const response = await axios.get(apiUrl + '/stats/overall');
         if (response.status === 200) {
           const stats = response.data.statistics;
 
@@ -105,7 +105,7 @@ export default {
     },
     async downloadStats(dataKey) {
       try {
-        const response = await axios.get(databaseUrl + `/${dataKey}`);
+        const response = await axios.get(apiUrl + `/${dataKey}`);
         if (response.status === 200) {
           const statsData = response.data[dataKey];
           saveExcelData(statsData, dataKey);

@@ -34,7 +34,7 @@
 
 <script>
 import axios from 'axios';
-import { databaseUrl } from '@/store/constants';
+import { apiUrl } from '@/constants';
 import { formatDate } from '@/utils/data-formaters';
 import CountryFlag from '@/components/ui-components/country-flag.vue';
 import { getCountryCode } from '@/store/data/countries';
@@ -55,7 +55,7 @@ export default {
     formatDate,
     async getJurySeminars() {
       try {
-        const response = await axios.get(databaseUrl + `/jury/${this.jury_code}/seminars`);
+        const response = await axios.get(apiUrl + `/jury/${this.jury_code}/seminars`);
         if (response.status === 200) {
           this.seminars = response.data['seminars'];
         }

@@ -39,9 +39,9 @@ import JuryCategoryInput from '@/components/ui-components/search/search-inputs/j
 import DateInput from '@/components/ui-components/search/search-inputs/date-input.vue';
 import { translateField } from '@/utils/formFields-translator';
 import axios from 'axios';
-import { databaseUrl } from '@/store/constants';
+import { apiUrl } from '@/constants';
 import { mdiDownload } from '@mdi/js';
-import { saveExcelData } from '@/utils/excel-data-saver';
+import { saveExcelData } from '@/utils/excelData-saver';
 
 export default {
   name: 'stat-filters',
@@ -131,7 +131,7 @@ export default {
         }
         const queryString = searchParams.toString();
 
-        const response = await axios.get(`${databaseUrl}/${this.selectedFilter}/find${queryString ? '?' + queryString : ''}`);
+        const response = await axios.get(`${apiUrl}/${this.selectedFilter}/find${queryString ? '?' + queryString : ''}`);
         if (response.status === 200) {
           this.filterResults = response.data[this.selectedFilter];
         }

@@ -9,8 +9,8 @@
 <script>
 import MessageContainer from '@/components/ui-components/message-container.vue';
 import axios from 'axios';
-import { databaseUrl } from '@/store/constants';
-import { mapGetters } from 'vuex';
+import { apiUrl } from '@/constants';
+import { mapActions, mapGetters } from 'vuex';
 import TrainerForm from '@/pages/admin-pages/trainers/form-trainer.vue';
 
 export default {
@@ -50,6 +50,10 @@ export default {
     }),
   },
   methods: {
+    ...mapActions('trainers', {
+      fetchTrainers: 'LOAD_TRAINERS',
+    }),
+
     async createTrainer(selectedFile) {
       const formData = new FormData();
 
@@ -66,7 +70,7 @@ export default {
       }
 
       try {
-        const response = await axios.post(databaseUrl + '/trainers/', formData, {
+        const response = await axios.post(apiUrl + '/trainers/', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
             authorization: `Bearer ${this.userData.token}`,
@@ -75,12 +79,10 @@ export default {
 
         if (response.status === 200) {
           this.messages.push('Тренер успешно добавлен в базу данных');
+          await this.fetchTrainers();
 
           setTimeout(() => {
-            this.$router.push({
-              name: 'trainerPage',
-              params: { trainer_id: this.trainer.trainer_id },
-            });
+            if (this.$route.name === 'createTrainerPage') this.$router.push({ name: 'trainerPage', params: { trainer_id: response.data.trainer.trainer_id } });
           }, 2000);
         }
       } catch (err) {
@@ -100,5 +102,6 @@ export default {
   display: flex;
   flex-direction: column;
   padding: 2rem;
+  overflow-y: auto;
 }
 </style>

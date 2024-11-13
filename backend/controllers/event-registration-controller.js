@@ -1,4 +1,4 @@
-import { dirname, join } from 'path';
+import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { OnlineRegistration } from '../models/onlineRegistration-model.js';
 import { User } from '../models/user-model.js';
@@ -10,7 +10,7 @@ export const getAllEventRegistrations = async (req, res) => {
   const event_id = req.params.event_id;
 
   try {
-    const registrations = await OnlineRegistration.find({ event_id: event_id }).populate({
+    const registrations = await OnlineRegistration.find({ event_id: event_id }).sort({ created_at: -1 }).populate({
       path: 'athletes.athlete',
       model: 'Athlete',
       select: 'rus_code name lastname gender birth_date country regions sport disciplines category is_national_team trainer',
@@ -22,7 +22,7 @@ export const getAllEventRegistrations = async (req, res) => {
   } catch (e) {
     res.status(404).json({
       status: 'Err',
-      data: 'Registrations not found ',
+      message: 'Не удалось получить список онлайн заявок',
       err: e,
     });
   }

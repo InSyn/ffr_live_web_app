@@ -24,8 +24,8 @@
 
 <script>
 import axios from 'axios';
-import { databaseUrl } from '@/store/constants';
-import { mapGetters } from 'vuex';
+import { apiUrl } from '@/constants';
+import { mapActions, mapGetters } from 'vuex';
 import MessageContainer from '@/components/ui-components/message-container.vue';
 import EventForm from '@/pages/admin-pages/events/form-event.vue';
 import { formatDate } from '@/utils/data-formaters';
@@ -55,6 +55,7 @@ export default {
         translation_url: '',
         international: false,
         documents: [],
+        is_public: true,
       },
       eventImages: {
         logo_image_url: '',
@@ -75,9 +76,12 @@ export default {
     }),
   },
   methods: {
+    ...mapActions('events', {
+      fetchEvents: 'SET_EVENTS',
+    }),
     async loadEventData() {
       try {
-        const response = await axios.get(`${databaseUrl}/events/${this.event_id}`);
+        const response = await axios.get(`${apiUrl}/events/${this.event_id}`);
         if (response.status === 200) {
           const eventData = response.data.event;
           Object.keys(this.event).forEach((key) => {
@@ -163,7 +167,7 @@ export default {
       }
 
       try {
-        const response = await axios.put(`${databaseUrl}/events/${this.event_id}`, formData, {
+        const response = await axios.put(`${apiUrl}/events/${this.event_id}`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
             authorization: `Bearer ${this.userData.token}`,
@@ -172,40 +176,31 @@ export default {
 
         if (response.status === 200) {
           this.messages.push('Информация о событии успешно обновлена');
+          await this.fetchEvents();
 
           setTimeout(() => {
-            if (this.$route.name === 'editEventPage') {
-              this.$router.push({
-                name: 'eventPage',
-                params: { event_id: this.event_id },
-              });
-            }
-          }, 2000);
+            if (this.$route.name === 'editEventPage') this.$router.push({ name: 'eventPage', params: { event_id: this.event_id } });
+          }, 1280);
         }
       } catch (err) {
-        if (err) {
-          this.errors.push(`Информация о событии не была обновлена: ${err.response?.data?.data || err.message}`);
-        }
+        console.log(`Информация о событии не была обновлена: ${err.response?.data?.message || err.message}`);
+        this.errors.push(`Информация о событии не была обновлена: ${err.response?.data?.message || err.message}`);
       }
     },
     async deleteEvent() {
       try {
-        const response = await axios.delete(`${databaseUrl}/events/${this.event_id}`, {
+        const response = await axios.delete(`${apiUrl}/events/${this.event_id}`, {
           headers: {
             authorization: `Bearer ${this.userData.token}`,
           },
         });
         if (response.data.status === 'success') {
           this.messages.push('Событие было успешно удалено');
+          await this.fetchEvents();
 
           setTimeout(() => {
-            if (this.$route.name === 'editEventPage') {
-              this.$router.push({
-                name: 'eventPage',
-                params: { event_id: this.event_id },
-              });
-            }
-          }, 2000);
+            if (this.$route.name === 'editEventPage') this.$router.push({ name: 'results' });
+          }, 1280);
         }
       } catch (e) {
         console.error('Не удалось удалить семинар:', e);
@@ -217,7 +212,7 @@ export default {
 
       try {
         const response = await axios.patch(
-          `${databaseUrl}/events/${this.event_id}/registration-settings`,
+          `${apiUrl}/events/${this.event_id}/registration-settings`,
           {
             registration_status,
             allow_registration_by_organization,
@@ -264,5 +259,6 @@ export default {
   display: flex;
   flex-direction: column;
   padding: 2rem;
+  overflow-y: auto;
 }
 </style>

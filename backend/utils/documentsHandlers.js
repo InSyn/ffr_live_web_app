@@ -1,5 +1,5 @@
-import { removeOldFile } from '../file-storage/fileStorage.js';
-import { join } from 'path';
+import { resolve } from 'path';
+import { deleteFileIfExists } from './filesUtils.js';
 
 export const parseDocuments = (reqBody) => {
   return reqBody.documents ? JSON.parse(reqBody.documents) : [];
@@ -48,7 +48,7 @@ export const updateDocuments = async (documents, documentFiles) => {
         }
 
         if (documentFile.url && doc.file && doc.file.url) {
-          await removeOldFile(join(__dirname, '..', doc.file.url));
+          await deleteFileIfExists(resolve(__dirname, '..', doc.file.url));
         }
 
         return {

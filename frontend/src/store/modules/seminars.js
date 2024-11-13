@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { databaseUrl } from '@/store/constants';
+import { apiUrl } from '@/constants';
 
 export default {
   namespaced: true,
@@ -20,7 +20,7 @@ export default {
     },
     LOAD_SEMINARS: async (store) => {
       try {
-        const response = await axios.get(databaseUrl + '/seminars');
+        const response = await axios.get(apiUrl + '/seminars');
         if (response.status === 200) {
           store.commit('setSeminars', response.data.seminars);
         }

@@ -174,7 +174,7 @@ import axios from 'axios';
 import ResultsTable from '@/pages/events/event-page/resultsTable.vue';
 import { formatDate } from '@/utils/data-formaters';
 import LoaderSpinner from '@/components/ui-components/loader-spinner.vue';
-import { databaseUrl, uploadsFolderUrl } from '@/store/constants';
+import { apiUrl, backendRootUrl } from '@/constants';
 import { mdiImage } from '@mdi/js';
 import CompetitionImageFillerIcon from '@/assets/svg/competitionImageFiller-icon.vue';
 import CountryFlag from '@/components/ui-components/country-flag.vue';
@@ -187,6 +187,7 @@ import MedalIcon from '@/components/icons/medal-icon.vue';
 import EditButton from '@/components/ui-components/edit-button.vue';
 import { getCountryCode } from '@/store/data/countries';
 import { getRegionCode } from '@/store/data/russia-regions';
+import { mapGetters } from 'vuex';
 
 export default {
   components: {
@@ -218,8 +219,11 @@ export default {
     };
   },
   computed: {
+    ...mapGetters('authorization', {
+      isSecretary: 'isSecretary',
+    }),
     uploadsFolderUrl() {
-      return uploadsFolderUrl;
+      return backendRootUrl;
     },
     sports() {
       return sports;
@@ -253,7 +257,7 @@ export default {
       this.eventIsLoading = true;
 
       try {
-        const response = await axios.get(databaseUrl + '/events/' + this.$route.params.event_id);
+        const response = await axios.get(apiUrl + '/events/' + this.$route.params.event_id);
         if (response.status === 200) {
           const eventData = response.data.event;
           if (eventData.event_id === this.$route.params.event_id) this.event = eventData;

@@ -1,13 +1,13 @@
 ﻿<script>
 import CountryFlag from '@/components/ui-components/country-flag.vue';
 import { mapActions } from 'vuex';
-import { databaseUrl, uploadsFolderUrl } from '@/store/constants';
+import { apiUrl, backendRootUrl } from '@/constants';
 import { getCountryCode } from '@/store/data/countries';
 import { getRegionCode } from '@/store/data/russia-regions';
 import { formatDate } from '@/utils/data-formaters';
 import LoaderSpinner from '@/components/ui-components/loader-spinner.vue';
 import axios from 'axios';
-import { exportRegistrationApplicationAthletesToExcel } from '@/utils/excel-data-saver';
+import { exportRegistrationApplicationAthletesToExcel } from '@/utils/excelData-saver';
 import { mdiDownload } from '@mdi/js';
 
 export default {
@@ -30,7 +30,7 @@ export default {
   },
   computed: {
     uploadsFolderUrl() {
-      return uploadsFolderUrl;
+      return backendRootUrl;
     },
   },
   methods: {
@@ -59,7 +59,7 @@ export default {
     },
     async loadRegisteredEventApplications() {
       try {
-        const response = await axios.get(`${databaseUrl}/event-online-registration/${this.event._id}`);
+        const response = await axios.get(`${apiUrl}/event-online-registration/${this.event._id}`);
 
         if (response.status === 200) {
           this.registeredEventApplications = response.data.registrations;
@@ -149,7 +149,8 @@ export default {
             <div class="registeredApplications__list">
               <div class="registeredApplications__list__item" v-for="application in registeredEventApplications" :key="application._id">
                 <div class="registeredApplications__list__item__info">
-                  {{ application.creator_username }}
+                  <span> {{ application.creator_username }}</span
+                  ><span> {{ formatDate(application.created_at, { full: true }) }}</span>
                 </div>
                 <button class="registeredApplications__list__item__action actionButton" type="button" @click.prevent="selectApplication(application)">
                   Открыть
@@ -362,8 +363,21 @@ export default {
               padding: 0.5rem 1rem;
               font-size: 0.9rem;
               transition: background-color 92ms;
+
               &:hover {
                 background-color: var(--background--card-hover);
+              }
+              .registeredApplications__list__item__info {
+                flex: 1 1 0;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 1.25rem;
+                margin-right: 2rem;
+
+                & > * {
+                  display: inline-block;
+                }
               }
             }
           }

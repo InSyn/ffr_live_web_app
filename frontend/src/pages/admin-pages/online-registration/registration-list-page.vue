@@ -1,7 +1,7 @@
 ﻿<script>
 import axios from 'axios';
-import { databaseUrl } from '@/store/constants';
-import CompetitionListItem from '@/pages/events/calendar-page/competition-list-item.vue';
+import { apiUrl } from '@/constants';
+import CompetitionListItem from '@/pages/events/competition-list-item.vue';
 
 export default {
   name: 'registration-list-page',
@@ -14,7 +14,7 @@ export default {
   methods: {
     async loadEventsWithRegistration() {
       try {
-        const response = await axios.get(databaseUrl + '/events/opened-registration');
+        const response = await axios.get(apiUrl + '/events/opened-registration');
         if (response.status === 200) {
           this.events = response.data.events;
         }

@@ -38,7 +38,7 @@
             rounding="2px"
             height="1rem"
           ></country-flag>
-          {{ event['region'] + ',&nbsp;' + event['location'] }}
+          {{ concatStringsWithComma([event.region, event.location]) }}
         </div>
         <div class="competition__link__footer__info__date">
           <span v-if="!dateMatch">
@@ -55,10 +55,10 @@
 <script>
 import CountryFlag from '@/components/ui-components/country-flag.vue';
 import CompetitionImageFillerIcon from '@/assets/svg/competitionImageFiller-icon.vue';
-import { formatDate } from '@/utils/data-formaters';
+import { concatStringsWithComma, formatDate } from '@/utils/data-formaters';
 import { getCountryCode } from '@/store/data/countries';
 import { getRegionCode } from '@/store/data/russia-regions';
-import { uploadsFolderUrl } from '@/store/constants';
+import { backendRootUrl } from '@/constants';
 import { getDisciplineCode } from '@/store/data/sports';
 
 export default {
@@ -71,10 +71,11 @@ export default {
   components: { CompetitionImageFillerIcon, CountryFlag },
   computed: {
     uploadsFolderUrl() {
-      return uploadsFolderUrl;
+      return backendRootUrl;
     },
   },
   methods: {
+    concatStringsWithComma,
     getDisciplineCode,
     getRegionCode,
     getCountryCode,

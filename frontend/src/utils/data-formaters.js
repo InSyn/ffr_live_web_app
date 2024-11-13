@@ -53,7 +53,6 @@ export const getAgeFromBirthdate = (birthDateString) => {
   const monthDifference = today.getMonth() - birthDate.getMonth();
   const dayDifference = today.getDate() - birthDate.getDate();
 
-  // Adjust age if the current date is before the birthday this year
   if (monthDifference < 0 || (monthDifference === 0 && dayDifference < 0)) {
     age--;
   }
@@ -61,30 +60,6 @@ export const getAgeFromBirthdate = (birthDateString) => {
   return age;
 };
 
-// export function set_accuracy(val, precision) {
-//   let suffix = null;
-//
-//   if (typeof val === "string" && val.split(" ").length > 1) {
-//     suffix = val.split(" ")[1];
-//     val = val.split(" ")[0];
-//   }
-//
-//   const digits = precision.toString().length - 1;
-//   let res = (Math.round(precision * +val) / precision).toString().split(".");
-//
-//   if (digits > 0) {
-//     if (res[1]) {
-//       for (let i = 0; i < digits - res[1].length; i++) {
-//         res[1] += "0";
-//       }
-//     } else {
-//       res.push([]);
-//       for (let i = 0; i < digits; i++) {
-//         res[1] += "0";
-//       }
-//     }
-//   } else res = res[0];
-//   res = res.join(".");
-//
-//   return `${res}${suffix ? " " + suffix : ""}`;
-// }
+export const concatStringsWithComma = (strArr) => {
+  return strArr.filter((str) => !!str).join(', ');
+};

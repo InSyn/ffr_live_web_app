@@ -44,7 +44,6 @@ export default {
 <style scoped>
 svg {
   fill: #757589;
-  box-shadow: 0 0 0 2px var(--border-photo);
   border-radius: 50%;
 }
 </style>

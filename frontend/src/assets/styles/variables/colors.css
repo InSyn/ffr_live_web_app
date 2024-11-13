@@ -12,9 +12,12 @@
     --background--primary-hover: #cfcfd6;
     --background--primary-hover-contrast: #303036;
     --background--secondary: #212125;
+
+    --background--transparent: rgba(242, 242, 248, 0.48);
     --background--card: rgba(242, 242, 248, 0.92);
     --background--card-hover: rgba(248, 248, 254, 0.92);
     --background--card-secondary: rgba(230, 230, 234, 0.78);
+
     --background--diff: rgba(0, 0, 0, 0.04);
     --background--image: rgba(242, 242, 248, 0.2);
 
@@ -35,13 +38,15 @@
     --text-card-contrast: #f2f2f7;
 }
 
-.theme-dark {
+:root.dark {
     --ffr-brand-shadow: 7px 6px 23px -6px rgba(72, 92, 144, 0.18);
 
     --background--primary: #2f2f34;
     --background--primary-hover: #303036;
     --background--primary-hover-contrast: #303036;
     --background--secondary: #111118;
+
+    --background--transparent: rgba(16, 16, 24, 0.48);
     --background--card: rgba(16, 16, 24, 0.92);
     --background--card-hover: rgba(41, 41, 47, 0.92);
     --background--card-secondary: rgba(36, 36, 42, 0.78);

@@ -5,10 +5,11 @@ import ThemeSwitch from '@/components/ui-components/theme-switch.vue';
 import MenuMobile from '@/components/navigation/menu-mobile.vue';
 import { mapGetters } from 'vuex';
 import { mdiAccount } from '@mdi/js';
+import HeaderLogo from '@/components/layout/app-header/header-logo.vue';
 
 export default {
-  name: 'AppHeader',
-  components: { MenuMobile, ThemeSwitch, NavBar, MobileMenuButton },
+  name: 'app-header',
+  components: { HeaderLogo, MenuMobile, ThemeSwitch, NavBar, MobileMenuButton },
   data() {
     return {
       icons: { mdiAccount },
@@ -28,16 +29,8 @@ export default {
   <div class="appHeader__wrapper">
     <div class="appHeader__container">
       <div class="appHeader__content">
-        <div class="header__logo__wrapper">
-          <img alt="tw-logo" class="header__logo__image light" src="../../assets/logo/FFR_HEADER_LOGO_BLUE.png" />
-          <img alt="tw-logo" class="header__logo__image dark" src="../../assets/logo/FFR_HEADER_LOGO_WHITE.png" />
-        </div>
-
+        <header-logo></header-logo>
         <mobile-menu-button :menu-state="mobileMenuState" @toggle-menu="mobileMenuState = !mobileMenuState"></mobile-menu-button>
-        <div class="header__logo__wrapper-mobile">
-          <img alt="tw-logo" class="header__logo__image light" src="../../assets/logo/FFR_HEADER_LOGO_BLUE.png" />
-          <img alt="tw-logo" class="header__logo__image dark" src="../../assets/logo/FFR_HEADER_LOGO_WHITE.png" />
-        </div>
         <nav-bar></nav-bar>
 
         <router-link :class="['login__link', isLoggedIn && 'logged_in']" :to="{ name: 'auth' }" custom>
@@ -58,7 +51,7 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-@import './../../assets/fonts/Bebasneue-Regular/stylesheet.css';
+@import '../../../assets/fonts/Bebasneue-Regular/stylesheet.css';
 
 .appHeader__wrapper {
   position: relative;
@@ -121,78 +114,6 @@ export default {
       margin: 0 auto;
       font-family: 'Bebas Neue', sans-serif;
 
-      .header__logo__wrapper {
-        position: absolute;
-        flex: 0 0 auto;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-
-        &::before {
-          position: absolute;
-          width: 400px;
-          height: 400px;
-          top: -272px;
-          left: 0;
-          background-color: var(--text-card-contrast);
-          box-shadow: var(--ffr-brand-shadow);
-          transform: rotate(40deg) skewX(-27deg);
-          content: '';
-        }
-
-        .header__logo__image {
-          position: relative;
-          height: 55px;
-          top: 28px;
-          left: 84px;
-
-          &.light {
-            display: block;
-          }
-          &.dark {
-            display: none;
-          }
-        }
-
-        @media screen and (max-width: 1200px) {
-          &::before {
-            top: -316px;
-          }
-          .header__logo__image {
-            top: 12px;
-            left: 102px;
-            height: 40px;
-          }
-        }
-        @media screen and (max-width: 920px) {
-          display: none;
-        }
-      }
-
-      .header__logo__wrapper-mobile {
-        display: none;
-        justify-content: center;
-        height: 24px;
-        margin: auto 8px;
-        padding: 0.25rem;
-
-        .header__logo__image {
-          flex: 1 1 0;
-          max-height: 100%;
-
-          &.light {
-            display: block;
-          }
-          &.dark {
-            display: none;
-          }
-        }
-        @media screen and (max-width: 920px) {
-          display: flex;
-        }
-      }
-
       .login__link {
         flex: 0 0 auto;
         display: flex;
@@ -228,6 +149,9 @@ export default {
           color: var(--text-contrast-hovered);
           fill: var(--text-contrast-hovered);
         }
+      }
+      @media screen and (max-width: 1200px) {
+        max-width: 100%;
       }
     }
   }

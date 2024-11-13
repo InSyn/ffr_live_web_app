@@ -1,27 +1,38 @@
 import { Event } from '../models/event-model.js';
+import { deleteFileIfExists, flushDocuments } from '../utils/filesUtils.js';
+import { createEntityDocuments, extractDocumentFiles, parseDocuments, updateDocuments } from '../utils/documentsHandlers.js';
 import * as crypto from 'crypto';
 import { getSeason } from '../utils/formatters.js';
-import { flushDocuments, removeOldFile } from '../file-storage/fileStorage.js';
-import { dirname, resolve } from 'path';
-import { fileURLToPath } from 'url';
-import { createEntityDocuments, extractDocumentFiles, parseDocuments, updateDocuments } from '../middleware/documentsHandlers.js';
+import { buildDateRangeQuery } from '../utils/dateUtils.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const buildEventQuery = (req) => {
+  const query = {};
+
+  if (req.query.title) query.$text = { $search: req.query.title };
+  if (req.query.sport) query.sport = req.query.sport;
+  if (req.query.discipline) query.discipline = req.query.discipline;
+  if (req.query.season) query.season = req.query.season;
+  if (req.query.date) query.start_at = buildDateRangeQuery(req.query.date);
+  if (req.query.location) query.location = new RegExp(req.query.location, 'i');
+  if (req.query.calendar_code) query.calendar_code = req.query.calendar_code;
+
+  return query;
+};
 
 export const getAllEvents = async (req, res) => {
   try {
     const events = await Event.find({}, { competitions: 0 }).sort({
       start_at: -1,
     });
+
     res.status(200).json({
       status: 'success',
       events,
     });
   } catch (e) {
-    res.status(404).json({
+    res.status(500).json({
       status: 'Err',
-      data: 'Ошибка загрузки событий',
+      message: 'Ошибка загрузки событий',
       err: e,
     });
   }
@@ -29,52 +40,12 @@ export const getAllEvents = async (req, res) => {
 
 export const searchEvents = async (req, res) => {
   try {
-    const query = {};
-
-    if (req.query.title) {
-      query.$text = { $search: req.query.title };
-    }
-    if (req.query.sport) {
-      query.sport = req.query.sport;
-    }
-    if (req.query.discipline) {
-      query.discipline = req.query.discipline;
-    }
-    if (req.query.season) {
-      query.season = req.query.season;
-    }
-    if (req.query.date) {
-      const startOfDay = new Date(req.query.date);
-      startOfDay.setUTCHours(0, 0, 0, 0);
-      const endOfDay = new Date(req.query.date);
-      endOfDay.setUTCHours(23, 59, 59, 999);
-
-      query.start_at = {
-        $gte: startOfDay,
-        $lte: endOfDay,
-      };
-    }
-    if (req.query.location) {
-      query.location = new RegExp(req.query.location, 'i');
-    }
-
-    if (req.query.calendar_code) {
-      query.calendar_code = req.query.calendar_code;
-    }
-
+    const query = buildEventQuery(req);
     const events = await Event.find(query).sort({ start_at: -1 });
-    res.status(200).json({
-      status: 'success',
-      results: events.length,
-      events,
-    });
+
+    res.status(200).json({ status: 'success', results: events.length, events });
   } catch (error) {
-    console.error('Error during search:', error);
-    res.status(500).json({
-      status: 'error',
-      message: 'Failed to search events',
-      error: error.message,
-    });
+    res.status(500).json({ status: 'error', message: 'Failed to search events', error: error.message });
   }
 };
 
@@ -103,7 +74,7 @@ export const getEventByDate = async (req, res) => {
   } catch (e) {
     res.status(404).json({
       status: 'Err',
-      data: 'События не найдены',
+      message: 'События не найдены',
       err: e,
     });
   }
@@ -114,6 +85,7 @@ export const getEventsWithRegistration = async (req, res) => {
     const events = await Event.find({ registration_status: true }, { competitions: 0 }).sort({
       start_at: -1,
     });
+
     res.status(200).json({
       status: 'success',
       events,
@@ -121,7 +93,7 @@ export const getEventsWithRegistration = async (req, res) => {
   } catch (e) {
     res.status(404).json({
       status: 'Err',
-      data: 'Ошибка загрузки событий',
+      message: 'Ошибка загрузки событий',
       err: e,
     });
   }
@@ -130,6 +102,7 @@ export const getEventsWithRegistration = async (req, res) => {
 export const getEvent = async (req, res) => {
   try {
     const event = await Event.findOne({ event_id: req.params.id });
+
     res.status(200).json({
       status: 'success',
       event,
@@ -137,7 +110,7 @@ export const getEvent = async (req, res) => {
   } catch (e) {
     res.status(404).json({
       status: 'Err',
-      data: 'Событие не найдено',
+      message: 'Событие не найдено',
       err: e,
     });
   }
@@ -154,12 +127,12 @@ export const addNewEvent = async (req, res) => {
     const eventDocuments = createEntityDocuments(documents, documentFiles);
 
     const eventObj = {
+      is_public: req.body.is_public,
       event_id: req.body.event_id || crypto.randomUUID(),
       created_at: new Date(),
       logo_image_url: logoImage,
       track_image_url: trackImage,
       calendar_code: req.body.calendar_code,
-
       title: req.body.title,
       international: req.body.international,
       start_at: req.body.start_at,
@@ -169,7 +142,6 @@ export const addNewEvent = async (req, res) => {
       country: req.body.country,
       region: req.body.region,
       location: req.body.location,
-
       organization: req.body.organization,
       organization_logo: organizationLogo,
       timing_provider: req.body.timing_provider,
@@ -190,7 +162,7 @@ export const addNewEvent = async (req, res) => {
     console.log('ADD ERR', e);
     res.status(500).json({
       status: 'Err',
-      data: `Ошибка, событие не было добавлено: ${e.message}`,
+      message: `Ошибка, событие не было добавлено: ${e.message}`,
       err: e,
     });
   }
@@ -206,27 +178,24 @@ export const updateEvent = async (req, res) => {
       });
     }
 
-    const updateFields = {};
-
     const originalLogoImage = event.logo_image_url;
     const originalTrackImage = event.track_image_url;
     const originalOrganizationLogo = event.organization_logo;
 
-    if (req.files['logo_image_url']) {
-      updateFields.logo_image_url = `/uploads/images/${req.files['logo_image_url'][0].filename}`;
-    }
-    if (req.files['track_image_url']) {
-      updateFields.track_image_url = `/uploads/images/${req.files['track_image_url'][0].filename}`;
-    }
-    if (req.files['organization_logo']) {
-      updateFields.organization_logo = `/uploads/images/${req.files['organization_logo'][0].filename}`;
-    }
+    const logoImageUrl = req.files['logo_image_url'] ? `/uploads/images/${req.files['logo_image_url'][0].filename}` : event.logo_image_url;
+    const trackImageUrl = req.files['track_image_url'] ? `/uploads/images/${req.files['track_image_url'][0].filename}` : event.track_image_url;
+    const organizationLogo = req.files['organization_logo'] ? `/uploads/images/${req.files['organization_logo'][0].filename}` : event.organization_logo;
+
     const documentFiles = extractDocumentFiles(req.files);
     const documents = req.body.documents ? JSON.parse(req.body.documents) : event.documents;
     const updatedDocuments = await updateDocuments(documents, documentFiles);
-    updateFields.documents = updatedDocuments;
 
-    Object.assign(updateFields, {
+    event.set({
+      logo_image_url: logoImageUrl,
+      track_image_url: trackImageUrl,
+      organization_logo: organizationLogo,
+      documents: updatedDocuments,
+      is_public: req.body.is_public ?? event.is_public,
       calendar_code: req.body.calendar_code || event.calendar_code,
       title: req.body.title || event.title,
       start_at: req.body.start_at || event.start_at,
@@ -242,16 +211,16 @@ export const updateEvent = async (req, res) => {
       international: req.body.international !== undefined ? req.body.international : event.international,
     });
 
-    await Event.updateOne({ event_id: req.params.id }, { $set: updateFields });
+    await event.save();
 
-    if (updateFields.logo_image_url !== originalLogoImage && originalLogoImage) {
-      await removeOldFile(resolve(__dirname, '..', originalLogoImage));
+    if (logoImageUrl !== originalLogoImage && originalLogoImage) {
+      await deleteFileIfExists(originalLogoImage);
     }
-    if (updateFields.track_image_url !== originalTrackImage && originalTrackImage) {
-      await removeOldFile(resolve(__dirname, '..', originalTrackImage));
+    if (trackImageUrl !== originalTrackImage && originalTrackImage) {
+      await deleteFileIfExists(originalTrackImage);
     }
-    if (updateFields.organization_logo !== originalOrganizationLogo && originalOrganizationLogo) {
-      await removeOldFile(resolve(__dirname, '..', originalOrganizationLogo));
+    if (organizationLogo !== originalOrganizationLogo && originalOrganizationLogo) {
+      await deleteFileIfExists(originalOrganizationLogo);
     }
 
     res.status(200).json({
@@ -261,7 +230,7 @@ export const updateEvent = async (req, res) => {
   } catch (e) {
     res.status(500).json({
       status: 'Err',
-      data: `Не удалось обновить данные события: ${e.message}`,
+      message: `Не удалось обновить данные события: ${e.message}`,
       err: e,
     });
   }
@@ -335,7 +304,7 @@ export const updateEventResults = async (req, res) => {
   } catch (e) {
     res.status(500).json({
       status: 'Err',
-      data: `Не удалось обновить данные события. ${e.message}`,
+      message: `Не удалось обновить данные события. ${e.message}`,
       err: e,
     });
   }
@@ -352,7 +321,12 @@ export const deleteEvent = async (req, res) => {
       });
     }
 
+    const filesToDelete = [event.logo_image_url, event.track_image_url, event.organization_logo];
+    await Promise.all(filesToDelete.map((filePath) => filePath && deleteFileIfExists(filePath)));
+
     await flushDocuments(event);
+
+    await Event.deleteOne({ event_id: req.params.id });
 
     res.status(200).json({
       status: 'success',
@@ -361,7 +335,7 @@ export const deleteEvent = async (req, res) => {
   } catch (e) {
     res.status(500).json({
       status: 'Err',
-      data: `Не удалось удалить событие: ${e.message}`,
+      message: `Не удалось удалить событие: ${e.message}`,
       err: e,
     });
   }

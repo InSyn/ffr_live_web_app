@@ -59,7 +59,7 @@
 <script>
 import CompetitionImageFillerIcon from '@/assets/svg/competitionImageFiller-icon.vue';
 import { formatDate } from '@/utils/data-formaters';
-import { uploadsFolderUrl } from '@/store/constants';
+import { backendRootUrl } from '@/constants';
 import CountryFlag from '@/components/ui-components/country-flag.vue';
 
 export default {
@@ -68,7 +68,7 @@ export default {
   props: ['athleteCode', 'event', 'competitions', 'index'],
   methods: {
     uploadsFolderUrl() {
-      return uploadsFolderUrl;
+      return backendRootUrl;
     },
     formatDate,
     getEventResults(event_id) {

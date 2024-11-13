@@ -1,5 +1,5 @@
 <template>
-  <router-link v-if="isAdmin" :to="getTargetLink(type, code)">
+  <router-link v-if="isSecretary" :to="getTargetLink(type, code)">
     <button class="editButton__wrapper" :style="type === 'seminar' || (type === 'event' && { marginLeft: '1rem' })">
       <edit-icon class="editButton__icon"></edit-icon>
     </button>
@@ -17,6 +17,12 @@ export default {
     type: String,
   },
   components: { EditIcon },
+  computed: {
+    ...mapGetters('authorization', {
+      isAdmin: 'isAdmin',
+      isSecretary: 'isSecretary',
+    }),
+  },
   methods: {
     getTargetLink(type, code) {
       switch (type) {
@@ -70,11 +76,6 @@ export default {
         }
       }
     },
-  },
-  computed: {
-    ...mapGetters('authorization', {
-      isAdmin: 'isAdmin',
-    }),
   },
 };
 </script>

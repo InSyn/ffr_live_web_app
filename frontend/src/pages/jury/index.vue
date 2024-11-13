@@ -56,7 +56,7 @@
 </template>
 
 <script>
-import { uploadsFolderUrl } from '@/store/constants';
+import { backendRootUrl } from '@/constants';
 import { mdiAccount } from '@mdi/js';
 import CountryFlag from '@/components/ui-components/country-flag.vue';
 import Search from '@/components/ui-components/search/index.vue';
@@ -89,18 +89,18 @@ export default {
       juryList: 'getJury',
     }),
     uploadsFolderUrl() {
-      return uploadsFolderUrl;
+      return backendRootUrl;
     },
     getJuryList() {
       return this.searchResults === null ? this.juryList : this.searchResults;
     },
   },
   methods: {
-    getAlphabetList,
     ...mapActions('jury', {
       fetchJury: 'LOAD_JURY',
       setJury: 'SET_JURY',
     }),
+    getAlphabetList,
     getAthleteName,
     getAgeFromBirthdate,
     getCountryCode,
@@ -138,8 +138,9 @@ export default {
   flex: 1 1 0;
   display: flex;
   flex-wrap: nowrap;
-  max-width: var(--desktop-small);
   width: 100%;
+  height: 100%;
+  max-width: var(--desktop-small);
   margin: 0 auto;
   padding: var(--padd-page);
 

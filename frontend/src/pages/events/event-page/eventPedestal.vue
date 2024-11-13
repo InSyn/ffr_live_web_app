@@ -54,7 +54,7 @@
 <script>
 import AthletePhotoFillerIcon from '@/assets/svg/athletePhotoFiller-icon.vue';
 import CountryFlag from '@/components/ui-components/country-flag.vue';
-import { databaseUrl, uploadsFolderUrl } from '@/store/constants';
+import { apiUrl, backendRootUrl } from '@/constants';
 import { getRegionCode } from '@/store/data/russia-regions';
 import { getAthleteName } from '@/utils/data-formaters';
 import axios from 'axios';
@@ -76,7 +76,7 @@ export default {
     getAthleteName,
     getRegionCode,
     uploadsFolderUrl() {
-      return uploadsFolderUrl;
+      return backendRootUrl;
     },
     async getAthletesTop() {
       if (!this.competition || !this.competition['total_results']) return;
@@ -103,7 +103,7 @@ export default {
     },
     async loadAthleteData(code) {
       try {
-        const data = await axios.get(databaseUrl + '/athletes/' + code);
+        const data = await axios.get(apiUrl + '/athletes/' + code);
         if (data.status === 200) {
           const athleteData = data.data.data;
           if (athleteData) return athleteData;

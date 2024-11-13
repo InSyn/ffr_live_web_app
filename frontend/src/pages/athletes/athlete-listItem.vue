@@ -39,7 +39,7 @@
           </div>
 
           <div class="personalInfo__item__wrapper athleteRegions" v-if="athlete['regions'].length">
-            {{ athlete['regions'].join(', ') }}
+            {{ concatStringsWithComma(['regions']) }}
           </div>
         </div>
 
@@ -59,9 +59,9 @@
 <script>
 import CountryFlag from '@/components/ui-components/country-flag.vue';
 import { getDisciplineCode } from '@/store/data/sports';
-import { formatBirthDate, getAthleteName } from '@/utils/data-formaters';
+import { concatStringsWithComma, formatBirthDate, getAthleteName } from '@/utils/data-formaters';
 import { getRegionCode } from '@/store/data/russia-regions';
-import { uploadsFolderUrl } from '@/store/constants';
+import { backendRootUrl } from '@/constants';
 import { getShortAthleteRank } from '@/store/data/sport-data-sets';
 import PersonPhoto from '@/components/ui-components/person-photo.vue';
 import { getCountryCode } from '@/store/data/countries';
@@ -72,10 +72,11 @@ export default {
     athlete: Object,
   },
   methods: {
+    concatStringsWithComma,
     getCountryCode,
     getShortAthleteRank,
     uploadsFolderUrl() {
-      return uploadsFolderUrl;
+      return backendRootUrl;
     },
     getRegionCode,
     getAthleteName,

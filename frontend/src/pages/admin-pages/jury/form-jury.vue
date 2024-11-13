@@ -3,6 +3,9 @@
     <div class="formHeader">
       <span v-if="action === 'create'">Новый судья</span>
       <span v-else>Обновление данных судьи</span>
+      <div v-if="userData['role'] === 'admin' || userData['role'] === 'secretary'" class="secretaryToggle__wrapper">
+        <custom-checkbox :value="jury.is_secretary" label="Секретарь" @input="setSecretaryRole"></custom-checkbox>
+      </div>
     </div>
 
     <div class="formBody">
@@ -20,7 +23,7 @@
         </div>
       </div>
 
-      <div v-for="(_, key) in jury" v-show="key !== 'country_code' && key !== 'region_code'" :key="key" class="formGroup">
+      <div v-for="(_, key) in jury" v-show="key !== 'country_code' && key !== 'region_code' && key !== 'is_secretary'" :key="key" class="formGroup">
         <label :for="key" class="formLabel">{{ translateField(key) }}</label>
 
         <select v-if="key === 'gender'" :id="key" class="formControl" v-model="jury[key]">
@@ -59,23 +62,14 @@
           </select>
         </div>
 
-        <select v-else-if="key === 'country'" :id="key" class="formControl" :value="jury[key]" @change="setFieldValue(jury, 'country', $event.target.value)">
-          <option selected disabled value="">Выберите страну</option>
-          <option v-for="country in countries" :key="country.country_code" class="formControl-option">
-            {{ country.country_name }}
-          </option>
-        </select>
-        <div class="select__wrapper" v-else-if="key === 'region'">
-          <input v-if="getCountryCode(jury['country']) !== 'RU'" v-model="jury[key]" :id="key" :name="key" :type="getInputType(key)" class="formControl" />
-          <div v-else class="formControl__wrapper">
-            <select @change="setFieldValue(jury, 'region', $event.target.value)" :id="key" data-new-region="false" class="formControl" :value="jury[key]">
-              <option selected disabled value="">Выберите регион</option>
-              <option v-for="region in russiaRegions" :key="region.code">
-                {{ region.fullname }}
-              </option>
-            </select>
-          </div>
-        </div>
+        <country-select-control v-else-if="key === 'country'" :value="jury[key]" @input="setFieldValue(jury, 'country', $event)"></country-select-control>
+        <region-select-control
+          v-else-if="key === 'region'"
+          :value="jury[key]"
+          :country="jury['country']"
+          @input="setFieldValue(jury, 'region', $event)"
+        ></region-select-control>
+
         <select
           v-else-if="key === 'jury_category'"
           :id="key"
@@ -115,19 +109,23 @@
 
 <script>
 import AthletePhotoFillerIcon from '@/assets/svg/athletePhotoFiller-icon.vue';
-import { getInputType } from '@/utils/get-input-type';
+import { getInputType } from '@/utils/inputType-util';
 import { getJuryCategoriesList } from '@/store/data/sport-data-sets';
 import { russiaRegions } from '@/store/data/russia-regions';
 import { countries, getCountryCode } from '@/store/data/countries';
 import { getDisciplines, sports } from '@/store/data/sports';
 import { capitalizeString } from '@/utils/capitalizeString';
 import { translateField } from '@/utils/formFields-translator';
-import { uploadsFolderUrl } from '@/store/constants';
-import { addFieldValue, removeFieldValue, setFieldValue } from '@/utils/form-data-helpers';
+import { backendRootUrl } from '@/constants';
+import { addFieldValue, removeFieldValue, setFieldValue } from '@/utils/formData-helpers';
+import CustomCheckbox from '@/components/ui-components/custom-checkbox.vue';
+import { mapGetters } from 'vuex';
+import CountrySelectControl from '@/components/ui-components/custom-controls/country-select-control.vue';
+import RegionSelectControl from '@/components/ui-components/custom-controls/region-select-control.vue';
 
 export default {
   name: 'jury-form',
-  components: { AthletePhotoFillerIcon },
+  components: { RegionSelectControl, CountrySelectControl, CustomCheckbox, AthletePhotoFillerIcon },
   props: {
     jury: Object,
     juryImages: Object,
@@ -140,6 +138,9 @@ export default {
     };
   },
   computed: {
+    ...mapGetters('authorization', {
+      userData: 'getUserData',
+    }),
     countries() {
       return countries;
     },
@@ -178,10 +179,13 @@ export default {
         };
         reader.readAsDataURL(this.selectedFile[imageType]);
       } else if (sourceType === 'url') {
-        this.$set(this.imagePreview, imageType, uploadsFolderUrl + this.juryImages[imageType]);
+        this.$set(this.imagePreview, imageType, backendRootUrl + this.juryImages[imageType]);
       }
     },
 
+    setSecretaryRole() {
+      this.$emit('set-secretary-role');
+    },
     async submitForm() {
       switch (this.action) {
         case 'create': {
@@ -222,6 +226,8 @@ form {
   position: relative;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  max-width: var(--tablet-default);
 
   margin: auto;
   padding: 1rem 1.6rem;
@@ -234,17 +240,25 @@ form {
   .formHeader {
     flex: 0 0 auto;
     display: flex;
+    align-items: center;
     flex-wrap: wrap;
     gap: 8px;
     padding: 0 0.5rem 1.25rem;
     font-size: 1.4rem;
     font-weight: bold;
+    user-select: none;
+
+    .secretaryToggle__wrapper {
+      margin-left: auto;
+      font-size: 1rem;
+      color: var(--text-depressed);
+    }
   }
 
   .formBody {
     flex: 0 1 auto;
     display: grid;
-    grid-template-columns: repeat(2, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     grid-auto-rows: min-content;
     gap: 0.75rem 1.25rem;
     overflow-y: auto;
@@ -309,6 +323,7 @@ form {
     }
 
     .formGroup {
+      flex: 0 0 auto;
       display: flex;
       align-items: flex-start;
       padding: 0 0 0.25rem;
@@ -430,6 +445,7 @@ form {
   .formActions {
     display: flex;
     justify-content: flex-end;
+    gap: 1.25rem;
     margin-top: 1.75rem;
 
     .actionButton {

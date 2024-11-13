@@ -13,9 +13,9 @@
 
 <script>
 import MessageContainer from '@/components/ui-components/message-container.vue';
-import { mapGetters } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 import axios from 'axios';
-import { databaseUrl } from '@/store/constants';
+import { apiUrl } from '@/constants';
 import TrainerForm from '@/pages/admin-pages/trainers/form-trainer.vue';
 
 export default {
@@ -58,9 +58,13 @@ export default {
     }),
   },
   methods: {
+    ...mapActions('trainers', {
+      fetchTrainers: 'LOAD_TRAINERS',
+    }),
+
     async loadTrainerData() {
       try {
-        const response = await axios.get(`${databaseUrl}/trainers/${this.trainer_id}`);
+        const response = await axios.get(`${apiUrl}/trainers/${this.trainer_id}`);
         if (response.status === 200) {
           const trainerData = response.data.trainer;
           Object.keys(this.trainer).forEach((key) => {
@@ -99,7 +103,7 @@ export default {
       }
 
       try {
-        const response = await axios.patch(`${databaseUrl}/trainers/${this.trainer_id}`, formData, {
+        const response = await axios.patch(`${apiUrl}/trainers/${this.trainer_id}`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
             authorization: `Bearer ${this.userData.token}`,
@@ -108,44 +112,36 @@ export default {
 
         if (response.status === 200) {
           this.messages.push('Информация о тренере успешно обновлена');
+          await this.fetchTrainers();
 
           setTimeout(() => {
-            if (this.$route.name === 'editTrainerPage') {
-              this.$router.push({
-                name: 'trainerPage',
-                params: { trainer_id: this.trainer_id },
-              });
-            }
+            if (this.$route.name === 'editTrainerPage') this.$router.push({ name: 'trainerPage', params: { trainer_id: response.data.trainer.trainer_id } });
           }, 2000);
         }
       } catch (err) {
         if (err) {
-          this.errors.push(`Информация о тренере не была обновлена: ${err.response?.data?.data || err.message}`);
+          this.errors.push(`Информация о тренере не была обновлена: ${err.response?.data?.message}`);
         }
       }
     },
     async deleteTrainer() {
       try {
-        const response = await axios.delete(`${databaseUrl}/trainers/${this.trainer_id}`, {
+        const response = await axios.delete(`${apiUrl}/trainers/${this.trainer_id}`, {
           headers: {
             authorization: `Bearer ${this.userData.token}`,
           },
         });
         if (response.data.status === 'success') {
           this.messages.push('Тренер был успешно удалён');
+          await this.fetchTrainers();
 
           setTimeout(() => {
-            if (this.$route.name === 'editTrainerPage') {
-              this.$router.push({
-                name: 'trainerPage',
-                params: { trainer_id: this.trainer_id },
-              });
-            }
+            if (this.$route.name === 'editTrainerPage') this.$router.push({ name: 'trainersPage' });
           }, 2000);
         }
       } catch (e) {
         console.error('Не удалось удалить тренера:', e);
-        this.errors.push('Не удалось удалить тренера');
+        this.errors.push(`Не удалось удалить тренера ${e?.response?.data?.message}`);
       }
     },
   },
@@ -162,5 +158,6 @@ export default {
   display: flex;
   flex-direction: column;
   padding: 2rem;
+  overflow-y: auto;
 }
 </style>

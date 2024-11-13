@@ -1,5 +1,5 @@
 ﻿import { User } from '../models/user-model.js';
-import { hash } from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 export const checkAdminPresence = async () => {
   try {
@@ -7,7 +7,7 @@ export const checkAdminPresence = async () => {
     if (admin) return;
 
     console.log('Starting admin creation...');
-    const hashedPwd = await hash(process.env.SERVICE_ADMIN_PASSWORD, 10);
+    const hashedPwd = await bcrypt.hash(process.env.SERVICE_ADMIN_PASSWORD, 10);
     const user = new User({
       username: process.env.SERVICE_ADMIN_LOGIN,
       password: hashedPwd,

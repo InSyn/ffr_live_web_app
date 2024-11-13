@@ -1,7 +1,8 @@
 ﻿<script>
-import CompetitionListItem from '@/pages/events/calendar-page/competition-list-item.vue';
+import CompetitionListItem from '@/pages/events/competition-list-item.vue';
 import axios from 'axios';
-import { databaseUrl } from '@/store/constants';
+import { apiUrl } from '@/constants';
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'events-with-registration-list',
@@ -11,10 +12,28 @@ export default {
       events: [],
     };
   },
+  computed: {
+    ...mapGetters('authorization', {
+      userData: 'getUserData',
+    }),
+    getFilteredEvents() {
+      const role = this.userData.role;
+      if (role === 'regional_organization') {
+        return this.events.filter((event) => event.allow_registration_by_organization);
+      }
+      if (role === 'trainer') {
+        return this.events.filter((event) => event.allow_registration_by_trainer);
+      }
+      if (role === 'admin') {
+        return this.events;
+      }
+      return [];
+    },
+  },
   methods: {
     async loadEventsWithRegistration() {
       try {
-        const response = await axios.get(databaseUrl + '/events/opened-registration');
+        const response = await axios.get(apiUrl + '/events/opened-registration');
         if (response.status === 200) {
           this.events = response.data.events;
         }
@@ -37,11 +56,11 @@ export default {
     <div class="eventsWithRegistration__list">
       <router-link
         :class="['eventsWithRegistration__list__item', idx % 2 === 0 && 'even']"
-        v-for="(event, idx) in events"
-        :key="event._id"
-        :to="{ name: 'eventOnlineRegistrationApplication', params: { event_id: event.event_id } }"
+        v-for="(eventReg, idx) in getFilteredEvents"
+        :key="eventReg._id"
+        :to="{ name: 'eventOnlineRegistrationApplication', params: { event_id: eventReg.event_id } }"
       >
-        <competition-list-item :event="event"></competition-list-item>
+        <competition-list-item :event="eventReg"></competition-list-item>
       </router-link>
     </div>
   </div>
@@ -53,7 +72,7 @@ export default {
   overflow-y: auto;
   background-color: var(--background--card);
   box-shadow: var(--container-shadow-m);
-  border: var(--border-container);
+  border: 1px solid var(--border-container);
   border-radius: 4px;
 
   .eventsWithRegistration__list {

@@ -5,20 +5,21 @@
     <div class="eventsList__wrapper">
       <calendar-carousel @set-calendar-date="setCalendarDate" :calendar-date-prop="calendarDate" :events="eventsList"></calendar-carousel>
 
-      <router-link
-        v-for="(event, idx) in getFilteredEvents"
-        :key="event._id"
-        :to="{
-          name: 'eventPage',
-          params: { event_id: event['event_id'] },
-        }"
-      >
-        <competition-list-item :event="event" :index="idx" :date-match="matchEventDate(event['start_at'])"></competition-list-item
-      ></router-link>
-
       <span class="emptySearchResults" v-if="getFilteredEvents.length === 0 && !loading"> События не найдены </span>
-
       <loader-spinner v-if="loading" class="loading__spinner"></loader-spinner>
+
+      <div class="eventsList__list">
+        <router-link
+          v-for="(event, idx) in getFilteredEvents"
+          :key="event._id"
+          :to="{
+            name: 'eventPage',
+            params: { event_id: event['event_id'] },
+          }"
+        >
+          <competition-list-item :event="event" :index="idx" :date-match="matchEventDate(event['start_at'])"></competition-list-item
+        ></router-link>
+      </div>
     </div>
   </div>
 </template>
@@ -28,10 +29,10 @@ import axios from 'axios';
 import { mapActions, mapGetters } from 'vuex';
 import Search from '@/components/ui-components/search/index.vue';
 import LoaderSpinner from '@/components/ui-components/loader-spinner.vue';
-import { databaseUrl, uploadsFolderUrl } from '@/store/constants';
+import { apiUrl, backendRootUrl } from '@/constants';
 import { mdiImage } from '@mdi/js';
 import CalendarCarousel from '@/components/ui-components/calendar-carousel.vue';
-import CompetitionListItem from '@/pages/events/calendar-page/competition-list-item.vue';
+import CompetitionListItem from '@/pages/events/competition-list-item.vue';
 
 export default {
   name: 'calendarPage',
@@ -51,7 +52,7 @@ export default {
       eventsList: 'getEvents',
     }),
     uploadsFolderUrl() {
-      return uploadsFolderUrl;
+      return backendRootUrl;
     },
 
     getFilteredEvents() {
@@ -69,8 +70,7 @@ export default {
   },
   methods: {
     ...mapActions('events', {
-      fetchEvents: 'LOAD_EVENTS',
-      setEvents: 'SET_EVENTS',
+      fetchEvents: 'SET_EVENTS',
     }),
     setCalendarDate(date) {
       this.calendarDate = date;
@@ -94,8 +94,9 @@ export default {
       this.setLoadingState(true);
 
       try {
-        const response = await axios.get(databaseUrl + '/events/date-search/' + date);
+        const response = await axios.get(apiUrl + '/events/date-search/' + date);
         if (response.status === 200) {
+          console.log(response.data);
           this.searchResults = [...response.data.events];
           this.setLoadingState(false);
         }
@@ -143,6 +144,7 @@ export default {
   flex: 1 1 0;
   display: flex;
   flex-wrap: nowrap;
+  height: 100%;
   width: 100%;
   max-width: var(--desktop-small);
   margin: 0 auto;
@@ -153,12 +155,18 @@ export default {
   flex: 1 1 0;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
+
   background-color: var(--background--card);
   box-shadow: var(--container-shadow-l);
   border: 1px solid var(--border-container);
   border-radius: 4px;
 
+  .eventsList__list {
+    flex: 1 1 200px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
   .emptySearchResults {
     align-self: center;
     display: inline-block;

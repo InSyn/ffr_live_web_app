@@ -14,9 +14,9 @@
 
 <script>
 import MessageContainer from '@/components/ui-components/message-container.vue';
-import { mapGetters } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 import axios from 'axios';
-import { databaseUrl } from '@/store/constants';
+import { apiUrl } from '@/constants';
 import OrganizationForm from '@/pages/admin-pages/organizations/form-organization.vue';
 
 export default {
@@ -52,9 +52,13 @@ export default {
     }),
   },
   methods: {
+    ...mapActions('organizations', {
+      fetchOrganizations: 'LOAD_ORGANIZATIONS',
+    }),
+
     async loadOrganizationData() {
       try {
-        const response = await axios.get(`${databaseUrl}/organizations/${this.org_id}`);
+        const response = await axios.get(`${apiUrl}/organizations/${this.org_id}`);
         if (response.status === 200) {
           const organizationData = response.data.organization;
           Object.keys(this.organization).forEach((key) => {
@@ -89,7 +93,7 @@ export default {
       }
 
       try {
-        const response = await axios.patch(`${databaseUrl}/organizations/${this.org_id}`, formData, {
+        const response = await axios.patch(`${apiUrl}/organizations/${this.org_id}`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
             authorization: `Bearer ${this.userData.token}`,
@@ -98,15 +102,12 @@ export default {
 
         if (response.status === 200) {
           this.messages.push('Информация о судье успешно обновлена');
+          await this.fetchOrganizations();
 
           setTimeout(() => {
-            if (this.$route.name === 'editOrganizationPage') {
-              this.$router.push({
-                name: 'organizationPage',
-                params: { org_id: this.org_id },
-              });
-            }
-          }, 2000);
+            if (this.$route.name === 'editOrganizationPage')
+              this.$router.push({ name: 'organizationPage', params: { org_id: response.data.organization.org_id } });
+          }, 1280);
         }
       } catch (err) {
         if (err) {
@@ -116,22 +117,18 @@ export default {
     },
     async deleteOrganization() {
       try {
-        const response = await axios.delete(`${databaseUrl}/organizations/${this.org_id}`, {
+        const response = await axios.delete(`${apiUrl}/organizations/${this.org_id}`, {
           headers: {
             authorization: `Bearer ${this.userData.token}`,
           },
         });
         if (response.data.status === 'success') {
           this.messages.push('Организация была успешно удалёна');
+          await this.fetchOrganizations();
 
           setTimeout(() => {
-            if (this.$route.name === 'editOrganizationPage') {
-              this.$router.push({
-                name: 'organizationPage',
-                params: { org_id: this.org_id },
-              });
-            }
-          }, 2000);
+            if (this.$route.name === 'editOrganizationPage') this.$router.push({ name: 'organizationsPage' });
+          }, 1280);
         }
       } catch (e) {
         console.error('Не удалось удалить организацию:', e);
@@ -152,5 +149,6 @@ export default {
   display: flex;
   flex-direction: column;
   padding: 2rem;
+  overflow-y: auto;
 }
 </style>

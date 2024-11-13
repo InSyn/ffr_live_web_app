@@ -14,13 +14,9 @@
             </div>
             <div class="athleteMainInfo__wrapper">
               <div class="athleteMainInfo__header">
-                <div class="athleteFederation__wrapper" v-if="athlete['sport'] && athlete['sport'].toLowerCase() === 'фристайл'">
+                <div class="athleteFederation__wrapper">
                   <img class="athleteFederation__logo" src="../../../assets/logo/FFR_logo_mini.png" alt="FFR_logo" />
                   <span>Федерация фристайла России</span>
-                </div>
-                <div class="athleteFederation__wrapper" v-else-if="athlete['sport'] && athlete['sport'].toLowerCase() === 'сноуборд'">
-                  <img class="athleteFederation__logo" src="../../../assets/logo/FSR_logo_mini.png" alt="FSR_logo" />
-                  <span>Федерация сноуборда России</span>
                 </div>
 
                 <div class="athleteSport">
@@ -184,7 +180,7 @@
 
 <script>
 import axios from 'axios';
-import { databaseUrl, uploadsFolderUrl } from '@/store/constants';
+import { apiUrl, backendRootUrl } from '@/constants';
 import { mdiImage } from '@mdi/js';
 import AthletePhotoFillerIcon from '@/assets/svg/athletePhotoFiller-icon.vue';
 import CountryFlag from '@/components/ui-components/country-flag.vue';
@@ -230,7 +226,7 @@ export default {
     getRegionCode,
     async getAthleteById(id) {
       try {
-        const data = await axios.get(databaseUrl + '/athletes/' + id);
+        const data = await axios.get(apiUrl + '/athletes/' + id);
         if (data.status === 200) {
           const eventData = data.data.data;
           if (eventData) this.athlete = { ...eventData };
@@ -247,7 +243,7 @@ export default {
     },
     async getAthleteCompetitions() {
       try {
-        const response = await axios.get(databaseUrl + `/athletes/${this.athlete_code}/competitions`);
+        const response = await axios.get(apiUrl + `/athletes/${this.athlete_code}/competitions`);
         if (response.status === 200) {
           this.athleteCompetitions = response.data.events;
         }
@@ -259,7 +255,7 @@ export default {
     },
 
     uploadsFolderUrl() {
-      return uploadsFolderUrl;
+      return backendRootUrl;
     },
   },
   mounted() {

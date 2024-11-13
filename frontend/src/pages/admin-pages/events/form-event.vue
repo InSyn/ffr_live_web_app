@@ -68,42 +68,28 @@
           </select>
         </div>
 
-        <select
+        <country-select-control
           v-else-if="field_key === 'country'"
-          @change="setFieldValue(event, 'country', $event.target.value)"
-          :id="field_key"
-          class="formControl"
           :value="event[field_key]"
-        >
-          <option v-for="country in countries" :key="country.country_code" class="formControl-option">
-            {{ country.country_name }}
-          </option>
-        </select>
-        <div class="select__wrapper" v-else-if="field_key === 'region'">
-          <input
-            v-if="getCountryCode(event['country']) !== 'RU'"
-            v-model="event[field_key]"
-            :id="field_key"
-            :name="field_key"
-            :type="getInputType(field_key)"
-            class="formControl"
-          />
-          <div v-else class="formControl__wrapper">
-            <select @change="setFieldValue(event, 'region', $event.target.value)" :id="field_key" class="formControl" :value="event[field_key]">
-              <option selected disabled value="">Выберите регион</option>
-              <option v-for="region in getSortedRegions()" :key="region.code">
-                {{ region.fullname }}
-              </option>
-            </select>
-          </div>
-        </div>
+          @input="setFieldValue(event, 'country', $event)"
+        ></country-select-control>
+        <region-select-control
+          v-else-if="field_key === 'region'"
+          :value="event[field_key]"
+          :country="event['country']"
+          @input="setFieldValue(event, 'region', $event)"
+        ></region-select-control>
 
         <documents-select-control
           v-else-if="field_key === 'documents'"
           @update:documents="updateDocuments"
           :initial-documents="event.documents"
         ></documents-select-control>
-
+        <custom-checkbox
+          v-else-if="field_key === 'international' || field_key === 'is_public'"
+          :value="event[field_key]"
+          @input="setFieldValue(event, field_key, $event)"
+        ></custom-checkbox>
         <input v-else v-model="event[field_key]" :id="field_key" class="formControl" :type="getInputType(field_key)" :name="field_key" />
       </div>
     </div>
@@ -119,20 +105,23 @@
 
 <script>
 import DocumentsSelectControl from '@/components/ui-components/custom-controls/documents-select-control.vue';
-import { uploadsFolderUrl } from '@/store/constants';
-import { getInputType } from '@/utils/get-input-type';
+import { backendRootUrl } from '@/constants';
+import { getInputType } from '@/utils/inputType-util';
 import { getDisciplines, sports } from '@/store/data/sports';
-import { setFieldValue } from '@/utils/form-data-helpers';
+import { setFieldValue } from '@/utils/formData-helpers';
 import { translateField } from '@/utils/formFields-translator';
 import { countries, getCountryCode } from '@/store/data/countries';
 import { getSortedRegions } from '@/store/data/russia-regions';
 import CompetitionImageFillerIcon from '@/assets/svg/competitionImageFiller-icon.vue';
 import { capitalizeString } from '@/utils/capitalizeString';
 import { mdiArrowRight } from '@mdi/js';
+import CustomCheckbox from '@/components/ui-components/custom-checkbox.vue';
+import CountrySelectControl from '@/components/ui-components/custom-controls/country-select-control.vue';
+import RegionSelectControl from '@/components/ui-components/custom-controls/region-select-control.vue';
 
 export default {
   name: 'event-form',
-  components: { CompetitionImageFillerIcon, DocumentsSelectControl },
+  components: { RegionSelectControl, CountrySelectControl, CustomCheckbox, CompetitionImageFillerIcon, DocumentsSelectControl },
   props: {
     event: Object,
     eventImages: Object,
@@ -179,7 +168,7 @@ export default {
         };
         reader.readAsDataURL(this.selectedFile[imageType]);
       } else if (sourceType === 'url') {
-        this.$set(this.imagePreview, imageType, uploadsFolderUrl + this.eventImages[imageType]);
+        this.$set(this.imagePreview, imageType, backendRootUrl + this.eventImages[imageType]);
       }
     },
     updateDocuments(documents) {
@@ -435,6 +424,7 @@ form {
   .formActions {
     display: flex;
     justify-content: flex-end;
+    gap: 1.25rem;
     margin-top: 1.75rem;
 
     .actionButton {

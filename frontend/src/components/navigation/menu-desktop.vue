@@ -55,7 +55,6 @@ export default {
     &:hover {
       color: var(--text-contrast-hovered);
     }
-
     &::after {
       position: absolute;
       content: '';
@@ -67,7 +66,6 @@ export default {
       background: var(--ffr-brand);
       transition: width 92ms ease-out;
     }
-
     /*noinspection CssUnusedSymbol*/
     &.isActive::after {
       width: 100%;
@@ -76,6 +74,9 @@ export default {
 
   @media screen and (max-width: 1200px) {
     padding-left: 280px;
+  }
+  @media screen and (max-width: 1000px) {
+    padding-left: 232px;
   }
   @media screen and (max-width: 920px) {
     display: none;

@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import { uploadsFolderUrl } from '@/store/constants';
+import { backendRootUrl } from '@/constants';
 import { mdiAccount } from '@mdi/js';
 import CountryFlag from '@/components/ui-components/country-flag.vue';
 import Search from '@/components/ui-components/search/index.vue';
@@ -92,7 +92,7 @@ export default {
       trainersList: 'getTrainers',
     }),
     uploadsFolderUrl() {
-      return uploadsFolderUrl;
+      return backendRootUrl;
     },
     getTrainersList() {
       return this.searchResults === null ? this.trainersList : this.searchResults;
@@ -140,8 +140,9 @@ export default {
   flex: 1 1 0;
   display: flex;
   flex-wrap: nowrap;
-  max-width: var(--desktop-small);
+  height: 100%;
   width: 100%;
+  max-width: var(--desktop-small);
   margin: 0 auto;
   padding: var(--padd-page);
 

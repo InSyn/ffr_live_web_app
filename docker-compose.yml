@@ -16,9 +16,7 @@ services:
       - DB=$DB
     ports:
       - "8081:8080"
-      #- "8082:443"
     volumes:
-      #- /etc/letsencrypt:/etc/letsencrypt
       - ./backend/uploads:/home/ffr_live_back/uploads
     links:
       - live_db

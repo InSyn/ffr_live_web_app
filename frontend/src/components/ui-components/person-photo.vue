@@ -45,7 +45,7 @@
 <script>
 import CountryFlag from '@/components/ui-components/country-flag.vue';
 import AthletePhotoFillerIcon from '@/assets/svg/athletePhotoFiller-icon.vue';
-import { uploadsFolderUrl } from '@/store/constants';
+import { backendRootUrl } from '@/constants';
 import { getRegionCode } from '@/store/data/russia-regions';
 import { getCountryCode } from '@/store/data/countries';
 
@@ -60,7 +60,7 @@ export default {
   components: { AthletePhotoFillerIcon, CountryFlag },
   computed: {
     uploadsFolderUrl() {
-      return uploadsFolderUrl;
+      return backendRootUrl;
     },
   },
 };

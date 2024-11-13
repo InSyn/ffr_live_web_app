@@ -5,6 +5,9 @@
     <div class="seminars__list__wrapper">
       <calendar-carousel @set-calendar-date="setCalendarDate" :calendar-date-prop="calendarDate" :events="seminarsList"></calendar-carousel>
 
+      <span class="emptySearchResults" v-if="getSeminarsList.length === 0 && !loading"> Семинары не найдены </span>
+      <loader-spinner v-if="loading" class="loading__spinner"></loader-spinner>
+
       <div class="seminars__list">
         <router-link v-for="(seminar, idx) in getSeminarsList" :key="seminar._id" :to="{ name: 'seminarPage', params: { seminar_id: seminar._id } }">
           <div :class="['seminar__item__wrapper', idx % 2 === 0 && 'isEven', matchCalendarDate(seminar.date) && 'calendarDate-match']">
@@ -33,10 +36,6 @@
             </div>
           </div>
         </router-link>
-
-        <span class="emptySearchResults" v-if="getSeminarsList.length === 0 && !loading"> Семинары не найдены </span>
-
-        <loader-spinner v-if="loading" class="loading__spinner"></loader-spinner>
       </div>
     </div>
   </div>
@@ -53,7 +52,7 @@ import { mapActions, mapGetters } from 'vuex';
 import LoaderSpinner from '@/components/ui-components/loader-spinner.vue';
 import CalendarCarousel from '@/components/ui-components/calendar-carousel.vue';
 import axios from 'axios';
-import { databaseUrl } from '@/store/constants';
+import { apiUrl } from '@/constants';
 
 export default {
   name: 'seminarsPage',
@@ -105,7 +104,7 @@ export default {
       this.setLoadingState(true);
 
       try {
-        const response = await axios.get(databaseUrl + '/seminars/date-search/' + date);
+        const response = await axios.get(apiUrl + '/seminars/date-search/' + date);
         if (response.status === 200) {
           this.searchResults = [...response.data.seminars];
           this.setLoadingState(false);
@@ -149,8 +148,9 @@ export default {
   flex: 1 1 0;
   display: flex;
   flex-wrap: nowrap;
-  max-width: var(--desktop-small);
+  height: 100%;
   width: 100%;
+  max-width: var(--desktop-small);
   margin: 0 auto;
   padding: var(--padd-page);
 
@@ -158,8 +158,6 @@ export default {
     flex: 1 1 0;
     display: flex;
     flex-direction: column;
-    max-height: 100%;
-    overflow-y: auto;
 
     background-color: var(--background--card);
     box-shadow: var(--container-shadow-l);
@@ -167,9 +165,10 @@ export default {
     border-radius: 4px;
 
     .seminars__list {
-      flex: 0 0 auto;
+      flex: 1 1 200px;
       display: flex;
       flex-direction: column;
+      overflow-y: auto;
 
       .seminar__item__wrapper {
         display: flex;

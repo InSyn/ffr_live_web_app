@@ -205,7 +205,7 @@ export default {
     navigateToAthletePage(athlete_code) {
       if (!athlete_code) return;
 
-      this.$router.push(`/athlete_info/${athlete_code}`);
+      this.$router.push(`/athlete-info/${athlete_code}`);
     },
   },
   data() {

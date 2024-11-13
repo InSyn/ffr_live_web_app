@@ -1,6 +1,6 @@
 ﻿<script>
 import { mapActions, mapGetters } from 'vuex';
-import { databaseUrl, uploadsFolderUrl } from '@/store/constants';
+import { apiUrl, backendRootUrl } from '@/constants';
 import { formatDate } from '@/utils/data-formaters';
 import CountryFlag from '@/components/ui-components/country-flag.vue';
 import { getRegionCode } from '@/store/data/russia-regions';
@@ -21,7 +21,7 @@ export default {
       userData: 'getUserData',
     }),
     uploadsFolderUrl() {
-      return uploadsFolderUrl;
+      return backendRootUrl;
     },
     getAvailableAthletes() {
       return this.regionAthletes.filter((athlete) => {
@@ -69,7 +69,7 @@ export default {
     },
     async getRegionAthletes() {
       try {
-        const response = await axios.get(`${databaseUrl}/athletes`);
+        const response = await axios.get(`${apiUrl}/athletes`);
 
         if (response.status === 200) {
           this.regionAthletes = response.data['athletes'];
@@ -110,7 +110,7 @@ export default {
         athletes_groups: this.event.athletes_groups,
       };
       try {
-        const response = await axios.post(`${databaseUrl}/event-online-registration`, registrationData, {
+        const response = await axios.post(`${apiUrl}/event-online-registration`, registrationData, {
           headers: {
             'Content-Type': 'application/json',
             authorization: `Bearer ${this.userData.token}`,
