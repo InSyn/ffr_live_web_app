@@ -1,6 +1,7 @@
 <template>
   <div class="eventsPage__wrapper">
-    <search @search-loading="setLoadingState" @search-results-loaded="showSearchResults" mode="events"></search>
+    <search mode="events" @search-loading="setLoadingState" @search-results-loaded="showSearchResults"></search>
+    <search-mobile mode="events" @search-loading="setLoadingState" @search-results-loaded="showSearchResults"> </search-mobile>
 
     <div class="eventsList__wrapper">
       <calendar-carousel @set-calendar-date="setCalendarDate" :calendar-date-prop="calendarDate" :events="eventsList"></calendar-carousel>
@@ -33,6 +34,7 @@ import { apiUrl, backendRootUrl } from '@/constants';
 import { mdiImage } from '@mdi/js';
 import CalendarCarousel from '@/components/ui-components/calendar-carousel.vue';
 import CompetitionListItem from '@/pages/events/competition-list-item.vue';
+import SearchMobile from '@/components/ui-components/search/search-mobile.vue';
 
 export default {
   name: 'calendarPage',
@@ -96,7 +98,6 @@ export default {
       try {
         const response = await axios.get(apiUrl + '/events/date-search/' + date);
         if (response.status === 200) {
-          console.log(response.data);
           this.searchResults = [...response.data.events];
           this.setLoadingState(false);
         }
@@ -123,6 +124,7 @@ export default {
     },
   },
   components: {
+    SearchMobile,
     CompetitionListItem,
     CalendarCarousel,
     LoaderSpinner,

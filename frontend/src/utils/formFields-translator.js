@@ -4,7 +4,7 @@ const translationMap = new Map([
   ['jury', 'Судья'],
   ['trainer', 'Тренер'],
   ['regional_organization', 'Организация'],
-  ['admin', 'Админ'],
+  ['admin', 'Администратор'],
   //----------------------//
 
   //----Поля событий----//
@@ -30,7 +30,7 @@ const translationMap = new Map([
   //-------------------------------------//
 
   //        Поля ID        //
-  ['rus_code', 'FFR-ID'],
+  ['ffr_id', 'FFR-ID'],
   ['jury_code', 'FFR-ID'],
   ['trainer_id', 'FFR-ID'],
   //                    //

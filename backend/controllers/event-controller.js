@@ -340,14 +340,3 @@ export const deleteEvent = async (req, res) => {
     });
   }
 };
-
-// const setDefaultEventAccessSettings = (event) => {
-//   return {
-//     ...event,
-//     registration_status: false,
-//     allow_registration_by_trainer: true,
-//     allow_registration_by_organization: true,
-//     allowed_secretaries: [],
-//     athletes_groups: [],
-//   };
-// };

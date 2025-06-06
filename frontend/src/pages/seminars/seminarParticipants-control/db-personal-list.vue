@@ -15,7 +15,7 @@
           <span v-if="personalType === 'athletes' || personalType === 'jury'">{{ `${person.lastname ? person.lastname : ''} ${person.name}` }}</span>
           <span v-else>{{ `${person.fullname}` }}</span>
           <span>
-            {{ person.jury_code || person.trainer_id || person.rus_code }}
+            {{ person.jury_code || person.trainer_id || person.ffr_id }}
           </span>
         </div>
         <div class="dbPerson__item__menu">
@@ -64,7 +64,7 @@ export default {
         case 'athletes':
           return this.personal.filter((person) => {
             return (
-              person.lastname.toLowerCase().includes(searchText) || person.name.toLowerCase().includes(searchText) || person.rus_code.includes(this.searchText)
+              person.lastname.toLowerCase().includes(searchText) || person.name.toLowerCase().includes(searchText) || person.ffr_id.includes(this.searchText)
             );
           });
         default:

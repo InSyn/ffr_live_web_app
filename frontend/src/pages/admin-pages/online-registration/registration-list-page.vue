@@ -55,15 +55,15 @@ export default {
   flex: 1 1 0;
   display: flex;
   max-width: var(--desktop-small);
-  width: 100%;
   margin: 0 auto;
   padding: var(--padd-page);
 
   .registrationList__wrapper {
-    flex: 1 1 300px;
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0;
 
-    max-width: var(--tablet-default);
+    max-width: var(--desktop-small);
     width: 100%;
     margin: 0 auto;
 
@@ -80,8 +80,10 @@ export default {
       border-bottom: 1px solid var(--border-container);
     }
     .registrationList__list {
+      flex: 1 1 300px;
       display: flex;
       flex-direction: column;
+      overflow-y: auto;
 
       .registrationList__list__item {
         flex: 0 0 auto;

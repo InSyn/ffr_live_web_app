@@ -9,13 +9,14 @@ import LoaderSpinner from '@/components/ui-components/loader-spinner.vue';
 import axios from 'axios';
 import { exportRegistrationApplicationAthletesToExcel } from '@/utils/excelData-saver';
 import { mdiDownload } from '@mdi/js';
+import FileIcon from '@/components/icons/file-icon.vue';
 
 export default {
   name: 'event-online-registration',
   props: {
     event_id: String,
   },
-  components: { LoaderSpinner, CountryFlag },
+  components: { FileIcon, LoaderSpinner, CountryFlag },
   data() {
     return {
       event: null,
@@ -29,8 +30,14 @@ export default {
     };
   },
   computed: {
+    backendRootUrl() {
+      return backendRootUrl;
+    },
     uploadsFolderUrl() {
       return backendRootUrl;
+    },
+    getRegisteredApplications() {
+      return this.registeredEventApplications.filter(Boolean);
     },
   },
   methods: {
@@ -45,7 +52,6 @@ export default {
       this.loading = true;
       try {
         const eventData = await this.loadEvent(this.event_id);
-
         if (eventData) {
           this.event = eventData;
 
@@ -82,7 +88,7 @@ export default {
       this.selectedApplication = application;
     },
     getApplicationAthletes(application, group) {
-      return application.athletes.filter((athlete) => athlete.group === group).map((athlete) => athlete.athlete);
+      return application.athletes.filter((athlete) => !!athlete && athlete.group === group).map((athlete) => athlete.athlete || {});
     },
   },
 
@@ -147,7 +153,7 @@ export default {
           <h4 class="registeredApplications__title">Зарегистрированные заявки</h4>
           <div class="registeredApplications__body">
             <div class="registeredApplications__list">
-              <div class="registeredApplications__list__item" v-for="application in registeredEventApplications" :key="application._id">
+              <div class="registeredApplications__list__item" v-for="application in getRegisteredApplications" :key="application._id">
                 <div class="registeredApplications__list__item__info">
                   <span> {{ application.creator_username }}</span
                   ><span> {{ formatDate(application.created_at, { full: true }) }}</span>
@@ -177,20 +183,33 @@ export default {
             <div class="registrationInfo__application__date">{{ formatDate(selectedApplication.created_at, { full: true }) }}</div>
           </div>
         </div>
-        <div class="registrationInfo__application__documents"></div>
         <div class="registrationInfo__application__athletesGroups">
           <div class="registrationInfo__application__athletesGroups__item" v-for="group in event.athletes_groups" :key="group">
             <div class="registrationInfo__application__athletesGroups__item__title">Группа: {{ group }} {{ getRegisteredAthletesCount(group) }}</div>
-            <div class="registrationInfo__application__athletesGroups__item__athletes">
-              <div
+            <ol class="registrationInfo__application__athletesGroups__item__athletes">
+              <li
                 class="registrationInfo__application__athletesGroups__item__athletes__item"
                 v-for="athlete in getApplicationAthletes(selectedApplication, group)"
                 :key="athlete._id"
               >
                 <span>{{ `${athlete.lastname} ${athlete.name}` }}</span>
-                <span>{{ ` - ${athlete.rus_code}` }}</span>
-              </div>
-            </div>
+                <span>{{ ` - ${athlete.ffr_id}` }}</span>
+              </li>
+            </ol>
+          </div>
+        </div>
+        <div class="registrationInfo__application__documents">
+          <div class="registrationInfo__application__documents__title">Документы</div>
+          <div class="registrationInfo__application__documents__list">
+            <a
+              class="registrationInfo__application__documents__list__item"
+              v-for="document in selectedApplication.documents.filter(Boolean)"
+              :key="document._id"
+              :href="backendRootUrl + `${document.file.url}`"
+            >
+              <file-icon class="document__icon"></file-icon>
+              {{ document.title }}
+            </a>
           </div>
         </div>
       </div>
@@ -230,8 +249,7 @@ export default {
       display: flex;
       flex-wrap: nowrap;
       gap: 0 1.25rem;
-      margin-bottom: 1.25rem;
-      padding: 0.25rem;
+      padding: 0.75rem 0.25rem;
 
       .eventImage__wrapper {
         display: flex;
@@ -414,6 +432,33 @@ export default {
         }
       }
       .registrationInfo__application__documents {
+        padding: 0.5rem;
+
+        .registrationInfo__application__documents__title {
+          margin-bottom: 0.5rem;
+        }
+        .registrationInfo__application__documents__list {
+          display: flex;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 0.25rem 0.75rem;
+
+          .registrationInfo__application__documents__list__item {
+            flex: 0 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            text-decoration: underline;
+
+            .document__icon {
+              height: 1rem;
+              color: var(--accent);
+            }
+            &:hover {
+              text-decoration: none;
+            }
+          }
+        }
       }
       .registrationInfo__application__athletesGroups {
         .registrationInfo__application__athletesGroups__item {

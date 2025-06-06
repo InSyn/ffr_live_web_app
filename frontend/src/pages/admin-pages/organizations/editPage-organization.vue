@@ -106,7 +106,7 @@ export default {
 
           setTimeout(() => {
             if (this.$route.name === 'editOrganizationPage')
-              this.$router.push({ name: 'organizationPage', params: { org_id: response.data.organization.org_id } });
+              this.$router.push({ name: 'organizationPage', params: { org_id: response.data.organization._id } });
           }, 1280);
         }
       } catch (err) {

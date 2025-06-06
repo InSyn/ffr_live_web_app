@@ -1,0 +1,475 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# OPERATIONAL GUIDE
+*FFR Live Sports Platform - Day-to-Day Development Operations*
+
+## 🚀 Development Environment Setup
+
+### Prerequisites
+```bash
+# Required Software
+- Node.js 16+ (LTS recommended)
+- MongoDB 5.0+
+- Docker & Docker Compose
+- Git
+- VS Code or preferred IDE
+```
+
+### Quick Start Commands
+```bash
+# Clone and setup
+git clone <repository-url>
+cd ffr_live_web_app
+
+# Backend setup
+cd backend
+npm install
+cp .env.example .env  # Configure environment variables
+
+# Frontend setup
+cd ../frontend
+npm install
+
+# Docker development
+docker-compose up -d live_db  # Start MongoDB only
+npm run dev:backend          # Backend dev server
+npm run dev:frontend         # Frontend dev server
+
+# Full Docker environment
+docker-compose up            # All services
+```
+
+### Environment Configuration
+```bash
+# .env file (backend)
+DB_USER=admin
+DB_PWD=password123
+DB_HOSTNAME=localhost
+DB_PORT=27017
+DB=ffr_live_db
+JWTS=your-jwt-secret-key-here
+NODE_ENV=development
+PORT=8080
+```
+
+## 🔄 Development Workflow
+
+### Multi-Agent Collaboration Pattern
+
+#### 1. Feature Development Cycle
+```
+Planning → Backend Agent → Frontend Agent → QA Agent → Integration → Review
+```
+
+#### 2. Agent Communication Protocol
+```markdown
+## Backend Agent Request
+As the Backend Agent, implement user authentication endpoint ensuring JWT security and role validation.
+
+Context:
+- Current issue: Need secure login endpoint
+- Expected behavior: Return JWT token with user role
+- Business rules: Support admin, secretary, jury roles
+- Technical constraints: Use bcryptjs for hashing
+
+## Frontend Agent Request  
+As the Frontend Agent, create login form component focusing on UX and validation.
+
+Context:
+- Backend endpoint: POST /api/v1/auth/login
+- User workflow: Simple login with username/password
+- Design requirements: Vuetify components, error handling
+- Validation: Required fields, proper feedback
+
+## QA Agent Request
+As the QA Agent, create comprehensive test scenarios for authentication ensuring security validation.
+
+Context:
+- Components: Login endpoint and form
+- Test scenarios: Valid/invalid credentials, role verification
+- Security: JWT validation, password protection
+- Performance: Response time under 200ms
+```
+
+### Git Workflow
+```bash
+# Feature branch workflow
+git checkout main
+git pull origin main
+git checkout -b feature/user-authentication
+
+# Development commits
+git add .
+git commit -m "feat(auth): implement JWT authentication endpoint"
+git commit -m "feat(frontend): add login form component"
+git commit -m "test(auth): add authentication test scenarios"
+
+# Push and create PR
+git push origin feature/user-authentication
+# Create Pull Request on GitHub/GitLab
+```
+
+### Code Review Checklist
+```markdown
+## Backend Code Review
+- [ ] JWT implementation secure
+- [ ] Input validation present
+- [ ] Error handling comprehensive
+- [ ] Database queries optimized
+- [ ] Authentication middleware correct
+- [ ] File uploads handled safely
+
+## Frontend Code Review
+- [ ] Component structure follows Vue 2 patterns
+- [ ] Vuetify components used correctly
+- [ ] CSS custom properties used
+- [ ] Responsive design implemented
+- [ ] Accessibility considerations met
+- [ ] State management proper (Vuex)
+
+## QA Review
+- [ ] Test coverage comprehensive
+- [ ] Edge cases identified
+- [ ] Performance benchmarks met
+- [ ] Security scenarios tested
+- [ ] Error handling validated
+- [ ] Documentation complete
+```
+
+## 📊 Project Health Monitoring
+
+### Daily Checks
+```bash
+# Backend health
+curl http://localhost:8081/api/v1/health
+# Expected: {"status": "ok", "database": "connected"}
+
+# Frontend build
+npm run build
+# Expected: No build errors, warnings acceptable
+
+# Database connection
+mongo mongodb://admin:password@localhost:27017/ffr_live_db
+# Expected: Successful connection
+
+# Docker status
+docker-compose ps
+# Expected: All services running
+```
+
+### Performance Metrics
+```javascript
+// API Response Times (Target < 200ms)
+GET /api/v1/events        // List events
+GET /api/v1/athletes      // List athletes  
+POST /api/v1/auth/login   // Authentication
+GET /api/v1/events/:id    // Single event
+
+// Database Query Performance
+Events.find().limit(20)   // < 50ms
+Athletes.aggregate()      // < 100ms
+User.findById()           // < 10ms
+```
+
+### Error Monitoring
+```bash
+# Backend logs
+tail -f backend/logs/error.log
+tail -f backend/logs/access.log
+
+# MongoDB logs
+docker logs ffr_live_db
+
+# Frontend build warnings
+npm run build 2>&1 | grep -i warning
+```
+
+## 🛠️ Common Development Tasks
+
+### Adding New Entity (Full Stack)
+
+#### 1. Backend Implementation
+```bash
+# Create model
+touch backend/models/new-entity-model.js
+
+# Create controller
+touch backend/controllers/new-entity-controller.js
+
+# Create routes
+touch backend/routes/new-entity-routes.js
+
+# Add to app.js
+echo "import { newEntityRouter } from './routes/new-entity-routes.js';" >> backend/app.js
+echo "app.use('/api/v1/new-entities', newEntityRouter);" >> backend/app.js
+```
+
+#### 2. Frontend Implementation
+```bash
+# Create Vuex module
+touch frontend/src/store/modules/new-entities.js
+
+# Create page component
+mkdir -p frontend/src/pages/new-entities
+touch frontend/src/pages/new-entities/index.vue
+
+# Add route
+# Edit frontend/src/router/index.js
+```
+
+#### 3. Testing
+```bash
+# Backend tests
+touch backend/tests/new-entity.test.js
+
+# Frontend tests  
+touch frontend/tests/unit/new-entity.spec.js
+
+# Integration tests
+touch tests/integration/new-entity-flow.test.js
+```
+
+### Database Operations
+
+#### Add Migration
+```javascript
+// backend/migrations/add-new-field.js
+db.events.updateMany(
+  {},
+  { $set: { new_field: null } }
+);
+```
+
+#### Backup Database
+```bash
+# Create backup
+docker exec ffr_live_db mongodump --db ffr_live_db --out /backup
+
+# Restore backup
+docker exec ffr_live_db mongorestore --db ffr_live_db /backup/ffr_live_db
+```
+
+### File Upload Setup
+```javascript
+// Add new upload field
+const multerFields = [
+  { name: 'existing_field', maxCount: 1 },
+  { name: 'new_field', maxCount: 1 }  // Add new field
+];
+
+// Update controller
+if (req.files.new_field) {
+  updateData.new_field = `/uploads/${req.files.new_field[0].filename}`;
+}
+```
+
+## 🚨 Troubleshooting Guide
+
+### Common Issues
+
+#### Backend Issues
+```bash
+# Port already in use
+lsof -ti:8080 | xargs kill -9
+
+# MongoDB connection failed
+docker-compose restart live_db
+# Check logs: docker logs ffr_live_db
+
+# JWT errors
+# Verify JWTS environment variable is set
+echo $JWTS
+
+# File upload errors
+# Check uploads directory permissions
+ls -la backend/uploads/
+chmod 755 backend/uploads/
+```
+
+#### Frontend Issues
+```bash
+# Build errors
+rm -rf node_modules package-lock.json
+npm install
+
+# Vuetify import errors
+# Check if vuetify plugin is properly imported
+grep -r "vuetify" frontend/src/plugins/
+
+# CSS custom properties not working
+# Verify CSS files are imported in App.vue
+grep -r "defaults.css" frontend/src/App.vue
+```
+
+#### Docker Issues
+```bash
+# Container won't start
+docker-compose down
+docker-compose up --build
+
+# Database data lost
+# Check if volume is properly mounted
+docker volume ls | grep ffr
+
+# Permission errors
+sudo chown -R $USER:$USER .
+```
+
+### Debug Commands
+```bash
+# Backend debugging
+NODE_ENV=development DEBUG=* npm start
+
+# Database queries
+mongo mongodb://admin:password@localhost:27017/ffr_live_db
+> db.events.find().limit(1).pretty()
+> db.users.countDocuments()
+
+# Frontend debugging
+npm run serve -- --port 8082
+# Open browser dev tools, check console
+```
+
+## 📈 Performance Optimization
+
+### Backend Optimizations
+```javascript
+// Database indexing
+db.events.createIndex({ "title": "text", "location": "text" })
+db.athletes.createIndex({ "ffr_id": 1 })
+db.events.createIndex({ "start_at": 1, "discipline": 1 })
+
+// Query optimization
+const events = await Event.find(query)
+  .select('title start_at location discipline') // Only needed fields
+  .limit(20)
+  .sort({ start_at: -1 })
+  .lean(); // Return plain objects, not Mongoose documents
+```
+
+### Frontend Optimizations
+```javascript
+// Lazy loading
+const LazyComponent = () => import('./HeavyComponent.vue');
+
+// Image optimization
+<v-img
+  :src="imageUrl"
+  :lazy-src="placeholder"
+  loading="lazy"
+  max-width="300"
+/>
+
+// Bundle analysis
+npm run build -- --analyze
+```
+
+## 🔒 Security Checklist
+
+### Backend Security
+- [ ] Input validation on all endpoints
+- [ ] SQL injection prevention (MongoDB injection)
+- [ ] XSS protection with proper sanitization
+- [ ] CORS configured correctly
+- [ ] Rate limiting implemented
+- [ ] File upload restrictions (size, type)
+- [ ] JWT token expiration set
+- [ ] Passwords properly hashed (bcryptjs)
+- [ ] Environment variables secured
+- [ ] HTTPS in production
+
+### Frontend Security
+- [ ] User input sanitized (DOMPurify)
+- [ ] No sensitive data in client-side code
+- [ ] JWT tokens stored securely
+- [ ] API endpoints use HTTPS
+- [ ] Form validation client & server-side
+- [ ] File uploads validated
+- [ ] Content Security Policy headers
+- [ ] No console.log in production
+
+## 📝 Documentation Standards
+
+### Code Documentation
+```javascript
+/**
+ * Retrieves events with pagination and filtering
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {string} req.query.search - Search term for events
+ * @param {number} req.query.page - Page number (default: 1)
+ * @param {number} req.query.limit - Items per page (default: 10)
+ * @returns {Object} Paginated events with metadata
+ */
+export const getAllEvents = async (req, res) => {
+  // Implementation
+};
+```
+
+### API Documentation
+```yaml
+# OpenAPI/Swagger format
+paths:
+  /api/v1/events:
+    get:
+      summary: Get all events
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  docs:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Event'
+```
+
+### Component Documentation
+```vue
+<template>
+  <!-- Event card component for displaying event information -->
+</template>
+
+<script>
+/**
+ * EventCard - Displays event information in card format
+ * @param {Object} event - Event object with title, date, location
+ * @param {Boolean} showActions - Whether to show action buttons
+ * @emits {String} edit - Emitted when edit button clicked
+ * @emits {String} delete - Emitted when delete button clicked
+ */
+export default {
+  name: 'EventCard',
+  props: {
+    event: {
+      type: Object,
+      required: true
+    },
+    showActions: {
+      type: Boolean,
+      default: false
+    }
+  }
+};
+</script>
+```
+
+---
+
+*This operational guide provides the practical framework for daily development work on the FFR Live platform. Follow these procedures to maintain code quality and team collaboration.*

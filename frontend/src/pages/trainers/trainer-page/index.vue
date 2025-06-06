@@ -109,7 +109,7 @@
         <div class="trainerTeam__header">Команда</div>
 
         <div class="trainerTeam__list">
-          <athlete-list-item v-for="(athlete, idx) in team" :key="athlete.rus_code" :athlete="athlete" :idx="idx"></athlete-list-item>
+          <athlete-list-item v-for="(athlete, idx) in team" :key="athlete.ffr_id" :athlete="athlete" :idx="idx"></athlete-list-item>
         </div>
       </div>
       <div v-if="bottomMenu === 'seminars'" class="trainerBottomSection__wrapper">
@@ -588,7 +588,7 @@ export default {
     flex-direction: column;
     max-width: var(--desktop-small);
     width: 100%;
-    margin: 2rem auto 1rem;
+    margin: 0.75rem auto 0.5rem;
     padding: 0 2rem;
 
     .trainerBottomSection__wrapper {

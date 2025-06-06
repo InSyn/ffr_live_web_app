@@ -404,11 +404,11 @@ export const countries = [
     country_code: 'TW',
   },
   {
-    country_name: 'КНДР (Корейская Народно-Демократическая Республика)',
+    country_name: 'КНДР',
     country_code: 'KP',
   },
   {
-    country_name: 'КНР (Китайская Народная Республика)',
+    country_name: 'КНР',
     country_code: 'CN',
   },
   {
@@ -1002,7 +1002,9 @@ export const countries = [
 ];
 
 export const getCountryCode = (countryName) => {
-  const country = countries.find((country) => country.country_name === countryName);
+  if (typeof countryName !== 'string') return '-';
+
+  const country = countries.find((country) => country.country_name.toLowerCase() === countryName.toLowerCase());
   if (!country) return '-';
 
   return country.country_code;

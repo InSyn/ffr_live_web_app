@@ -26,8 +26,9 @@ export const organizationsRoutes = [
   },
   {
     name: 'createReportPage',
-    path: 'create-organization-report',
+    path: 'create-organization-report/:orgId-:reportId?',
     component: createOrganizationReportPage,
+    props: true,
     meta: { requiresAuth: true },
   },
   {

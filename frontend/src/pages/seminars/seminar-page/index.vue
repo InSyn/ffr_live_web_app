@@ -41,7 +41,7 @@
         <div class="seminarFiles__wrapper">
           <div class="seminarFiles__title">Документы:</div>
           <div v-for="(document, idx) in seminar.documents" :key="idx" class="seminarFile__item">
-            <a v-if="document?.file?.url" :href="`${uploadsFolderUrl}${document.file.url}`" target="_blank" class="seminarFile__item__link">
+            <a v-if="document?.file?.url" :href="uploadsFolderUrl + document.file.url" target="_blank" class="seminarFile__item__link">
               <file-icon class="seminarFile__item__icon"></file-icon>
               {{ document.title }}
             </a>
@@ -54,7 +54,7 @@
           </div>
         </div>
       </div>
-      <div v-if="isAdmin" class="seminarPage__actions">
+      <div v-if="isSecretary" class="seminarPage__actions">
         <v-btn @click="openParticipantsControl" color="var(--accent)" small text> Добавить участников </v-btn>
       </div>
     </div>
@@ -94,7 +94,7 @@ export default {
   },
   computed: {
     ...mapGetters('authorization', {
-      isAdmin: 'isAdmin',
+      isSecretary: 'isSecretary',
     }),
 
     uploadsFolderUrl() {

@@ -87,7 +87,7 @@ export default {
           calendar_code: '',
         },
         athletes: {
-          rus_code: '',
+          ffr_id: '',
           discipline: '',
           name: '',
           gender: '',

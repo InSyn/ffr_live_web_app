@@ -10,6 +10,7 @@ export const competitionSchema = new mongoose.Schema({
   },
   title: String,
   stage: String,
+  discipline_code: String,
 
   competitors: [competingAthleteSchema],
   races: [raceSchema],

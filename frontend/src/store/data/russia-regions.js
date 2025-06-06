@@ -672,10 +672,20 @@ export const getSortedRegions = () => {
 };
 
 export const getRegionCode = (regionName) => {
+  if (typeof regionName !== 'string') return null;
+
   const region = russiaRegions.find((region) => region.fullname === regionName);
   if (!region) return null;
 
   return region.code;
+};
+
+export const parseCompetitorRegions = (regionsData) => {
+  if (typeof regionsData !== 'string') return [];
+
+  const parsedRegions = regionsData.split(',').map((region) => region.trim());
+
+  return parsedRegions;
 };
 
 export const getRegionFederal = (regionName) => {

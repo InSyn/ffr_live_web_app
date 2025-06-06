@@ -1,10 +1,15 @@
 ﻿<script>
+import axios from 'axios';
 import { mapGetters } from 'vuex';
 import { apiUrl } from '@/constants';
-import axios from 'axios';
+import MessageContainer from '@/components/ui-components/message-container.vue';
+import { formatDate } from '@/utils/data-formaters';
+import LoaderSpinner from '@/components/ui-components/loader-spinner.vue';
 
 export default {
   name: 'createOrganizationReport-page',
+  components: { LoaderSpinner, MessageContainer },
+  props: ['reportId', 'orgId'],
   data() {
     return {
       report: {
@@ -13,29 +18,52 @@ export default {
         report_date: '',
       },
       files: [],
+
+      loading: false,
       isSubmitting: false,
+
+      messages: [],
+      errors: [],
+      isEditMode: false,
     };
   },
   computed: {
     ...mapGetters('authorization', {
       userData: 'getUserData',
     }),
-    organizationId() {
-      return this.userData.organizationId || null;
+    organizationRegion() {
+      return this.userData.region || null;
     },
   },
   methods: {
     handleFilesUpload(event) {
       this.files = Array.from(event.target.files);
     },
+    async fetchReportData() {
+      this.loading = true;
+      try {
+        const response = await axios.get(`${apiUrl}/organizations/${this.organizationRegion}/reports/${this.reportId}`);
+        if (response.status === 200) {
+          const report = response.data.report;
+          if (report.report_date) report.report_date = formatDate(report.report_date, { toDateInputFormat: true });
+
+          this.report = report;
+          this.isEditMode = true;
+        }
+      } catch (error) {
+        this.errors.push('Не удалось загрузить данные отчёта');
+      } finally {
+        this.loading = false;
+      }
+    },
     async submitReport() {
       if (this.files.length > 5) {
-        alert('You can upload up to 5 photos.');
+        this.errors.push('Превышено максимальное количество изображений (5).');
         return;
       }
 
-      if (!this.organizationId) {
-        alert('Organization ID not found.');
+      if (!this.organizationRegion) {
+        this.errors.push('Необходимо авторизоваться в качестве организации для создания отчёта.');
         return;
       }
 
@@ -51,19 +79,30 @@ export default {
       });
 
       try {
-        const response = await axios.post(`${apiUrl}/organizations/${this.organizationId}/reports`, formData, {
+        const endpoint = this.reportId
+          ? `${apiUrl}/organizations/${this.orgId}/reports/${this.reportId}`
+          : `${apiUrl}/organizations/reports/${this.organizationRegion}`;
+        const method = this.isEditMode ? 'put' : 'post';
+        const response = await axios({
+          method,
+          url: endpoint,
+          data: formData,
           headers: {
             'Content-Type': 'multipart/form-data',
+            authorization: `Bearer ${this.userData.token}`,
           },
         });
 
-        if (response.status === 201) {
-          alert('Отчёт создан успешно');
+        if (response.status === 201 || response.status === 200) {
+          this.messages.push(`Отчёт ${this.isEditMode ? 'обновлён' : 'создан'} успешно`);
           this.resetForm();
+          setTimeout(() => {
+            this.$router.push({ name: 'organizationsPage' });
+          }, 1280);
         }
       } catch (error) {
         console.error('Ошибка при создании отчёта:', error);
-        alert(`Не удалось создать отчёт: ${error.response?.data?.message || error.message}`);
+        this.errors.push(`Не удалось создать отчёт: ${error.response?.data?.message || error.message}`);
       } finally {
         this.isSubmitting = false;
       }
@@ -77,13 +116,18 @@ export default {
       this.$refs.fileInput.value = '';
     },
   },
+  mounted() {
+    if (this.reportId) {
+      this.fetchReportData();
+    }
+  },
 };
 </script>
 
 <template>
   <div class="createOrganizationPage__wrapper">
-    <form class="createOrganizationPage__form" @submit.prevent="submitReport" enctype="multipart/form-data">
-      <h3 class="createOrganizationPage__title">Создание отчёта организации</h3>
+    <form v-if="!loading" class="createOrganizationPage__form" @submit.prevent="submitReport" enctype="multipart/form-data">
+      <h3 class="createOrganizationPage__title">{{ isEditMode ? 'Редактирование' : 'Создание' }} отчёта организации</h3>
       <div class="createOrganizationPage__control__wrapper">
         <label for="title">Заголовок:</label>
         <input type="text" id="title" v-model="report.title" required />
@@ -107,10 +151,13 @@ export default {
 
       <div class="createOrganizationPage__control__actions">
         <button class="actionButton" type="submit" :disabled="isSubmitting || files.length > 5">
-          {{ isSubmitting ? 'Отправка...' : 'Создать' }}
+          {{ isSubmitting ? 'Отправка...' : isEditMode ? 'Сохранить' : 'Создать' }}
         </button>
       </div>
     </form>
+    <loader-spinner v-else></loader-spinner>
+
+    <message-container :messages="messages" :errors="errors"></message-container>
   </div>
 </template>
 

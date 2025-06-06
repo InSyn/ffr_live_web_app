@@ -1,108 +1,3 @@
-<template>
-  <form enctype="multipart/form-data" @submit.prevent="submitForm">
-    <div class="formHeader">
-      <span v-if="action === 'create'">Новое соревнование</span>
-      <span v-else>Обновление данных соревнования</span>
-
-      <div @click="openOnlineRegistration" v-if="action === 'update'" class="onlineRegistration__link">
-        Дополнительные настройки
-        <v-icon class="onlineRegistration__icon" color="currentColor" size="18">
-          {{ arrowRightIcon }}
-        </v-icon>
-      </div>
-    </div>
-
-    <div class="formBody">
-      <div class="imageUpload__wrapper">
-        <div class="imagePreview__wrapper">
-          <img v-if="imagePreview['logo_image_url']" :src="imagePreview['logo_image_url']" alt="Selected Image" />
-          <div v-else class="imageFiller">
-            <competition-image-filler-icon class="imageFiller__icon"></competition-image-filler-icon>
-          </div>
-        </div>
-
-        <div class="imageInput__wrapper">
-          <div class="imageInput__title">Логотип события</div>
-          <input @change="onFileChange($event, 'logo_image_url')" id="image_url" class="formControl-image" name="image_url" type="file" />
-        </div>
-      </div>
-
-      <div class="imageUpload__wrapper">
-        <div class="imagePreview__wrapper">
-          <img v-if="imagePreview['track_image_url']" :src="imagePreview['track_image_url']" alt="Selected Image" />
-          <div v-else class="imageFiller">
-            <competition-image-filler-icon class="imageFiller__icon"></competition-image-filler-icon>
-          </div>
-        </div>
-
-        <div class="imageInput__wrapper">
-          <div class="imageInput__title">Изображение трассы</div>
-          <input @change="onFileChange($event, 'track_image_url')" id="image_url" class="formControl-image" name="image_url" type="file" />
-        </div>
-      </div>
-
-      <div v-for="(_, field_key) in event" v-show="field_key !== 'country_code' && field_key !== 'region_code'" :key="field_key" class="formGroup">
-        <label :for="field_key" class="formLabel">
-          {{ translateField(field_key) }}
-        </label>
-
-        <select v-if="field_key === 'sport'" :id="field_key" class="formControl" v-model="event[field_key]">
-          <option selected disabled value="">Выберите вид спорта</option>
-          <option v-for="sport in sports" :key="sport.code" class="formControl-option">
-            {{ capitalizeString(sport.name_rus) }}
-          </option>
-        </select>
-        <div class="select__wrapper" v-else-if="field_key === 'discipline'">
-          <select
-            @change="setFieldValue(event, 'discipline', $event.target.value)"
-            :value="event[field_key]"
-            :key="event[field_key] || 'dsc'"
-            :id="field_key"
-            class="formControl"
-            :disabled="!event['sport']"
-          >
-            <option selected disabled value="">Выберите дисциплину</option>
-            <option v-for="discipline in getDisciplines(event['sport'])" :key="discipline.code">
-              {{ discipline.name_rus }}
-            </option>
-          </select>
-        </div>
-
-        <country-select-control
-          v-else-if="field_key === 'country'"
-          :value="event[field_key]"
-          @input="setFieldValue(event, 'country', $event)"
-        ></country-select-control>
-        <region-select-control
-          v-else-if="field_key === 'region'"
-          :value="event[field_key]"
-          :country="event['country']"
-          @input="setFieldValue(event, 'region', $event)"
-        ></region-select-control>
-
-        <documents-select-control
-          v-else-if="field_key === 'documents'"
-          @update:documents="updateDocuments"
-          :initial-documents="event.documents"
-        ></documents-select-control>
-        <custom-checkbox
-          v-else-if="field_key === 'international' || field_key === 'is_public'"
-          :value="event[field_key]"
-          @input="setFieldValue(event, field_key, $event)"
-        ></custom-checkbox>
-        <input v-else v-model="event[field_key]" :id="field_key" class="formControl" :type="getInputType(field_key)" :name="field_key" />
-      </div>
-    </div>
-
-    <div class="formActions">
-      <v-btn class="actionButton" type="submit" color="var(--text-contrast)" small>
-        {{ action === 'create' ? 'Создать' : 'Обновить' }}
-      </v-btn>
-      <v-btn v-show="action === 'update'" class="actionButton" type="button" color="var(--message-error)" @click="deleteEvent" text small> Удалить </v-btn>
-    </div>
-  </form>
-</template>
-
 <script>
 import DocumentsSelectControl from '@/components/ui-components/custom-controls/documents-select-control.vue';
 import { backendRootUrl } from '@/constants';
@@ -211,6 +106,111 @@ export default {
   },
 };
 </script>
+
+<template>
+  <form enctype="multipart/form-data" @submit.prevent="submitForm">
+    <div class="formHeader">
+      <span v-if="action === 'create'">Новое соревнование</span>
+      <span v-else>Обновление данных соревнования</span>
+
+      <div @click="openOnlineRegistration" v-if="action === 'update'" class="onlineRegistration__link">
+        Дополнительные настройки
+        <v-icon class="onlineRegistration__icon" color="currentColor" size="18">
+          {{ arrowRightIcon }}
+        </v-icon>
+      </div>
+    </div>
+
+    <div class="formBody">
+      <div class="imageUpload__wrapper">
+        <div class="imagePreview__wrapper">
+          <img v-if="imagePreview['logo_image_url']" :src="imagePreview['logo_image_url']" alt="Selected Image" />
+          <div v-else class="imageFiller">
+            <competition-image-filler-icon class="imageFiller__icon"></competition-image-filler-icon>
+          </div>
+        </div>
+
+        <div class="imageInput__wrapper">
+          <div class="imageInput__title">Логотип события</div>
+          <input @change="onFileChange($event, 'logo_image_url')" id="image_url" class="formControl-image" name="image_url" type="file" />
+        </div>
+      </div>
+
+      <div class="imageUpload__wrapper">
+        <div class="imagePreview__wrapper">
+          <img v-if="imagePreview['track_image_url']" :src="imagePreview['track_image_url']" alt="Selected Image" />
+          <div v-else class="imageFiller">
+            <competition-image-filler-icon class="imageFiller__icon"></competition-image-filler-icon>
+          </div>
+        </div>
+
+        <div class="imageInput__wrapper">
+          <div class="imageInput__title">Изображение трассы</div>
+          <input @change="onFileChange($event, 'track_image_url')" id="image_url" class="formControl-image" name="image_url" type="file" />
+        </div>
+      </div>
+
+      <div v-for="(_, field_key) in event" v-show="field_key !== 'country_code' && field_key !== 'region_code'" :key="field_key" class="formGroup">
+        <label :for="field_key" class="formLabel">
+          {{ translateField(field_key) }}
+        </label>
+
+        <select v-if="field_key === 'sport'" :id="field_key" class="formControl" v-model="event[field_key]">
+          <option selected disabled value="">Выберите вид спорта</option>
+          <option v-for="sport in sports" :key="sport.code" class="formControl-option">
+            {{ capitalizeString(sport.name_rus) }}
+          </option>
+        </select>
+        <div class="select__wrapper" v-else-if="field_key === 'discipline'">
+          <select
+            @change="setFieldValue(event, 'discipline', $event.target.value)"
+            :value="event[field_key]"
+            :key="event[field_key] || 'dsc'"
+            :id="field_key"
+            class="formControl"
+            :disabled="!event['sport']"
+          >
+            <option selected disabled value="">Выберите дисциплину</option>
+            <option v-for="discipline in getDisciplines(event['sport'])" :key="discipline.code">
+              {{ discipline.name_rus }}
+            </option>
+          </select>
+        </div>
+
+        <country-select-control
+          v-else-if="field_key === 'country'"
+          :value="event[field_key]"
+          @input="setFieldValue(event, 'country', $event)"
+        ></country-select-control>
+        <region-select-control
+          v-else-if="field_key === 'region'"
+          :value="event[field_key]"
+          :country="event['country']"
+          @input="setFieldValue(event, 'region', $event)"
+        ></region-select-control>
+
+        <documents-select-control
+          v-else-if="field_key === 'documents'"
+          @update:documents="updateDocuments"
+          :initial-documents="event.documents"
+        ></documents-select-control>
+        <custom-checkbox
+          v-else-if="field_key === 'international' || field_key === 'is_public'"
+          :value="event[field_key]"
+          @input="setFieldValue(event, field_key, $event)"
+        ></custom-checkbox>
+        <input v-else v-model="event[field_key]" :id="field_key" class="formControl" :type="getInputType(field_key)" :name="field_key" />
+      </div>
+    </div>
+
+    <div class="formActions">
+      <v-btn class="actionButton" type="submit" color="var(--text-contrast)" small>
+        {{ action === 'create' ? 'Создать' : 'Обновить' }}
+      </v-btn>
+      <v-btn v-show="action === 'update'" class="actionButton" type="button" color="var(--message-error)" @click="deleteEvent" text small> Удалить </v-btn>
+    </div>
+  </form>
+</template>
 
 <style scoped lang="scss">
 form {

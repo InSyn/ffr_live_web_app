@@ -1,3 +1,144 @@
+<script>
+import { mdiEyeOff, mdiNumeric10BoxMultiple } from '@mdi/js';
+import CountryFlag from '@/components/ui-components/country-flag.vue';
+import { isLoggedIn } from '@/utils/auth-helpers';
+import { getCountryCode } from '@/store/data/countries';
+import { getRegionCode, parseCompetitorRegions } from '@/store/data/russia-regions';
+
+export default {
+  name: 'resultsTable',
+  components: { CountryFlag },
+  props: ['competition', 'selectedStage'],
+  data() {
+    return {
+      icons: {
+        showMarksButtonIcon: mdiNumeric10BoxMultiple,
+        closeMarksIcon: mdiEyeOff,
+      },
+      marksFilter: null,
+      raceFilter: {
+        type: null,
+        target: null,
+      },
+    };
+  },
+  computed: {
+    getSheetContent() {
+      switch (this.raceFilter.type) {
+        case 'start-list':
+          return this.getRaceStartlist(this.raceFilter.target);
+
+        case 'race-results':
+          return this.getRaceResults(this.raceFilter.target);
+
+        case 'overall':
+          return this.getTotalResults();
+
+        default:
+          return [];
+      }
+    },
+    onDistance() {
+      if (!this.raceFilter.target) return null;
+
+      const selectedRace = this.competition['races'].find((race) => race['race_id'] === this.raceFilter.target);
+      if (!selectedRace) return null;
+
+      const competitorOnTrack = this.competition['competitors'].find((competitor) => competitor['local_id'] === selectedRace['active_athlete']);
+
+      if (!competitorOnTrack) return null;
+
+      return competitorOnTrack;
+    },
+  },
+  methods: {
+    parseCompetitorRegions,
+    getRegionCode,
+    getCountryCode,
+    isLoggedIn,
+    getAthlete(competitor_id) {
+      const athlete = this.competition['competitors'].find((athlete) => athlete['local_id'] === competitor_id);
+
+      if (!athlete) return null;
+
+      return athlete;
+    },
+    getRaceStartlist(race_id) {
+      if (!race_id) return [];
+
+      const race = this.competition['races'].find((race) => race['race_id'] === race_id);
+      if (!race) return [];
+
+      return race['start_list'].map((competitor_id) => this.getAthlete(competitor_id));
+    },
+    getRaceResults(race_id) {
+      if (!race_id) return [];
+
+      const race = this.competition['races'].find((race) => race['race_id'] === race_id);
+      if (!race) return [];
+
+      const resultsList = new Array(...race['results']).map((result) => {
+        const athlete = this.getAthlete(result['competitor_id']);
+        if (!athlete) return;
+
+        return { ...athlete, result };
+      });
+
+      return resultsList;
+    },
+    getTotalResults() {
+      const totalResultsList = new Array(...this.competition['total_results']).map((totalResult) => {
+        if (!totalResult) return;
+
+        const athlete = this.getAthlete(totalResult['competitor_id']);
+        if (!athlete) return;
+
+        const raceResults = this.competition['races'].map((race) => {
+          return race.results.find((raceResult) => raceResult['competitor_id'] === athlete['local_id']);
+        });
+
+        return { ...athlete, raceResults, totalResult };
+      });
+
+      return totalResultsList.filter((result) => !!result);
+    },
+    selectMarksToShow(competitor_id) {
+      if (!competitor_id) return;
+
+      this.marksFilter === competitor_id ? (this.marksFilter = null) : (this.marksFilter = competitor_id);
+    },
+    setResultsFilter(filter) {
+      const filter_arr = filter.split(':');
+
+      this.raceFilter.type = filter_arr[0];
+      this.raceFilter.target = filter_arr[1] ? filter_arr[1] : '';
+    },
+    navigateToAthletePage(athlete_code) {
+      if (!athlete_code) return;
+      this.$router.push(`/athlete-info/${athlete_code}`);
+    },
+  },
+
+  watch: {
+    selectedStage: function (val, oldVal) {
+      if (val === oldVal) return;
+
+      if (this.competition['races'].length > 0) {
+        this.setResultsFilter(`start-list:${this.competition['races'][0]['race_id']}`);
+        return;
+      }
+      this.raceFilter = 'overall';
+    },
+  },
+  mounted() {
+    if (this.competition['races'].length > 0) {
+      this.setResultsFilter(`start-list:${this.competition['races'][0]['race_id']}`);
+      return;
+    }
+    this.raceFilter.type = 'overall';
+  },
+};
+</script>
 <template>
   <div v-if="competition" class="competitionResults__wrapper">
     <div v-if="competition['races'].length > 0" class="raceSelect__wrapper">
@@ -64,16 +205,19 @@
             {{ competitor['bib'] }}
           </div>
 
-          <div v-if="competitor['region_code']" class="athleteFlag__wrapper">
+          <div v-if="competitor.region || competitor.country" class="athleteFlags__wrapper">
             <country-flag
-              :is-region-flag="true"
-              :country-code="competitor['country_code']"
-              :region-code="competitor['region_code']"
+              v-for="(athleteRegion, rIdx) in parseCompetitorRegions(competitor.region)"
+              :key="rIdx"
+              :is-region-flag="!!getRegionCode(athleteRegion)"
+              :country-code="getCountryCode(competitor.country || 'Россия')"
+              :region-code="getRegionCode(athleteRegion)"
               height="1rem"
+              rounding="2px"
             ></country-flag>
           </div>
 
-          <div @click="navigateToAthletePage(competitor['rus_code'])" class="resultsTable__tableValue" data-header-value="name">
+          <div @click="navigateToAthletePage(competitor.ffr_id)" class="resultsTable__tableValue" data-header-value="name">
             <span>{{ `${competitor['lastname'].toUpperCase()} ${competitor['name']}` }}</span>
           </div>
 
@@ -126,148 +270,6 @@
     </div>
   </div>
 </template>
-
-<script>
-import { mdiEyeOff, mdiNumeric10BoxMultiple } from '@mdi/js';
-import CountryFlag from '@/components/ui-components/country-flag.vue';
-import { isLoggedIn } from '@/utils/auth-helpers';
-
-export default {
-  name: 'resultsTable',
-  components: { CountryFlag },
-  props: ['competition', 'selectedStage'],
-  mounted() {
-    if (this.competition['races'].length > 0) {
-      this.setResultsFilter(`start-list:${this.competition['races'][0]['race_id']}`);
-      return;
-    }
-    this.raceFilter.type = 'overall';
-  },
-  methods: {
-    isLoggedIn,
-    getAthlete(competitor_id) {
-      const athlete = this.competition['competitors'].find((athlete) => athlete['local_id'] === competitor_id);
-
-      if (!athlete) return null;
-
-      return athlete;
-    },
-    getRaceStartlist(race_id) {
-      if (!race_id) return [];
-
-      const race = this.competition['races'].find((race) => race['race_id'] === race_id);
-      if (!race) return [];
-
-      return race['start_list'].map((competitor_id) => this.getAthlete(competitor_id));
-    },
-    getRaceResults(race_id) {
-      if (!race_id) return [];
-
-      const race = this.competition['races'].find((race) => race['race_id'] === race_id);
-      if (!race) return [];
-
-      const resultsList = new Array(...race['results']).map((result) => {
-        const athlete = this.getAthlete(result['competitor_id']);
-        if (!athlete) return;
-
-        return { ...athlete, result };
-      });
-
-      return resultsList;
-    },
-    getTotalResults() {
-      const totalResultsList = new Array(...this.competition['total_results']).map((totalResult) => {
-        if (!totalResult) return;
-
-        const athlete = this.getAthlete(totalResult['competitor_id']);
-        if (!athlete) return;
-
-        const raceResults = this.competition['races'].map((race) => {
-          return race.results.find((raceResult) => raceResult['competitor_id'] === athlete['local_id']);
-        });
-
-        return { ...athlete, raceResults, totalResult };
-      });
-
-      return totalResultsList.filter((result) => !!result);
-    },
-    selectMarksToShow(competitor_id) {
-      if (!competitor_id) return;
-
-      this.marksFilter === competitor_id ? (this.marksFilter = null) : (this.marksFilter = competitor_id);
-    },
-    setResultsFilter(filter) {
-      const filter_arr = filter.split(':');
-
-      this.raceFilter.type = filter_arr[0];
-      this.raceFilter.target = filter_arr[1] ? filter_arr[1] : '';
-    },
-    navigateToAthletePage(athlete_code) {
-      if (!athlete_code) return;
-
-      this.$router.push(`/athlete-info/${athlete_code}`);
-    },
-  },
-  data() {
-    return {
-      icons: {
-        showMarksButtonIcon: mdiNumeric10BoxMultiple,
-        closeMarksIcon: mdiEyeOff,
-      },
-      marksFilter: null,
-      raceFilter: {
-        type: null,
-        target: null,
-      },
-      statusMap: {
-        DNF: -1,
-        DNS: -2,
-        DSQ: -3,
-      },
-    };
-  },
-  computed: {
-    getSheetContent() {
-      switch (this.raceFilter.type) {
-        case 'start-list':
-          return this.getRaceStartlist(this.raceFilter.target);
-
-        case 'race-results':
-          return this.getRaceResults(this.raceFilter.target);
-
-        case 'overall':
-          return this.getTotalResults();
-
-        default:
-          return [];
-      }
-    },
-    onDistance() {
-      if (!this.raceFilter.target) return null;
-
-      const selectedRace = this.competition['races'].find((race) => race['race_id'] === this.raceFilter.target);
-      if (!selectedRace) return null;
-
-      const competitorOnTrack = this.competition['competitors'].find((competitor) => competitor['local_id'] === selectedRace['active_athlete']);
-
-      if (!competitorOnTrack) return null;
-
-      return competitorOnTrack;
-    },
-  },
-  watch: {
-    selectedStage: function (val, oldVal) {
-      if (val === oldVal) return;
-
-      if (this.competition['races'].length > 0) {
-        this.setResultsFilter(`start-list:${this.competition['races'][0]['race_id']}`);
-        return;
-      }
-      this.raceFilter = 'overall';
-    },
-  },
-};
-</script>
 
 <style scoped>
 .competitionResults__wrapper {
@@ -352,14 +354,12 @@ export default {
   min-width: 3rem;
   max-width: 5rem;
 }
-
 .resultsTable__tableValue[data-header-value='bib'] {
   flex: 2 0 0;
   min-width: 3rem;
   max-width: 5rem;
   font-weight: bold;
 }
-
 .resultsTable__tableValue[data-header-value='name'] {
   position: relative;
   flex: 8 0 0;
@@ -371,21 +371,21 @@ export default {
   text-align: left;
   cursor: pointer;
 }
-
 .resultsTable__tableValue[data-header-value='name']:hover {
   font-weight: bold;
 }
 
-.athleteFlag__wrapper {
+.athleteFlags__wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 3px;
   height: 100%;
   max-width: 36px;
   padding: 3px 6px;
 }
 
-.athleteFlag__wrapper img {
+.athleteFlags__wrapper img {
   max-height: 100%;
   min-width: 100%;
 }
@@ -450,7 +450,7 @@ export default {
 }
 
 .resultsSheet__body {
-  flex: 1 1 0;
+  flex: 1 1 320px;
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;

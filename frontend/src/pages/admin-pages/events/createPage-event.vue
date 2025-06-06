@@ -1,14 +1,8 @@
 <script>
 import axios from 'axios';
 import { apiUrl } from '@/constants';
-import { mdiImage } from '@mdi/js';
 import { mapActions, mapGetters } from 'vuex';
 import MessageContainer from '@/components/ui-components/message-container.vue';
-import { getInputType } from '@/utils/inputType-util';
-import { translateField } from '@/utils/formFields-translator';
-import { countries, getCountryCode } from '@/store/data/countries';
-import { getDisciplines, sports } from '@/store/data/sports';
-import { capitalizeString } from '@/utils/capitalizeString';
 import EventForm from '@/pages/admin-pages/events/form-event.vue';
 import { addDocumentsToFormData, addImagesToFormData, prepareFormData } from '@/utils/formData-helpers';
 
@@ -17,8 +11,6 @@ export default {
   components: { EventForm, MessageContainer },
   data() {
     return {
-      imageFillerIcon: mdiImage,
-
       event: {
         title: '',
         start_at: '',
@@ -46,19 +38,8 @@ export default {
     ...mapGetters('authorization', {
       userData: 'getUserData',
     }),
-    sports() {
-      return sports;
-    },
-    countries() {
-      return countries;
-    },
   },
   methods: {
-    getCountryCode,
-    getDisciplines,
-    capitalizeString,
-    translateField,
-    getInputType,
     ...mapActions('events', {
       fetchEvents: 'SET_EVENTS',
     }),
@@ -96,8 +77,7 @@ export default {
 
 <template>
   <div class="createEventPage__wrapper">
-    <event-form @create-event="createEvent" :event="event" action="create"> </event-form>
-
+    <event-form @create-event="createEvent" :event="event" action="create"></event-form>
     <message-container :messages="messages" :errors="errors"></message-container>
   </div>
 </template>

@@ -35,6 +35,6 @@ export const hasRole =
   };
 
 export const isAdmin = hasRole('admin');
-export const isSecretary = hasRole('secretary');
-export const isOrganization = hasRole('regional_organization');
-export const isTrainer = hasRole('trainer');
+export const isSecretary = hasRole('admin', 'secretary');
+export const isOrganization = hasRole('admin', 'regional_organization');
+export const isTrainer = hasRole('admin', 'trainer');

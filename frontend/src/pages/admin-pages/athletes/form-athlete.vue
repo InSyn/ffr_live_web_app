@@ -356,7 +356,7 @@ export default {
           this.trainersList = response.data.trainers;
         }
       } catch (error) {
-        console.log(error?.response?.data);
+        console.error(error?.response?.data?.message);
       }
     },
 
@@ -375,7 +375,7 @@ export default {
 
     deleteAthlete() {
       if (confirm('Вы уверены, что хотите удалить спортсмена?')) {
-        this.$emit('delete-athlete', this.athlete.rus_code);
+        this.$emit('delete-athlete', this.athlete.ffr_id);
       }
     },
   },

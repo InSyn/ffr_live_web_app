@@ -4,7 +4,7 @@ import { deleteFileIfExists, parseJsonFields } from '../utils/filesUtils.js';
 
 export const getAllOrganizations = async (req, res) => {
   try {
-    const organizations = await Organization.find().sort({
+    const organizations = await Organization.find({}, { reports: 0 }).sort({
       title: 1,
     });
     res.status(200).json({
@@ -124,7 +124,7 @@ export const updateOrganization = async (req, res) => {
 
 export const getOrganization = async (req, res) => {
   try {
-    const organization = await Organization.findById(req.params.id);
+    const organization = await Organization.findById(req.params.id, { reports: 0 });
 
     res.status(200).json({
       status: 'success',
@@ -172,7 +172,7 @@ export const deleteOrganization = async (req, res) => {
 
 export const addReportToOrganization = async (req, res) => {
   try {
-    const organization = await Organization.findById(req.params.id);
+    const organization = await Organization.findOne({ region: req.params.region });
     if (!organization) {
       return res.status(404).json({
         status: 'Err',
@@ -216,7 +216,7 @@ export const addReportToOrganization = async (req, res) => {
 };
 export const deleteReport = async (req, res) => {
   try {
-    const { id, reportId } = req.params;
+    const { id, report_id } = req.params;
 
     const organization = await Organization.findById(id);
     if (!organization) {
@@ -226,7 +226,7 @@ export const deleteReport = async (req, res) => {
       });
     }
 
-    const reportIndex = organization.reports.indexOf(reportId);
+    const reportIndex = organization.reports.indexOf(report_id);
     if (reportIndex === -1) {
       return res.status(404).json({
         status: 'Err',
@@ -237,7 +237,7 @@ export const deleteReport = async (req, res) => {
     organization.reports.splice(reportIndex, 1);
     await organization.save();
 
-    const report = await OrganizationReport.findById(reportId);
+    const report = await OrganizationReport.findById(report_id);
     if (report) {
       if (report.files && report.files.length > 0) {
         for (const file of report.files) {
@@ -263,9 +263,10 @@ export const deleteReport = async (req, res) => {
 };
 export const updateReport = async (req, res) => {
   try {
-    const { id, reportId } = req.params;
+    const { organization_id, report_id } = req.params;
+    console.log(req.params);
 
-    const organization = await Organization.findById(id);
+    const organization = await Organization.findById(organization_id);
     if (!organization) {
       return res.status(404).json({
         status: 'Err',
@@ -273,7 +274,7 @@ export const updateReport = async (req, res) => {
       });
     }
 
-    const report = await OrganizationReport.findById(reportId);
+    const report = await OrganizationReport.findById(report_id);
     if (!report) {
       return res.status(404).json({
         status: 'Err',
@@ -281,9 +282,11 @@ export const updateReport = async (req, res) => {
       });
     }
 
-    report.title = req.body.title || report.title;
-    report.content = req.body.content || report.content;
-    report.report_date = req.body.report_date || report.report_date;
+    report.set({
+      title: req.body.title || report.title,
+      content: req.body.content || report.content,
+      report_date: req.body.report_date || report.report_date,
+    });
 
     const newFiles = req.files['files'];
     if (newFiles && newFiles.length > 0) {
@@ -299,14 +302,64 @@ export const updateReport = async (req, res) => {
 
     res.status(200).json({
       status: 'success',
-      message: 'Report updated successfully',
-      data: { report },
+      message: 'Отчёт обновлен',
+      report,
     });
   } catch (error) {
     console.error('Error updating report:', error);
     res.status(500).json({
       status: 'Err',
-      message: `Error updating report: ${error.message}`,
+      message: `Ошибка при обновлении отчета: ${error.message}`,
+      error: error.message,
+    });
+  }
+};
+export const getReports = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const organization = await Organization.findById(id).populate('reports');
+
+    if (!organization) {
+      return res.status(404).json({
+        status: 'Err',
+        message: 'Организация не найдена',
+      });
+    }
+
+    res.status(200).json({
+      status: 'success',
+      reports: organization.reports,
+    });
+  } catch (error) {
+    console.error(`Ошибка при получении отчетов организации: ${error}`);
+    res.status(500).json({
+      status: 'Err',
+      message: `Во время получения отчетов организации произошла ошибка: ${error.message}`,
+      error: error.message,
+    });
+  }
+};
+export const getReportById = async (req, res) => {
+  try {
+    const { report_id } = req.params;
+    const report = await OrganizationReport.findById(report_id);
+
+    if (!report) {
+      return res.status(404).json({
+        status: 'Err',
+        message: 'Отчет не найден',
+      });
+    }
+
+    res.status(200).json({
+      status: 'success',
+      report,
+    });
+  } catch (error) {
+    console.error(`Ошибка при получении отчета: ${error}`);
+    res.status(500).json({
+      status: 'Err',
+      message: `Во время получения отчета произошла ошибка: ${error.message}`,
       error: error.message,
     });
   }
@@ -339,10 +392,10 @@ export const getAthletesByOrganizationRegion = async (req, res) => {
   }
 };
 
-export const getOrganizationIdByRegion = async (req, res) => {
+export const getOrganizationByRegion = async (req, res) => {
   try {
     const region = req.params.region;
-    const organization = await Organization.findOne({ region });
+    const organization = await Organization.findOne({ region }, { contacts: 0, logo_url: 0, socials: 0, reports: 0 });
 
     if (!organization) {
       return res.status(404).json({
@@ -353,7 +406,7 @@ export const getOrganizationIdByRegion = async (req, res) => {
 
     res.status(200).json({
       status: 'success',
-      organizationId: organization._id,
+      organization,
     });
   } catch (err) {
     console.error('Ошибка при получении ID организации:', err);

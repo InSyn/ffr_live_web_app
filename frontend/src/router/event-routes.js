@@ -3,6 +3,7 @@ import event_page from '@/pages/events/event-page/index.vue';
 import editEventPage from '@/pages/admin-pages/events/editPage-event.vue';
 import eventOnlineRegistration from '@/pages/admin-pages/online-registration/event-online-registration.vue';
 import eventOnlineRegistrationApplication from '@/pages/admin-pages/online-registration/event-online-registration-application.vue';
+import createPageCupEvent from '@/pages/admin-pages/events/createPage-cupEvent.vue';
 
 export const eventRoutes = [
   {
@@ -26,14 +27,20 @@ export const eventRoutes = [
   },
 
   {
+    name: 'cupEventPage',
+    path: 'new-cup-event',
+    component: createPageCupEvent,
+  },
+
+  {
     name: 'eventOnlineRegistration',
-    path: 'event-online-registration-application/:event_id',
+    path: 'event-online-registration/:event_id',
     props: true,
     component: eventOnlineRegistration,
   },
   {
     name: 'eventOnlineRegistrationApplication',
-    path: 'event-online-registration/:event_id',
+    path: 'event-online-registration-application/:event_id/:application_id?',
     props: true,
     component: eventOnlineRegistrationApplication,
   },

@@ -1,3 +1,72 @@
+<script>
+import { mapGetters } from 'vuex';
+
+export default {
+  name: 'admin-pages-nav',
+  props: {
+    db_id: String,
+  },
+  data() {
+    return {
+      adminRoutes: [
+        { routePath: 'registration', title: 'Создать пользователя', access: ['admin', 'secretary'] },
+        { routePath: 'all-registrations', title: 'Список онлайн заявок', access: ['admin', 'secretary'] },
+        { routePath: 'new-cup-event', title: 'Кубковое событие', access: ['admin', 'secretary'] },
+      ],
+      adminContentRoutes: [
+        { routePath: 'new-event', title: 'Создать событие', access: ['admin', 'secretary'] },
+        { routePath: 'new-athlete', title: 'Создать спортсмена', access: ['admin'] },
+        { routePath: 'new-jury', title: 'Создать судью', access: ['admin'] },
+        { routePath: 'new-trainer', title: 'Создать тренера', access: ['admin'] },
+        { routePath: 'new-organization', title: 'Создать организацию', access: ['admin'] },
+        { routePath: 'new-seminar', title: 'Создать семинар', access: ['admin', 'secretary'] },
+      ],
+    };
+  },
+  computed: {
+    ...mapGetters('authorization', {
+      userData: 'getUserData',
+    }),
+    dbUserRoutes() {
+      return [
+        {
+          routePath: `organizations/${this.db_id}`,
+          title: 'Страница организации',
+          access: ['regional_organization'],
+          check: this.checkRegionalOrganizationAccess,
+        },
+        {
+          routePath: `create-organization-report/${this.db_id}-`,
+          title: 'Создать отчёт',
+          access: ['regional_organization'],
+        },
+        {
+          routePath: `jury-page/${this.userData.ffr_id}`,
+          title: 'Страница судьи',
+          access: ['jury', 'secretary'],
+          check: this.checkRegionalOrganizationAccess,
+        },
+
+        {
+          routePath: `trainer-page/${this.userData.ffr_id}`,
+          title: 'Страница тренера',
+          access: ['trainer'],
+          check: this.checkRegionalOrganizationAccess,
+        },
+      ];
+    },
+  },
+  methods: {
+    checkRouteAccess(route) {
+      return route.access.includes(this.userData.role);
+    },
+    checkRegionalOrganizationAccess() {
+      return this.userData.role && this.db_id;
+    },
+  },
+};
+</script>
+
 <template>
   <div class="adminPages__wrapper">
     <div class="adminRoutes__wrapper">
@@ -10,9 +79,9 @@
         {{ route.title }}
       </router-link>
     </div>
-    <div class="regionalOrganizationRoutes__wrapper">
+    <div class="additionalRoutes__wrapper">
       <router-link
-        v-for="route in organizationRoutes"
+        v-for="route in dbUserRoutes"
         :key="route.routePath"
         v-show="checkRouteAccess(route)"
         class="adminPage__link"
@@ -25,104 +94,31 @@
   </div>
 </template>
 
-<script>
-import { mapGetters } from 'vuex';
-import axios from 'axios';
-import { apiUrl } from '@/constants';
-
-export default {
-  name: 'admin-pages-nav',
-  data() {
-    return {
-      adminRoutes: [
-        { routePath: 'registration', title: 'Создать пользователя', access: ['admin', 'secretary'] },
-        { routePath: 'all-registrations', title: 'Список онлайн заявок', access: ['admin', 'secretary'] },
-      ],
-      adminContentRoutes: [
-        { routePath: 'new-event', title: 'Создать событие', access: ['admin', 'secretary'] },
-        { routePath: 'new-athlete', title: 'Создать спортсмена', access: ['admin'] },
-        { routePath: 'new-jury', title: 'Создать судью', access: ['admin'] },
-        { routePath: 'new-trainer', title: 'Создать тренера', access: ['admin'] },
-        { routePath: 'new-organization', title: 'Создать организацию', access: ['admin'] },
-        { routePath: 'new-seminar', title: 'Создать семинар', access: ['admin', 'secretary'] },
-      ],
-
-      regionalOrganizationId: null,
-    };
-  },
-  computed: {
-    ...mapGetters('authorization', {
-      userData: 'getUserData',
-    }),
-    organizationRoutes() {
-      return [
-        {
-          routePath: `organizations/${this.regionalOrganizationId}`,
-          title: 'Страница организации',
-          access: ['regional_organization'],
-          check: this.checkRegionalOrganizationAccess,
-        },
-        {
-          routePath: 'create-organization-report',
-          title: 'Создать отчёт',
-          access: ['regional_organization'],
-        },
-      ];
-    },
-  },
-  methods: {
-    checkRouteAccess(route) {
-      return route.access.includes(this.userData.role);
-    },
-    checkRegionalOrganizationAccess() {
-      return this.userData.role === 'regional_organization' && this.regionalOrganizationId;
-    },
-    async loadRegionalOrganizationData() {
-      if (this.userData.role !== 'regional_organization' || !this.userData.region) return;
-      {
-        try {
-          const response = await axios.get(`${apiUrl}/organizations/findByRegion/${this.userData.region}`);
-
-          if (response.status === 200) {
-            this.regionalOrganizationId = response.data.organizationId;
-          }
-        } catch (error) {
-          console.log(`Не удалось загрузить данные организации: ${error?.response?.data?.message}`);
-        }
-      }
-    },
-  },
-
-  watch: {
-    'userData.region'(val) {
-      if (typeof val === 'string') this.loadRegionalOrganizationData();
-    },
-  },
-  mounted() {
-    this.loadRegionalOrganizationData();
-  },
-};
-</script>
-
 <style scoped lang="scss">
 .adminPages__wrapper {
   flex: 0 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 2.25rem;
-  margin-top: 2rem;
+  gap: 0.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border-container);
 
   .adminRoutes__wrapper,
-  .regionalOrganizationRoutes__wrapper {
+  .additionalRoutes__wrapper {
     flex: 0 0 auto;
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem 0.75rem;
+    margin-bottom: 0.75rem;
 
     & > * {
       flex: 1 0 200px;
       max-width: calc(33.3% - 0.5rem);
     }
+  }
+  .additionalRoutes__wrapper {
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border-container);
   }
 
   .adminContentRoutes__wrapper {
@@ -150,7 +146,7 @@ export default {
       border-color: var(--text-hovered);
     }
     &[disabled] {
-      cursor: not-allowed;
+      pointer-events: none;
       opacity: 0.5;
     }
   }

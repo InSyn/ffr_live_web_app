@@ -130,7 +130,7 @@ export default {
 .calendar__wrapper {
   display: flex;
   flex-direction: column;
-  padding-bottom: 8px;
+  padding-bottom: 4px;
   border-bottom: 1px solid var(--text-muted);
 
   .calendar__head {
@@ -186,31 +186,44 @@ export default {
 
     .calendar__day__item {
       position: relative;
-      flex: 0 0 1.5rem;
+      flex: 1 0 1.5rem;
+      max-width: 2rem;
       display: flex;
-      height: 1.75rem;
+      justify-content: center;
+      align-items: center;
+      height: 1.5rem;
 
       color: var(--text-muted);
-      border-radius: 50%;
+      //border-radius: 50%;
       font-size: 1.1rem;
 
+      &::before {
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 2px;
+        background-color: var(--accent);
+        transition: width 64ms;
+        content: '';
+      }
       &.hasEvents {
         font-weight: bold;
         color: var(--text-default);
       }
-
       &.selected {
         flex-basis: 1.75rem;
-        box-shadow: 0 0 0 2px var(--text-default);
         font-weight: bold;
+        &::before {
+          width: 100%;
+        }
       }
-
       &.isCurrentDay {
         color: var(--accent);
       }
-
       span {
-        display: block;
+        display: inline-block;
         margin: auto;
       }
     }

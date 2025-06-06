@@ -1,0 +1,83 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Frontend Architecture & Component Patterns
+
+## Tech Stack
+- **Framework**: Vue.js 2.6.11
+- **UI Library**: Vuetify 2.4.0
+- **State Management**: Vuex 3.4.0
+- **Routing**: Vue Router 3.2.0
+- **Build Tool**: Vue CLI 4.5.0
+- **Styling**: SCSS/CSS with CSS Custom Properties
+
+## Project Structure
+- **Entry Point**: [frontend/src/main.js](mdc:frontend/src/main.js)
+- **Root Component**: [frontend/src/App.vue](mdc:frontend/src/App.vue)
+- **Vuetify Config**: [frontend/src/plugins/vuetify.js](mdc:frontend/src/plugins/vuetify.js)
+- **Assets**: [frontend/src/assets/](mdc:frontend/src/assets)
+  - Icons: [frontend/src/assets/icons/](mdc:frontend/src/assets/icons)
+  - Fonts: [frontend/src/assets/fonts/](mdc:frontend/src/assets/fonts)
+  - Logos: [frontend/src/assets/logo/](mdc:frontend/src/assets/logo)
+  - Styles: [frontend/src/assets/styles/](mdc:frontend/src/assets/styles)
+
+## Component Conventions
+### Icon Components
+- Location: `frontend/src/assets/icons/`
+- Naming: `{name}-icon.vue` (e.g., `download-icon.vue`)
+- Structure: Vue SFC with SVG template
+- Example: [frontend/src/assets/icons/download-icon.vue](mdc:frontend/src/assets/icons/download-icon.vue)
+
+### Vue Component Structure
+```vue
+<template>
+  <!-- Use Vuetify components with custom styling -->
+</template>
+
+<script>
+export default {
+  name: "ComponentName",
+  // Component logic
+};
+</script>
+
+<style lang="scss" scoped>
+/* Use CSS custom properties from design system */
+</style>
+```
+
+## Styling Approach
+1. **Global Styles**: Imported in [frontend/src/App.vue](mdc:frontend/src/App.vue)
+2. **CSS Custom Properties**: Defined in theme files for consistency
+3. **SCSS**: Used for component-level styling with scoped styles
+4. **Vuetify Theming**: Minimal custom Vuetify configuration
+
+## State Management
+- **Store Location**: `frontend/src/store/`
+- **Modules**: Organized by feature (authorization, trainers, organizations)
+- **Pattern**: Vuex modules with namespaced actions
+
+## Asset Management
+### Fonts
+- Custom font: Petrov Sans-Trial with multiple weights
+- Web font formats: WOFF2 and WOFF for browser compatibility
+
+### Icons
+- Custom SVG icons as Vue components
+- Consistent 24x24px viewBox
+- Use `currentColor` for theming
+
+### Images/Logos
+- Organization logos (FSR, FFR)
+- Brand assets (SPORTTECH, TIMINGWEB)
+- PNG format for compatibility
+
+## Development Guidelines
+1. Use Vue 2 composition patterns
+2. Follow Vuetify component conventions
+3. Implement responsive design with mobile-first approach
+4. Use CSS custom properties for theming
+5. Maintain accessibility standards
+6. Keep components modular and reusable

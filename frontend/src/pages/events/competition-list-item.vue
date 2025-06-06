@@ -90,7 +90,6 @@ export default {
   flex: 0 0 auto;
   display: flex;
   flex-wrap: nowrap;
-  padding: 0.5rem;
 
   color: var(--text-default);
   cursor: pointer;

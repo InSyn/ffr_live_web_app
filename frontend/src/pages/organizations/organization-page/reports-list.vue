@@ -1,69 +1,46 @@
 ﻿<script>
 import { formatDate } from '@/utils/data-formaters';
+import axios from 'axios';
+import { apiUrl } from '@/constants';
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'reports-list',
-  methods: { formatDate },
+  props: {
+    organizationId: String,
+    organizationRegion: String,
+  },
+  computed: {
+    ...mapGetters('authorization', {
+      userData: 'getUserData',
+    }),
+    isReportsOwner() {
+      return this.userData.role === 'regional_organization' && this.userData.region === this.organizationRegion;
+    },
+  },
+  methods: {
+    formatDate,
+    async loadOrganizationReports() {
+      try {
+        const response = await axios.get(`${apiUrl}/organizations/${this.organizationId}/reports`);
+        if (response.status === 200) {
+          this.reports = response.data.reports;
+        }
+      } catch (err) {
+        if (err) {
+          console.error(err);
+        }
+      }
+    },
+  },
   data() {
     return {
-      reports: [
-        {
-          id: 1,
-          title: 'Отчет 1',
-          content: 'Описание отчета 1',
-          date: '01.01.2019',
-          file: {
-            url: 'https://www.example.com/file.pdf',
-          },
-        },
-        {
-          id: 2,
-          title: 'Отчет 1',
-          content:
-            "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-          date: '01.01.2019',
-          file: {
-            url: 'https://www.example.com/file.pdf',
-          },
-        },
-        {
-          id: 3,
-          title: 'Отчет 1',
-          content: 'Описание отчета 1',
-          date: '01.01.2019',
-          file: {
-            url: 'https://www.example.com/file.pdf',
-          },
-        },
-        {
-          id: 4,
-          title: 'Отчет 1',
-          content: 'Описание отчета 1',
-          date: '01.01.2019',
-          file: {
-            url: 'https://www.example.com/file.pdf',
-          },
-        },
-        {
-          id: 5,
-          title: 'Отчет 1',
-          content: 'Описание отчета 1',
-          date: '01.01.2019',
-          file: {
-            url: 'https://www.example.com/file.pdf',
-          },
-        },
-        {
-          id: 6,
-          title: 'Отчет 1',
-          content: 'Описание отчета 1',
-          date: '01.01.2019',
-          file: {
-            url: 'https://www.example.com/file.pdf',
-          },
-        },
-      ],
+      reports: [],
     };
+  },
+
+  mounted() {
+    this.loadOrganizationReports();
   },
 };
 </script>
@@ -72,20 +49,26 @@ export default {
   <div class="organizationReports__wrapper">
     <div class="organizationReports__header">Отчёты организации</div>
     <ul class="organizationReports__list">
-      <router-link v-for="report in reports" :key="report.id" :to="{ name: 'reportPage', params: { report_id: report.id } }">
-        <li class="organizationReports__list__item">
+      <li v-for="report in reports" :key="report._id" class="organizationReports__list__item">
+        <router-link class="report__link" :to="{ name: 'reportPage', params: { report_id: report._id } }">
           <div class="report__title">
             {{ report.title }}
-
             <div class="report__date">
-              {{ formatDate(report.date) }}
+              {{ formatDate(report.report_date) }}
             </div>
           </div>
           <div class="report__content">
             {{ report.content }}
           </div>
-        </li></router-link
-      >
+        </router-link>
+        <router-link
+          v-if="isReportsOwner"
+          class="report__link-edit"
+          :to="{ name: 'createReportPage', params: { reportId: report._id, orgId: organizationId } }"
+        >
+          <button type="button" class="actionButton" @click.stop>Редактировать</button>
+        </router-link>
+      </li>
     </ul>
   </div>
 </template>
@@ -104,6 +87,7 @@ export default {
   .organizationReports__header {
     flex: 0 0 auto;
     padding: 8px 12px;
+    border-bottom: 1px solid var(--border-container);
     font-size: 1.1rem;
     font-weight: bold;
   }
@@ -116,24 +100,42 @@ export default {
     .organizationReports__list__item {
       flex: 0 0 auto;
       display: flex;
-      flex-direction: column;
+      align-items: center;
+      flex-wrap: nowrap;
+      transition: background-color 92ms;
 
-      .report__title {
+      .report__link {
+        flex: 1 1 0;
         display: flex;
-        flex-wrap: nowrap;
-        padding: 0.25rem 0.75rem 0.75rem;
+        flex-direction: column;
+        overflow: hidden;
 
-        .report__date {
-          margin-left: auto;
+        .report__title {
+          flex: 0 0 auto;
+          display: flex;
+          flex-wrap: nowrap;
+          padding: 0.5rem 0.75rem 0.75rem;
+
+          .report__date {
+            margin-left: auto;
+          }
+        }
+        .report__content {
+          flex: 0 0 auto;
+          height: calc(1.3rem + 0.75rem);
+          padding: 0 0.75rem 0.25rem;
+          color: var(--text-muted);
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
         }
       }
-      .report__content {
-        height: calc(1.3rem + 0.75rem);
-        padding: 0 0.75rem;
-        color: var(--text-muted);
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
+      .report__link-edit {
+        flex: 0 0 auto;
+        margin: auto 0.75rem;
+      }
+      &:hover {
+        background-color: var(--background--card-hover);
       }
     }
   }

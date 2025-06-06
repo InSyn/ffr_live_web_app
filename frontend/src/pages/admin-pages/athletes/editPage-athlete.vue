@@ -17,6 +17,7 @@ import AthleteForm from '@/pages/admin-pages/athletes/form-athlete.vue';
 import axios from 'axios';
 import { apiUrl } from '@/constants';
 import { mapActions, mapGetters } from 'vuex';
+import { addImagesToFormData, prepareFormData } from '@/utils/formData-helpers';
 
 export default {
   name: 'editAthletePage',
@@ -25,7 +26,7 @@ export default {
   data() {
     return {
       athlete: {
-        rus_code: '',
+        ffr_id: '',
         gender: '',
         lastname: '',
         name: '',
@@ -72,6 +73,7 @@ export default {
     async loadAthleteData() {
       try {
         const response = await axios.get(`${apiUrl}/athletes/${this.athlete_code}`);
+
         if (response.status === 200) {
           const athleteData = response.data.data;
           Object.keys(this.athlete).forEach((key) => {
@@ -98,20 +100,10 @@ export default {
         }
       }
     },
-    async updateAthlete(selectedFile) {
-      const formData = new FormData();
+    async updateAthlete(images) {
+      const formData = prepareFormData(this.athlete, ['birth_date']);
 
-      Object.keys(this.athlete).forEach((key) => {
-        if (Array.isArray(this.athlete[key]) || typeof this.athlete[key] === 'object') {
-          formData.append(key, JSON.stringify(this.athlete[key]));
-        } else {
-          formData.append(key, this.athlete[key]);
-        }
-      });
-
-      for (const imageKey in selectedFile) {
-        formData.append(imageKey, selectedFile[imageKey]);
-      }
+      addImagesToFormData(formData, images);
 
       try {
         const response = await axios.patch(`${apiUrl}/athletes/${this.athlete_code}`, formData, {

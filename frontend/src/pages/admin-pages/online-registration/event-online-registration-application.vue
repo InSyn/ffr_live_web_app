@@ -9,11 +9,13 @@ import axios from 'axios';
 import DocumentsSelectControl from '@/components/ui-components/custom-controls/documents-select-control.vue';
 import MessageContainer from '@/components/ui-components/message-container.vue';
 import LoaderSpinner from '@/components/ui-components/loader-spinner.vue';
+import { addDocumentsToFormData } from '@/utils/formData-helpers';
 
 export default {
   name: 'index',
   props: {
-    event_id: String,
+    event_id: { type: String, required: true },
+    application_id: { type: String, default: null },
   },
   components: { LoaderSpinner, MessageContainer, DocumentsSelectControl, CountryFlag },
   computed: {
@@ -24,8 +26,22 @@ export default {
       return backendRootUrl;
     },
     getAvailableAthletes() {
-      return this.regionAthletes.filter((athlete) => {
-        return !this.registeredAthletes.find((registeredAthlete) => registeredAthlete.athlete._id === athlete._id);
+      const { role, ffr_id, region } = this.userData;
+
+      let associatedAthletes = [];
+      if (role === 'regional_organization') {
+        associatedAthletes = this.dbAthletes.filter((athlete) => {
+          return athlete.regions.includes(region);
+        });
+      }
+      if (role === 'trainer') {
+        associatedAthletes = this.dbAthletes.filter((athlete) => {
+          return athlete?.trainer?.trainer_id === ffr_id;
+        });
+      }
+
+      return associatedAthletes.filter((athlete) => {
+        return !this.registeredAthletes.some((registeredAthlete) => registeredAthlete.athlete._id === athlete._id);
       });
     },
   },
@@ -33,7 +49,7 @@ export default {
     return {
       event: null,
 
-      regionAthletes: [],
+      dbAthletes: [],
 
       editAthlete: null,
       registeredAthletes: [],
@@ -43,7 +59,8 @@ export default {
       messages: [],
       errors: [],
 
-      loading: true,
+      loading: false,
+      isSubmitting: false,
     };
   },
   methods: {
@@ -60,19 +77,38 @@ export default {
         if (eventData) {
           this.event = eventData;
         }
-        await this.getRegionAthletes();
+        if (this.application_id) await this.loadApplicationData();
+
+        await this.getDBAthletes();
       } catch (e) {
         console.error(e);
       } finally {
         this.loading = false;
       }
     },
-    async getRegionAthletes() {
+    async loadApplicationData() {
+      try {
+        const response = await axios.get(`${apiUrl}/event-online-registration/registered-applications/${this.application_id}`, {
+          headers: {
+            authorization: `Bearer ${this.userData.token}`,
+          },
+        });
+        if (response.status === 200) {
+          const { athletes, documents } = response.data.registration;
+
+          this.registeredAthletes = athletes;
+          this.registrationDocuments = documents;
+        }
+      } catch (e) {
+        console.error(e?.response?.data?.message);
+      }
+    },
+    async getDBAthletes() {
       try {
         const response = await axios.get(`${apiUrl}/athletes`);
 
         if (response.status === 200) {
-          this.regionAthletes = response.data['athletes'];
+          this.dbAthletes = response.data['athletes'];
         }
       } catch (err) {
         if (err) {
@@ -97,7 +133,13 @@ export default {
       this.registeredAthletes = this.registeredAthletes.filter((registeredAthlete) => registeredAthlete.athlete._id !== athlete.athlete._id);
     },
 
+    updateDocuments(documents) {
+      this.registrationDocuments = [...documents];
+    },
+
     async submitRegistration() {
+      this.isSubmitting = true;
+
       const registeredAthletes = this.registeredAthletes.map((athlete) => {
         return { athlete: athlete.athlete._id, group: athlete.group };
       });
@@ -109,8 +151,14 @@ export default {
         athletes: registeredAthletes,
         athletes_groups: this.event.athletes_groups,
       };
+
+      const formData = new FormData();
+      formData.append('registration_data', JSON.stringify(registrationData));
+
+      addDocumentsToFormData(formData, this.registrationDocuments);
+
       try {
-        const response = await axios.post(`${apiUrl}/event-online-registration`, registrationData, {
+        const response = await axios.post(`${apiUrl}/event-online-registration`, formData, {
           headers: {
             'Content-Type': 'application/json',
             authorization: `Bearer ${this.userData.token}`,
@@ -123,11 +171,67 @@ export default {
       } catch (e) {
         console.error(e?.response?.data?.message);
         this.errors.push(`Ошибка регистрации заявки: ${e?.response?.data?.message}`);
+      } finally {
+        setTimeout(() => {
+          if (this.$route.name === 'eventOnlineRegistrationApplication') this.$router.push({ name: 'userPage' });
+        }, 1280);
       }
     },
+    async updateRegistration() {
+      const registeredAthletes = this.registeredAthletes.map((athlete) => {
+        return { athlete: athlete.athlete._id, group: athlete.group };
+      });
 
-    updateDocuments(documents) {
-      this.registrationDocuments = [...documents];
+      const registrationData = {
+        athletes: registeredAthletes,
+      };
+
+      const formData = new FormData();
+      formData.append('registration_data', JSON.stringify(registrationData));
+
+      addDocumentsToFormData(formData, this.registrationDocuments);
+
+      try {
+        const response = await axios.put(`${apiUrl}/event-online-registration/registered-applications/${this.application_id}`, formData, {
+          headers: {
+            'Content-Type': 'application/json',
+            authorization: `Bearer ${this.userData.token}`,
+          },
+        });
+
+        if (response.status === 200) {
+          this.messages.push('Данные заявки были успешно обновлены');
+        }
+      } catch (e) {
+        console.error(e);
+        this.errors.push(`Ошибка обновления заявки: ${e?.response?.data?.message}`);
+      } finally {
+        setTimeout(() => {
+          if (this.$route.name === 'eventOnlineRegistrationApplication') this.$router.push({ name: 'userPage' });
+        }, 1280);
+      }
+    },
+    async deleteRegistration() {
+      if (!confirm('Удалить заявку?')) return;
+
+      try {
+        const response = await axios.delete(`${apiUrl}/event-online-registration/registered-applications/${this.application_id}`, {
+          headers: {
+            authorization: `Bearer ${this.userData.token}`,
+          },
+        });
+
+        if (response.status === 200) {
+          this.messages.push('Заявка была успешно удалена');
+        }
+      } catch (e) {
+        console.error(e);
+        this.errors.push(`Ошибка удаления заявки: ${e?.response?.data?.message}`);
+      } finally {
+        setTimeout(() => {
+          if (this.$route.name === 'eventOnlineRegistrationApplication') this.$router.push({ name: 'userPage' });
+        }, 1280);
+      }
     },
   },
 
@@ -190,7 +294,7 @@ export default {
                       @click="removeAthleteFromGroup(athlete, group)"
                     >
                       <span>{{ `${athlete.athlete.lastname} ${athlete.athlete.name}` }}</span>
-                      <span>{{ `${athlete.athlete.rus_code}` }}</span>
+                      <span>{{ `${athlete.athlete.ffr_id}` }}</span>
                     </div>
                   </div>
                 </div>
@@ -208,7 +312,7 @@ export default {
                   @click="selectAthleteToAdd(athlete._id)"
                 >
                   <div class="registrationAthletes__availableAthletes__list__item__data">
-                    {{ athlete.rus_code + ' - ' + athlete.lastname + ' ' + athlete.name }}
+                    {{ athlete.ffr_id + ' - ' + athlete.lastname + ' ' + athlete.name }}
                   </div>
                   <div class="editingAthlete__groups">
                     <span v-for="group in event.athletes_groups" :key="group" @click.stop="addAthleteToGroup(athlete, group)">{{ group }}</span>
@@ -225,6 +329,7 @@ export default {
               class="attachedDocuments__control"
               :initial-documents="registrationDocuments"
               @update:documents="updateDocuments"
+              :horizontal="true"
             ></documents-select-control>
           </div>
         </div>
@@ -233,7 +338,13 @@ export default {
           <div class="registrationApplicationStats__item">Прикреплено документов: {{ registrationDocuments.length }}</div>
         </div>
         <div class="eventOnlineRegistration__actions">
-          <button type="button" class="actionButton" @click.prevent="submitRegistration">Сохранить</button>
+          <button v-if="!application_id" type="button" class="actionButton" :disabled="isSubmitting" @click.prevent="submitRegistration">
+            {{ isSubmitting ? 'Отправка...' : 'Подать заявку' }}
+          </button>
+          <button v-else type="button" class="actionButton" @click.prevent="updateRegistration">Сохранить изменения</button>
+          <button v-if="application_id" type="button" class="actionButton action-delete" @click.prevent="deleteRegistration">
+            {{ 'Удалить' }}
+          </button>
         </div>
       </div>
     </div>
@@ -247,6 +358,7 @@ export default {
   flex: 1 1 0;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
   padding: var(--padd-page);
 
   .eventOnlineRegistration__wrapper {
@@ -284,7 +396,7 @@ export default {
         flex-wrap: nowrap;
         gap: 0 1.25rem;
         margin-bottom: 1.25rem;
-        padding: 0.25rem;
+        padding: 0.75rem 0.25rem;
 
         .eventImage__wrapper {
           display: flex;
@@ -393,6 +505,8 @@ export default {
                     align-items: center;
                     padding: 0.5rem;
                     font-size: 0.8rem;
+                    cursor: pointer;
+                    transition: color 64ms;
 
                     & > * {
                       display: inline-block;
@@ -400,6 +514,9 @@ export default {
                       &:nth-child(2) {
                         margin-left: auto;
                       }
+                    }
+                    &:hover {
+                      color: var(--message-error);
                     }
                   }
                 }
@@ -483,20 +600,11 @@ export default {
         .attachedDocuments__title {
           flex: 0 0 auto;
           padding: 0.25rem 0.75rem;
-          font-size: 1.2rem;
         }
         .attachedDocuments__body {
-          flex: 1 1 0;
-          display: flex;
+          flex: 1 1 200px;
           overflow-y: auto;
-          flex-wrap: wrap;
-          gap: 0.5rem 1.25rem;
           padding: 0.5rem 1rem;
-
-          .attachedDocuments__control {
-            flex: 0 0 auto;
-            max-width: 300px;
-          }
         }
       }
 
@@ -507,12 +615,12 @@ export default {
 
         .registrationApplicationStats__item {
           padding: 0.25rem 0.75rem;
-          font-size: 1.2rem;
         }
       }
       .eventOnlineRegistration__actions {
         display: flex;
         justify-content: flex-end;
+        gap: 0.75rem;
         padding: 0.5rem 1.25rem 0.25rem;
         border-top: 1px solid var(--border-container);
       }

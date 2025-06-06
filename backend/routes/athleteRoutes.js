@@ -21,6 +21,8 @@ athleteRouter
 
 athleteRouter.route('/find').get(athleteController.searchAthletes);
 
+athleteRouter.route('/tv-photo-url/:code').get(athleteController.getAthleteTvPhotoUrl);
+
 athleteRouter
   .route('/:code')
   .get(athleteController.getAthlete)

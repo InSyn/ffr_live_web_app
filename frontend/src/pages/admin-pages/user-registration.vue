@@ -57,7 +57,7 @@ export default {
           }, 2000);
         }
       } catch (error) {
-        console.log(error?.response?.data?.message);
+        console.error(error?.response?.data?.message);
         this.errors.push(error?.response?.data?.message);
       }
     },

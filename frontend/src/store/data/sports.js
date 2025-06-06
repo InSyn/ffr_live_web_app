@@ -37,6 +37,13 @@ export const sports = [
   // },
 ];
 
+export const checkCompetitionDiscipline = (competition, dscCodesArr) => {
+  if (!competition || !dscCodesArr || !dscCodesArr.length) return false;
+
+  const dscName = (competition && competition.discipline_code) || '';
+  return dscCodesArr.some((dscCode) => dscName === dscCode);
+};
+
 export const getDisciplines = (athleteSport) => {
   if (!athleteSport) return;
   const sport = sports.find((sport) => {
@@ -57,4 +64,24 @@ export const getDisciplineCode = (discipline) => {
   if (!dscCode) return '';
 
   return dscCode;
+};
+
+export const isQualification = (competition) => {
+  if (!competition) return false;
+
+  const stage = competition.stage ? competition.stage.split(' ')[0] : '';
+  return stage === 'Квалификация';
+};
+export const isQualificationOfDisciplines = (competition, dscCodes) => {
+  return isQualification(competition) && checkCompetitionDiscipline(competition, dscCodes);
+};
+
+export const isFinal = (competition) => {
+  if (!competition) return false;
+
+  const stage = competition.stage ? competition.stage.split(' ')[0] : '';
+  return stage.toLowerCase() === 'финал';
+};
+export const isFinalOfDisciplines = (competition, dscCodes) => {
+  return isFinal(competition) && checkCompetitionDiscipline(competition, dscCodes);
 };

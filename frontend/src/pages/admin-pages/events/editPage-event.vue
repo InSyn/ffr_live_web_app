@@ -30,6 +30,7 @@ import MessageContainer from '@/components/ui-components/message-container.vue';
 import EventForm from '@/pages/admin-pages/events/form-event.vue';
 import { formatDate } from '@/utils/data-formaters';
 import OnlineRegistrationSection from '@/pages/admin-pages/events/onlineRegistrationSettingsSection.vue';
+import { addDocumentsToFormData, addImagesToFormData, prepareFormData } from '@/utils/formData-helpers';
 
 export default {
   name: 'editEventPage',
@@ -117,54 +118,11 @@ export default {
         }
       }
     },
-    async updateEvent(selectedFile) {
-      const formData = new FormData();
+    async updateEvent(images) {
+      const formData = prepareFormData(this.event, ['start_at']);
 
-      Object.keys(this.event).forEach((key) => {
-        const value = this.event[key];
-
-        if (key === 'documents') return;
-
-        if (Array.isArray(value) || typeof value === 'object') {
-          formData.append(key, JSON.stringify(value));
-        } else {
-          if (key === 'start_at') {
-            formData.append(key, new Date(value).toISOString());
-            return;
-          }
-          formData.append(key, value);
-        }
-      });
-
-      if (this.event.documents.length) {
-        const documents = this.event.documents.filter((doc) => doc.file);
-
-        const filteredDocuments = documents.filter((doc) => doc.file?.url || doc.file?.newFile);
-
-        formData.append(
-          'documents',
-          JSON.stringify(
-            filteredDocuments.map((doc) => {
-              const file = doc.file?.newFile ? {} : doc.file;
-              return {
-                title: doc.title,
-                created_at: doc.created_at,
-                file: file,
-              };
-            })
-          )
-        );
-
-        filteredDocuments.forEach((doc, index) => {
-          if (doc.file?.newFile) {
-            formData.append(`document${index}`, doc.file?.newFile);
-          }
-        });
-      }
-
-      for (const imageKey in selectedFile) {
-        formData.append(imageKey, selectedFile[imageKey]);
-      }
+      addDocumentsToFormData(formData, this.event.documents);
+      addImagesToFormData(formData, images);
 
       try {
         const response = await axios.put(`${apiUrl}/events/${this.event_id}`, formData, {
@@ -238,7 +196,7 @@ export default {
         }
       } catch (error) {
         if (error) {
-          console.log(error?.response?.data);
+          console.log(error?.response?.data?.message);
           this.errors.push(error?.response?.data?.message);
         }
       }

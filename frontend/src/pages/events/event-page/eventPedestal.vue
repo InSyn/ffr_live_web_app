@@ -29,11 +29,11 @@
       </div>
       <div v-if="pedestalAthletes[athletePlace]" class="pedestalAthleteInfo__wrapper">
         <router-link
-          v-if="pedestalAthletes[athletePlace].rus_code"
+          v-if="pedestalAthletes[athletePlace].ffr_id"
           class="athleteName__link"
           :to="{
             name: 'athletePage',
-            params: { athlete_code: pedestalAthletes[athletePlace].rus_code },
+            params: { athlete_code: pedestalAthletes[athletePlace].ffr_id },
           }"
         >
           {{ getAthleteName(pedestalAthletes[athletePlace]) }}
@@ -89,8 +89,8 @@ export default {
           resultsTop.map(async (result) => {
             let athlete = this.competition['competitors'].find((competitor) => competitor['local_id'] === result['competitor_id']);
 
-            if (athlete && athlete.rus_code) {
-              const athleteData = await this.loadAthleteData(athlete.rus_code);
+            if (athlete && athlete.ffr_id) {
+              const athleteData = await this.loadAthleteData(athlete.ffr_id);
               athlete = { ...athlete, ...athleteData };
             }
 

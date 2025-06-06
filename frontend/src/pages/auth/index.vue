@@ -46,31 +46,13 @@ export default {
       updateUserData: 'CHECK_STORED_DATA',
     }),
 
-    addError(errMessage) {
-      if (!this.errors.some((err) => err === errMessage)) this.errors.push(errMessage);
-
-      setTimeout(() => {
-        const errIndex = this.errors.indexOf(errMessage).toString();
-
-        if (errIndex) this.errors.splice(Number(errIndex), 1);
-      }, 2048);
-    },
-    addMessage(message) {
-      if (!this.messages.some((msg) => msg === message)) this.messages.push(message);
-
-      setTimeout(() => {
-        const msgIdx = this.messages.indexOf(message).toString();
-
-        if (msgIdx) this.messages.splice(Number(msgIdx), 1);
-      }, 2048);
-    },
     async authorizeUser() {
       if (!this.authorizationData.username) {
-        this.addError('Введите логин');
+        this.errors.push('Введите логин');
         return;
       }
       if (!this.authorizationData.password) {
-        this.addError('Введите пароль');
+        this.errors.push('Введите пароль');
         return;
       }
 
@@ -78,6 +60,7 @@ export default {
         const authResponse = await axios.post(apiUrl + '/auth/login', this.authorizationData);
         if (authResponse.status === 200) {
           const userData = {
+            id: authResponse.data.id,
             username: this.authorizationData.username,
             token: authResponse.data.token,
             role: authResponse.data.role,
@@ -85,7 +68,7 @@ export default {
             ffr_id: authResponse.data.ffr_id,
           };
           localStorage.setItem('authorizationData', JSON.stringify(userData));
-          this.addMessage(`Добрый день, ${userData.username}!`);
+          this.messages.push(`Добрый день, ${userData.username}!`);
 
           setTimeout(() => {
             if (this.$route.name !== 'results') this.$router.push({ name: 'results' });
@@ -94,7 +77,7 @@ export default {
           }, 1536);
         }
       } catch (e) {
-        this.addError(e?.response?.data?.message || e.message);
+        this.errors.push(e?.response?.data?.message || e.message);
       }
     },
   },

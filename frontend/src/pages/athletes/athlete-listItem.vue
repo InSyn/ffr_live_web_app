@@ -1,5 +1,5 @@
 <template>
-  <router-link :to="{ name: 'athletePage', params: { athlete_code: athlete.rus_code } }">
+  <router-link :to="{ name: 'athletePage', params: { athlete_code: athlete.ffr_id } }">
     <div class="athlete__listItem__wrapper">
       <person-photo class="athletePhoto" :person="athlete"></person-photo>
 
@@ -9,7 +9,7 @@
         </span>
 
         <span class="athleteInfo__code">
-          <b>FFR-ID:&nbsp; {{ athlete.rus_code }}</b>
+          <b>FFR-ID:&nbsp; {{ athlete.ffr_id }}</b>
           <country-flag
             class="athleteInfo__countryFlag"
             :country-code="getCountryCode(athlete.country)"
@@ -39,14 +39,14 @@
           </div>
 
           <div class="personalInfo__item__wrapper athleteRegions" v-if="athlete['regions'].length">
-            {{ concatStringsWithComma(['regions']) }}
+            {{ concatStringsWithComma(athlete['regions']) }}
           </div>
         </div>
 
         <div class="athleteSport__wrapper">
           <div class="sport">{{ athlete.sport }}</div>
           <div class="disciplines__wrapper">
-            <div class="discipline__item" v-for="dsc in athlete.disciplines" :key="dsc">
+            <div class="discipline__item" v-for="(dsc, idx) in athlete.disciplines" :key="idx + dsc">
               {{ getDisciplineCode(dsc) }}
             </div>
           </div>
@@ -61,7 +61,6 @@ import CountryFlag from '@/components/ui-components/country-flag.vue';
 import { getDisciplineCode } from '@/store/data/sports';
 import { concatStringsWithComma, formatBirthDate, getAthleteName } from '@/utils/data-formaters';
 import { getRegionCode } from '@/store/data/russia-regions';
-import { backendRootUrl } from '@/constants';
 import { getShortAthleteRank } from '@/store/data/sport-data-sets';
 import PersonPhoto from '@/components/ui-components/person-photo.vue';
 import { getCountryCode } from '@/store/data/countries';
@@ -75,9 +74,6 @@ export default {
     concatStringsWithComma,
     getCountryCode,
     getShortAthleteRank,
-    uploadsFolderUrl() {
-      return backendRootUrl;
-    },
     getRegionCode,
     getAthleteName,
     formatBirthDate,

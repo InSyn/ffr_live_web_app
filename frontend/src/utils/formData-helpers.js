@@ -34,6 +34,8 @@ export const prepareFormData = (data, dateFields = []) => {
   Object.keys(data).forEach((key) => {
     const value = data[key];
 
+    if (key === 'documents') return;
+
     if (Array.isArray(value) || typeof value === 'object') {
       formData.append(key, JSON.stringify(value));
     } else if (dateFields.includes(key)) {

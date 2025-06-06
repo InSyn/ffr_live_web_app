@@ -22,15 +22,16 @@ export const competingAthleteSchema = new mongoose.Schema({
   local_id: String,
   bib: Number | String,
 
-  rus_code: String,
+  ffr_id: String,
   name: String,
   lastname: String,
+  country: String,
+  region: String,
   country_code: String,
   region_code: String,
 });
-
 export const athleteSchema = new mongoose.Schema({
-  rus_code: { type: String, required: true, unique: true },
+  ffr_id: { type: String, required: true, unique: true },
 
   name: { type: String, required: true },
   lastname: { type: String, required: true },
@@ -49,7 +50,7 @@ export const athleteSchema = new mongoose.Schema({
   disciplines: [String],
   category: String,
   is_national_team: Boolean,
-  trainer: athleteTrainerSchema,
+  trainer: athleteTrainerSchema || null,
   education: String,
   hobbies: [String],
   athleteAbout: String,
@@ -64,7 +65,7 @@ export const athleteSchema = new mongoose.Schema({
 });
 
 athleteSchema.index({
-  rus_code: 1,
+  ffr_id: 1,
   name: 'text',
   lastname: 'text',
 });

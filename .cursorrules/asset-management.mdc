@@ -1,0 +1,144 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Asset Management & Organization
+
+## Asset Directory Structure
+```
+frontend/src/assets/
+├── fonts/                  # Custom web fonts
+├── icons/                  # SVG icon components
+├── logo/                   # Brand logos and images
+├── styles/                 # CSS/SCSS style files
+├── svg/                    # Static SVG assets
+├── riv/                    # Rive animation files
+├── flags/                  # Country/region flag images
+└── athleteRegion-background/ # Regional background images
+```
+
+## Font Management
+### Custom Font: Petrov Sans-Trial
+- **Location**: [frontend/src/assets/fonts/Petrov Sans-Trial/](mdc:frontend/src/assets/fonts/Petrov Sans-Trial)
+- **CSS File**: [petrov-sans-trial.css](mdc:frontend/src/assets/fonts/Petrov Sans-Trial/petrov-sans-trial.css)
+- **Formats**: WOFF2 (preferred) and WOFF (fallback)
+- **Weights Available**: Thin (100) to Black (900)
+
+### Font Loading Strategy
+```css
+@font-face {
+  font-family: 'Petrov Sans-Trial';
+  src: url('PetrovSans-Trial-Regular.woff2') format('woff2'),
+       url('PetrovSans-Trial-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap; /* Optimize loading performance */
+}
+```
+
+## Icon System
+### SVG Icon Components
+- **Location**: [frontend/src/assets/icons/](mdc:frontend/src/assets/icons)
+- **Naming Convention**: `{name}-icon.vue`
+- **Format**: Vue Single File Components with SVG templates
+
+### Icon Component Structure
+```vue
+<template>
+  <svg viewBox="0 0 24 24" height="24px" width="24px" xmlns="http://www.w3.org/2000/svg">
+    <path d="..." fill="currentColor" />
+  </svg>
+</template>
+
+<script>
+export default {
+  name: "icon-name",
+};
+</script>
+```
+
+### Available Icons
+- [download-icon.vue](mdc:frontend/src/assets/icons/download-icon.vue) - Download functionality
+- [file-icon.vue](mdc:frontend/src/assets/icons/file-icon.vue) - File representation
+- [medal-icon.vue](mdc:frontend/src/assets/icons/medal-icon.vue) - Achievement/awards
+- [cup-icon.vue](mdc:frontend/src/assets/icons/cup-icon.vue) - Competition/trophy
+- [athlete-ski.vue](mdc:frontend/src/assets/icons/athlete-ski.vue) - Skiing sports
+- [athlete-snowboard.vue](mdc:frontend/src/assets/icons/athlete-snowboard.vue) - Snowboarding sports
+- [socials-telegram-icon.vue](mdc:frontend/src/assets/icons/socials-telegram-icon.vue) - Social media
+- [socials-vk-icon.vue](mdc:frontend/src/assets/icons/socials-vk-icon.vue) - Social media
+
+### Icon Usage Guidelines
+1. Use `currentColor` for fill to inherit text color
+2. Maintain 24x24px viewBox for consistency
+3. Keep stroke width at 1.5px for outline icons
+4. Export icons as Vue components for reusability
+
+## Logo & Brand Assets
+### Organization Logos
+- **Location**: [frontend/src/assets/logo/](mdc:frontend/src/assets/logo)
+- **Formats**: PNG for web compatibility
+- **Variants**: Regular and mini versions available
+
+### Available Logos
+- [FSR_logo.png](mdc:frontend/src/assets/logo/FSR_logo.png) / [FSR_logo_mini.png](mdc:frontend/src/assets/logo/FSR_logo_mini.png)
+- [FFR_logo.png](mdc:frontend/src/assets/logo/FFR_logo.png) / [FFR_logo_mini.png](mdc:frontend/src/assets/logo/FFR_logo_mini.png)
+- [SPORTTECHLOGO-WHITE.png](mdc:frontend/src/assets/logo/SPORTTECHLOGO-WHITE.png) - White variant
+- [TIMINGWEBLOGO-BLACK.png](mdc:frontend/src/assets/logo/TIMINGWEBLOGO-BLACK.png) - Dark theme
+- [TIMINGWEBLOGO-WHITE.png](mdc:frontend/src/assets/logo/TIMINGWEBLOGO-WHITE.png) - Light theme
+
+### Logo Usage Guidelines
+1. Use appropriate variants for light/dark themes
+2. Maintain aspect ratios when scaling
+3. Provide alt text for accessibility
+4. Use mini versions for compact layouts
+
+## Image Optimization
+### Best Practices
+1. **Format Selection**:
+   - PNG: Logos, icons with transparency
+   - JPEG: Photographs, complex images
+   - SVG: Simple graphics, icons
+   - WebP: Modern browsers (with fallbacks)
+
+2. **Responsive Images**:
+   - Provide multiple sizes for different screen densities
+   - Use `srcset` for responsive image delivery
+
+3. **Performance**:
+   - Optimize file sizes without quality loss
+   - Lazy load images below the fold
+   - Use appropriate compression levels
+
+## Asset Import Patterns
+### In Vue Components
+```javascript
+// Import static assets
+import logo from '@/assets/logo/FSR_logo.png';
+import IconComponent from '@/assets/icons/download-icon.vue';
+
+// In template
+<img :src="logo" alt="FSR Logo" />
+<IconComponent />
+```
+
+### CSS Background Images
+```css
+.background-image {
+  background-image: url('@/assets/images/background.jpg');
+  background-size: cover;
+  background-position: center;
+}
+```
+
+## Accessibility Considerations
+1. **Alt Text**: Always provide meaningful alt text for images
+2. **Icon Labels**: Use aria-label or sr-only text for icon-only buttons
+3. **Color Contrast**: Ensure logos/images don't interfere with text contrast
+4. **Focus States**: Ensure interactive images have visible focus indicators
+
+## File Naming Conventions
+- **Kebab-case** for all asset files: `my-asset-name.png`
+- **Descriptive names** that indicate purpose: `navigation-menu-icon.vue`
+- **Version suffixes** when needed: `logo-v2.png`
+- **Theme variants**: `logo-dark.png`, `logo-light.png`

@@ -44,7 +44,7 @@ export default {
 <style lang="scss" scoped>
 .messages__wrapper {
   position: fixed;
-  z-index: 99;
+  z-index: 999;
   display: grid;
   grid-template-rows: 0fr;
   gap: 8px;

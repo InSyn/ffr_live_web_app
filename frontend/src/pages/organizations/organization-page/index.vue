@@ -75,7 +75,7 @@
 
     <div class="organizationCard__bottom">
       <organization-team-list v-if="bottomPage === 'team'" :team="team"></organization-team-list>
-      <reports-list v-if="bottomPage === 'reports'"></reports-list>
+      <reports-list v-if="bottomPage === 'reports'" :organization-id="organization._id" :organization-region="organization.region"></reports-list>
       <events-with-registration-list v-if="bottomPage === 'eventsWithRegistration'"></events-with-registration-list>
     </div>
   </div>
@@ -444,7 +444,7 @@ export default {
     flex-direction: column;
     max-width: var(--desktop-small);
     width: 100%;
-    margin: 2rem auto 1rem;
+    margin: 0.75rem auto 0.5rem;
     padding: 0 2rem;
 
     @media screen and (max-width: 720px) {

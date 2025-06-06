@@ -1,0 +1,63 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# TW Live Design System & Style Guide
+
+## Overview
+This is a Vue 2 + Vuetify sports timing and live event management platform with a comprehensive design system built on CSS custom properties.
+
+## Core Design Files
+- Colors: [frontend/src/assets/styles/colors.css](mdc:frontend/src/assets/styles/colors.css)
+- Typography: [frontend/src/assets/styles/defaults.css](mdc:frontend/src/assets/styles/defaults.css)
+- Breakpoints: [frontend/src/assets/styles/sizes.css](mdc:frontend/src/assets/styles/sizes.css)
+- Custom Font: [frontend/src/assets/fonts/Petrov Sans-Trial/petrov-sans-trial.css](mdc:frontend/src/assets/fonts/Petrov Sans-Trial/petrov-sans-trial.css)
+
+## Brand Identity
+- **Primary Brand Color**: `--accent: #1a9ad7` (Blue)
+- **Secondary Brand**: `--ffr-brand: #009eda` (FFR Blue)
+- **Success Color**: `--success: #46C289` (Green)
+- **Error Color**: `--message-error: #D94D58` (Red)
+
+## Typography System
+- **Primary Font**: "Petrov Sans-Trial" (Custom font with multiple weights)
+- **Font Stack**: "Petrov Sans-Trial", Avenir, Helvetica, Arial, sans-serif
+- **Letter Spacing**: 0.01em standard
+- **Responsive Font Sizes**: Defined in media queries for different screen sizes
+
+## Color System
+### Light Theme
+- Background Primary: `--background--primary: #dadadf`
+- Background Card: `--background--card: rgba(242,242,248,0.92)`
+- Text Default: `--text-default: #080811`
+- Text Muted: `--text-muted: #757589`
+
+### Dark Theme
+- Uses `.theme-dark` class
+- Background Primary: `--background--primary: #2f2f34`
+- Background Card: `--background--card: rgba(16,16,24,0.92)`
+- Text Default: `--text-default: #f2f2f7`
+
+## Responsive Breakpoints
+- Desktop 2K: 2560px
+- Desktop Big: 1980px
+- Desktop Small: 1280px
+- Tablet Default: 920px
+- Tablet Small: 720px
+- Mobile Default: 640px
+- Mobile Small: 480px
+
+## Spacing & Layout
+- Uses 8pt grid system
+- Mobile-first responsive design
+- CSS Grid and Flexbox for layouts
+- Custom scrollbar styling
+
+## Usage Guidelines
+1. Always use CSS custom properties (CSS variables) for theming
+2. Follow mobile-first responsive approach
+3. Use semantic color names (primary, success, error) over descriptive ones
+4. Maintain WCAG AA accessibility standards
+5. Use the custom Petrov Sans font family as primary typeface
+6. Implement proper dark/light theme support with `.theme-dark` class

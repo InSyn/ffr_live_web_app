@@ -11,6 +11,7 @@ import { apiUrl } from '@/constants';
 import { mapActions, mapGetters } from 'vuex';
 import MessageContainer from '@/components/ui-components/message-container.vue';
 import AthleteForm from '@/pages/admin-pages/athletes/form-athlete.vue';
+import { addImagesToFormData, prepareFormData } from '@/utils/formData-helpers';
 
 export default {
   name: 'createAthletePage',
@@ -18,7 +19,7 @@ export default {
   data() {
     return {
       athlete: {
-        rus_code: '',
+        ffr_id: '',
         gender: '',
         lastname: '',
         name: '',
@@ -58,20 +59,10 @@ export default {
     ...mapActions('athletes', {
       fetchAthletes: 'LOAD_ATHLETES',
     }),
-    async createAthlete(selectedFile) {
-      const formData = new FormData();
+    async createAthlete(images) {
+      const formData = prepareFormData(this.athlete, ['birth_date']);
 
-      Object.keys(this.athlete).forEach((key) => {
-        if (Array.isArray(this.athlete[key]) || typeof this.athlete[key] === 'object') {
-          formData.append(key, JSON.stringify(this.athlete[key]));
-        } else {
-          formData.append(key, this.athlete[key]);
-        }
-      });
-
-      for (const imageKey in selectedFile) {
-        formData.append(imageKey, selectedFile[imageKey]);
-      }
+      addImagesToFormData(formData, images);
 
       try {
         const response = await axios.post(`${apiUrl}/athletes/`, formData, {
@@ -89,7 +80,7 @@ export default {
             if (this.$route.name === 'createAthletePage') {
               this.$router.push({
                 name: 'athletePage',
-                params: { athlete_code: response.data.athlete.rus_code },
+                params: { athlete_code: response.data.athlete.ffr_id },
               });
             }
           }, 1280);

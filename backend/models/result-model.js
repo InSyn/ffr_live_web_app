@@ -10,5 +10,6 @@ export const resultSchema = new mongoose.Schema({
     },
   ],
   value: String | Number,
+  gap: String | Number | null,
   trick_name: String,
 });

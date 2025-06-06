@@ -18,7 +18,7 @@
       </div>
 
       <div class="athleteCompetition__item__sportInfo">
-        <country-flag class="countryFlag" v-if="event.country_code" :country-code="event.country_code" width="1.25rem"></country-flag>
+        <country-flag class="countryFlag" v-if="event.country_code" :country-code="getCountryCode(event.country)" width="1.25rem"></country-flag>
         <div class="athleteCompetition__item__sportInfo__sport">
           {{ event['sport'] || '-' }}
         </div>
@@ -61,12 +61,14 @@ import CompetitionImageFillerIcon from '@/assets/svg/competitionImageFiller-icon
 import { formatDate } from '@/utils/data-formaters';
 import { backendRootUrl } from '@/constants';
 import CountryFlag from '@/components/ui-components/country-flag.vue';
+import { getCountryCode } from '@/store/data/countries';
 
 export default {
   name: 'athleteEventItem',
   components: { CountryFlag, CompetitionImageFillerIcon },
   props: ['athleteCode', 'event', 'competitions', 'index'],
   methods: {
+    getCountryCode,
     uploadsFolderUrl() {
       return backendRootUrl;
     },
@@ -79,7 +81,7 @@ export default {
         return competition['total_results'].find((result) => {
           if (!result) return;
 
-          const athleteLocalObj = competition['competitors'].find((competitor) => competitor['rus_code'] === this.athleteCode);
+          const athleteLocalObj = competition['competitors'].find((competitor) => competitor.ffr_id === this.athleteCode);
           if (!athleteLocalObj) return;
 
           result['competitor'] = athleteLocalObj;

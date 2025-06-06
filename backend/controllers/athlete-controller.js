@@ -5,7 +5,7 @@ import { deleteFileIfExists, extractFilesByPrefix, parseJsonFields } from '../ut
 
 const getLastAthleteCode = async () => {
   const lastAthlete = await Athlete.findOne().sort({ _id: -1 });
-  const lastIndex = lastAthlete ? lastAthlete['rus_code'] : null;
+  const lastIndex = lastAthlete ? lastAthlete.ffr_id : null;
 
   return (Number(lastIndex) + 1).toString().padStart(4, '0') || '0001';
 };
@@ -29,8 +29,8 @@ export const getAllAthletes = async (req, res) => {
 export const searchAthletes = async (req, res) => {
   try {
     const query = {};
-    if (req.query.rus_code) {
-      query.rus_code = req.query.rus_code;
+    if (req.query.ffr_id) {
+      query.ffr_id = req.query.ffr_id;
     }
     if (req.query.name) {
       const [lastname, name] = req.query.name.split(' ');
@@ -92,7 +92,7 @@ export const addNewAthlete = async (req, res) => {
     const parsedFields = parseJsonFields(req.body, ['regions', 'organizations', 'disciplines', 'trainer', 'equipment', 'hobbies', 'medals', 'socials']);
 
     const athlete = new Athlete({
-      rus_code: req.body.rus_code ? req.body.rus_code : await getLastAthleteCode(),
+      ffr_id: req.body.ffr_id ? req.body.ffr_id : await getLastAthleteCode(),
       name: req.body.name,
       lastname: formatLastname(req.body.lastname),
       gender: req.body.gender,
@@ -134,7 +134,7 @@ export const updateAthlete = async (req, res) => {
   const athleteId = req.params.code;
 
   try {
-    const athlete = await Athlete.findOne({ rus_code: athleteId });
+    const athlete = await Athlete.findOne({ ffr_id: athleteId });
     if (!athlete) {
       return res.status(404).json({
         status: 'Err',
@@ -160,13 +160,20 @@ export const updateAthlete = async (req, res) => {
       : athlete.sponsors;
 
     athlete.set({
+      ffr_id: req.body.ffr_id || athlete.ffr_id,
       name: req.body.name || athlete.name,
-      lastname: req.body.lastname || athlete.lastname,
+      lastname: formatLastname(req.body.lastname) || athlete.lastname,
+      gender: req.body.gender || athlete.gender,
+      birth_date: req.body.birth_date || athlete.birth_date,
       country: req.body.country || athlete.country,
+      sport: req.body.sport || athlete.sport,
+      category: req.body.category || athlete.category,
       photo_url: photoUrl,
       photo_tv_url: photoTvUrl,
       sponsors: updatedSponsors,
       is_national_team: req.body.is_national_team !== undefined ? req.body.is_national_team : athlete.is_national_team,
+      education: req.body.education || athlete.education,
+      athleteAbout: req.body.athleteAbout || athlete.athleteAbout,
       ...parsedFields,
     });
 
@@ -204,7 +211,7 @@ export const updateAthlete = async (req, res) => {
 
 export const getAthlete = async (req, res) => {
   try {
-    const athlete = await Athlete.findOne({ rus_code: req.params.code });
+    const athlete = await Athlete.findOne({ ffr_id: req.params.code });
 
     res.status(200).json({
       status: 'success',
@@ -223,7 +230,7 @@ export const getAthleteCompetitions = async (req, res) => {
   try {
     const events = await Event.find(
       {
-        'competitions.competitors.rus_code': req.params.code,
+        'competitions.competitors.ffr_id': req.params.code,
       },
       {
         created_at: 0,
@@ -247,12 +254,38 @@ export const getAthleteCompetitions = async (req, res) => {
   }
 };
 
+export const getAthleteTvPhotoUrl = async (req, res) => {
+  try {
+    const athlete = await Athlete.findOne({ ffr_id: req.params.code });
+
+    if (!athlete || !athlete.photo_tv_url) {
+      return res.status(404).json({
+        status: 'Err',
+        message: 'Фото TV не найдено',
+      });
+    }
+
+    const fullUrl = `${req.protocol}://${req.get('host')}${athlete.photo_tv_url}`;
+    res.status(200).json({
+      status: 'success',
+      photo_tv_url: fullUrl,
+    });
+  } catch (e) {
+    console.error('GET TV PHOTO URL ERR', e);
+    res.status(500).json({
+      status: 'Err',
+      message: 'Не удалось получить URL фото TV',
+      err: e.message,
+    });
+  }
+};
+
 export const deleteAthlete = async (req, res) => {
   const athleteId = req.params.code;
 
   try {
     const athlete = await Athlete.findOneAndDelete({
-      rus_code: athleteId,
+      ffr_id: athleteId,
     });
 
     if (!athlete) {

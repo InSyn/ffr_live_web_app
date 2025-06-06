@@ -12,6 +12,7 @@ import { apiUrl } from '@/constants';
 import SeminarForm from '@/pages/admin-pages/seminars/form-seminar.vue';
 import axios from 'axios';
 import { mapActions, mapGetters } from 'vuex';
+import { addDocumentsToFormData, prepareFormData } from '@/utils/formData-helpers';
 
 export default {
   name: 'createOrganization-Page',
@@ -46,44 +47,9 @@ export default {
     }),
 
     async createSeminar() {
-      const formData = new FormData();
+      const formData = prepareFormData(this.seminar, ['date']);
 
-      Object.keys(this.seminar).forEach((key) => {
-        const value = this.seminar[key];
-
-        if (key === 'documents') return;
-
-        if (Array.isArray(value) || typeof value === 'object') {
-          formData.append(key, JSON.stringify(value));
-        } else if (value !== undefined && value !== null) {
-          formData.append(key, value);
-        }
-      });
-
-      if (this.seminar.documents.length) {
-        const documents = this.seminar.documents.filter((doc) => doc.file);
-
-        const filteredDocuments = documents.filter((doc) => doc.file?.url || doc.file?.newFile);
-
-        formData.append(
-          'documents',
-          JSON.stringify(
-            filteredDocuments.map((doc) => {
-              const file = doc.file?.newFile ? {} : doc.file;
-              return {
-                title: doc.title,
-                file: file,
-              };
-            })
-          )
-        );
-
-        filteredDocuments.forEach((doc, index) => {
-          if (doc.file?.newFile) {
-            formData.append(`document${index}`, doc.file?.newFile);
-          }
-        });
-      }
+      addDocumentsToFormData(formData, this.seminar.documents);
 
       try {
         const response = await axios.post(`${apiUrl}/seminars/`, formData, {

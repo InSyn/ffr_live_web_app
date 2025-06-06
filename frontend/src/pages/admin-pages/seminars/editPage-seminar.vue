@@ -123,7 +123,7 @@ export default {
           await this.fetchSeminars();
 
           setTimeout(() => {
-            if (this.$route.name === 'editSeminarPage') this.$router.push({ name: 'seminarPage', params: { seminar_id: response.data.seminar.seminar_id } });
+            if (this.$route.name === 'editSeminarPage') this.$router.push({ name: 'seminarPage', params: { seminar_id: response.data.seminar._id } });
           }, 2000);
         }
       } catch (error) {

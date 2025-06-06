@@ -77,9 +77,9 @@
 
           <div class="athleteAdditionalInfo__wrapper">
             <div class="athleteAdditionalInfoSection mainSection">
-              <div v-if="athlete.rus_code" class="athleteInfo__group">
+              <div v-if="athlete.ffr_id" class="athleteInfo__group">
                 <b> FFR-ID: </b>
-                <span> {{ athlete.rus_code }}</span>
+                <span> {{ athlete.ffr_id }}</span>
               </div>
               <div v-if="athlete.birth_date" class="athleteInfo__group">
                 <b> Год рождения: </b>
@@ -121,10 +121,10 @@
                   {{ athlete.hobbies.join(', ') }}
                 </div>
               </div>
-              <div v-if="athlete.athleteAbout" class="athleteInfo__group">
-                <b> О себе: </b>
-                <span> {{ athlete.athleteAbout }}</span>
-              </div>
+              <!--              <div v-if="athlete.athleteAbout" class="athleteInfo__group">-->
+              <!--                <b> О себе: </b>-->
+              <!--                <span> {{ athlete.athleteAbout }}</span>-->
+              <!--              </div>-->
             </div>
             <div class="athleteAdditionalInfoSection equipmentSection">
               <div v-if="athlete.equipment.length" class="athleteInfo__group">
@@ -133,6 +133,12 @@
                     {{ equipment }}
                   </div>
                 </div>
+              </div>
+            </div>
+            <div class="athleteAdditionalInfoSection aboutSection">
+              <div v-if="athlete.athleteAbout" class="athleteInfo__group">
+                <b> О себе: </b>
+                <span> {{ athlete.athleteAbout }}</span>
               </div>
             </div>
           </div>
@@ -259,6 +265,7 @@ export default {
     },
   },
   mounted() {
+    console.log(this.$route);
     if (this.$route.params.athlete_code) {
       try {
         this.athleteIsLoading = true;
@@ -508,9 +515,11 @@ export default {
 
         .athleteAdditionalInfo__wrapper {
           display: grid;
-          grid-template-areas: 'main secondary equipment';
+          grid-template-areas:
+            'main secondary equipment'
+            'about about about';
           grid-template-columns: 2fr 1fr auto;
-          grid-gap: 1.25rem;
+          grid-gap: 0.75rem 1.25rem;
           padding: 0.75rem 1rem;
 
           .athleteAdditionalInfoSection {
@@ -533,6 +542,9 @@ export default {
             &.equipmentSection {
               grid-area: equipment;
               justify-self: flex-end;
+            }
+            &.aboutSection {
+              grid-area: about;
             }
 
             .athleteInfo__group {
@@ -696,7 +708,7 @@ export default {
     flex-direction: column;
     max-width: var(--desktop-small);
     width: 100%;
-    margin: 2rem auto 1rem;
+    margin: 0.75rem auto 0.5rem;
     padding: 0 2rem;
 
     .athleteCompetitions__wrapper {

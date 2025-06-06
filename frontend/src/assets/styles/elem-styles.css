@@ -3,17 +3,29 @@ button.actionButton {
     display: flex;align-items: center;
     gap: .25rem;
     padding: 0.25rem 0.75rem;
-    background: var(--background--card-hover);
+    background-color: var(--background--card-hover);
     border-radius: 4px;
     transition: background-color 64ms, color 64ms;
 }
 button.actionButton:hover {
-    background: var(--ffr-brand);
+    background-color: var(--ffr-brand);
     color: white;
 }
 button.actionButton:active {
     opacity: 0.75;
     scale: 0.95;
+}
+button.actionButton:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+button.actionButton.action-delete {
+    background-color: rgba(195,69,56,.24);
+    color: var(--background--card);
+}
+button.actionButton.action-delete:hover {
+    background-color: rgba(195,69,56,.78);
+    color: white;
 }
 
 button.downloadButton {

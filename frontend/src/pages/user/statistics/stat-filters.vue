@@ -70,7 +70,7 @@ export default {
           calendar_code: '',
         },
         athletes: {
-          rus_code: '',
+          ffr_id: '',
           sport: '',
           discipline: '',
           name: '',

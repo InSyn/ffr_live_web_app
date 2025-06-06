@@ -1,4 +1,11 @@
 :root {
+    --athlete-blue: #6165b8;
+    --athlete-red: #9c3f40;
+    --athlete-green: #2ba260;
+    --athlete-yellow: #C7AD38;
+}
+
+:root {
     --accent: #1a9ad7;
     --success: #46C289;
     --icon-color: var(--text-default);

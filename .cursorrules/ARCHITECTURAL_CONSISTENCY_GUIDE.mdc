@@ -1,0 +1,630 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# ARCHITECTURAL CONSISTENCY GUIDE
+*FFR Live Sports Platform - Maintaining System-wide Consistency*
+
+## 🏛️ Architectural Principles
+
+### Core Design Principles
+1. **Separation of Concerns**: Clear boundaries between frontend, backend, and database layers
+2. **Single Responsibility**: Each module, component, and function has one clear purpose
+3. **Consistency**: Uniform patterns across all parts of the system
+4. **Scalability**: Architecture supports growth in users, data, and features
+5. **Maintainability**: Code is readable, documented, and follows established patterns
+
+### Technology Consistency Rules
+```javascript
+// ✅ ALWAYS USE - Approved Technologies
+Frontend: Vue.js 2.6.11, Vuetify 2.4.0, Vuex 3.4.0, Vue Router 3.2.0
+Backend:  Node.js, Express 4.17.1, MongoDB 5.0, Mongoose 5.13.13
+Auth:     JWT with bcryptjs
+Files:    Multer for uploads
+Docker:   Official images (mongo:5.0-focal)
+
+// ❌ NEVER USE - Forbidden Technologies
+- Vue 3 (project uses Vue 2)
+- MySQL/PostgreSQL (project uses MongoDB)
+- Session-based auth (project uses JWT)
+- jQuery (use Vue.js patterns)
+- Bootstrap (project uses Vuetify)
+```
+
+## 🗂️ File Structure Consistency
+
+### Backend Structure (MANDATORY)
+```
+backend/
+├── controllers/          # Business logic handlers
+│   ├── auth-controller.js
+│   ├── event-controller.js
+│   └── [entity]-controller.js
+├── models/              # MongoDB schemas
+│   ├── user-model.js
+│   ├── event-model.js
+│   └── [entity]-model.js
+├── routes/              # Express route definitions
+│   ├── authRoutes.js
+│   ├── eventRoutes.js
+│   └── [entity]Routes.js
+├── middleware/          # Custom middleware
+│   ├── authentication.js
+│   └── multerErrorHandler.js
+├── utils/              # Helper functions
+├── file-storage/       # File upload configuration
+├── db/                # Database initialization
+├── uploads/           # Uploaded files storage
+├── app.js            # Express app configuration
+└── server.js         # Server startup
+```
+
+### Frontend Structure (MANDATORY)
+```
+frontend/src/
+├── assets/                    # Static assets
+│   ├── fonts/                # Custom fonts (Petrov Sans-Trial)
+│   ├── icons/               # SVG icon components
+│   ├── logo/                # Logo assets
+│   └── styles/              # Global CSS
+│       ├── variables/       # CSS custom properties
+│       ├── colors.css       # Color palette
+│       ├── defaults.css     # Base styles
+│       └── sizes.css        # Breakpoints
+├── components/              # Reusable components
+│   ├── ui-components/       # Generic UI components
+│   ├── layout/             # Layout components
+│   ├── navigation/         # Navigation components
+│   └── icons/              # Icon components
+├── pages/                  # Page components
+│   ├── admin-pages/        # Admin functionality
+│   ├── events/            # Event-related pages
+│   ├── athletes/          # Athlete-related pages
+│   └── [entity]/          # Entity-specific pages
+├── store/                 # Vuex state management
+│   ├── modules/           # Feature-specific modules
+│   └── data/             # Static data
+├── router/               # Vue Router configuration
+├── utils/               # Utility functions
+├── views/              # Top-level views
+├── plugins/           # Vue plugins (Vuetify)
+├── App.vue           # Root component
+└── main.js          # App entry point
+```
+
+## 🏗️ Component Architecture Standards
+
+### Vue Component Naming (MANDATORY)
+```javascript
+// ✅ CORRECT - Component Names
+EventCard.vue          // PascalCase for components
+event-card.vue         // kebab-case acceptable
+download-icon.vue      // Icons always with -icon suffix
+
+// ❌ INCORRECT - Component Names
+eventcard.vue          // No camelCase
+Event_Card.vue         // No underscores
+downloadIcon.vue       // Icons without suffix
+```
+
+### Component Structure Template (MANDATORY)
+```vue
+<template>
+  <!-- Always use semantic HTML -->
+  <div class="component-wrapper">
+    <!-- Vuetify components preferred -->
+    <v-card class="custom-card">
+      <v-card-title>{{ title }}</v-card-title>
+      <v-card-text>
+        <!-- Component content -->
+      </v-card-text>
+    </v-card>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'ComponentName', // Always include name
+  
+  props: {
+    // Always validate props
+    title: {
+      type: String,
+      required: true
+    },
+    showActions: {
+      type: Boolean,
+      default: false
+    }
+  },
+  
+  data() {
+    return {
+      // Local component state
+      loading: false,
+      items: []
+    };
+  },
+  
+  computed: {
+    // Computed properties
+    computedValue() {
+      return this.someCalculation;
+    }
+  },
+  
+  methods: {
+    // Component methods
+    handleAction() {
+      // Method implementation
+    }
+  },
+  
+  // Lifecycle hooks
+  mounted() {
+    // Initialization logic
+  }
+};
+</script>
+
+<style lang="scss" scoped>
+/* Always use scoped styles */
+.component-wrapper {
+  /* Use CSS custom properties */
+  background-color: var(--background--card);
+  color: var(--text-default);
+}
+
+.custom-card {
+  /* Component-specific styles */
+  border-radius: 8px;
+  
+  /* Responsive design */
+  @media screen and (max-width: 720px) {
+    margin: 0.5rem;
+  }
+}
+</style>
+```
+
+## 🛣️ API Design Consistency
+
+### Endpoint Naming (MANDATORY)
+```javascript
+// ✅ CORRECT - RESTful Conventions
+GET    /api/v1/events              // Get all events
+POST   /api/v1/events              // Create new event
+GET    /api/v1/events/:id          // Get specific event
+PUT    /api/v1/events/:id          // Update entire event
+PATCH  /api/v1/events/:id          // Partial update
+DELETE /api/v1/events/:id          // Delete event
+
+// Specialized endpoints
+GET    /api/v1/events/find         // Search events
+GET    /api/v1/events/opened-registration // Specific filter
+
+// ❌ INCORRECT - Endpoint Naming
+GET    /api/v1/getEvents           // No verbs in URLs
+POST   /api/v1/event/create       // No create in URL
+GET    /api/v1/events/all         // Redundant /all
+```
+
+### Controller Method Naming (MANDATORY)
+```javascript
+// ✅ CORRECT - Controller Methods
+export const getAllEvents = async (req, res) => {};
+export const getEvent = async (req, res) => {};
+export const createEvent = async (req, res) => {};
+export const updateEvent = async (req, res) => {};
+export const deleteEvent = async (req, res) => {};
+export const searchEvents = async (req, res) => {};
+
+// ❌ INCORRECT - Controller Methods
+export const events = async (req, res) => {};        // Unclear purpose
+export const getEventById = async (req, res) => {};  // Redundant 'ById'
+export const addNewEvent = async (req, res) => {};   // Use 'create'
+```
+
+### Response Format (MANDATORY)
+```javascript
+// ✅ CORRECT - Success Response
+{
+  docs: [...],                    // Data array
+  totalDocs: 100,                // Total count
+  limit: 10,                     // Page size
+  totalPages: 10,                // Total pages
+  page: 1,                       // Current page
+  hasNextPage: true,             // Pagination flags
+  hasPrevPage: false
+}
+
+// ✅ CORRECT - Error Response
+{
+  message: "Validation failed",   // Human-readable message
+  status: "error",               // Status indicator
+  errors: [                      // Detailed errors (optional)
+    { field: "title", message: "Title is required" }
+  ]
+}
+
+// ❌ INCORRECT - Inconsistent Response
+{
+  data: [...],                   // Use 'docs' not 'data'
+  count: 100,                    // Use 'totalDocs'
+  success: true                  // Use standardized format
+}
+```
+
+## 🗄️ Database Consistency
+
+### Model Naming (MANDATORY)
+```javascript
+// ✅ CORRECT - Model Names
+export const Event = mongoose.model('Event', eventSchema);
+export const Athlete = mongoose.model('Athlete', athleteSchema);
+export const User = mongoose.model('User', userSchema);
+
+// ✅ CORRECT - Schema Names
+export const eventSchema = new mongoose.Schema({...});
+export const athleteSchema = new mongoose.Schema({...});
+
+// ❌ INCORRECT - Model Names
+export const Events = mongoose.model('Events', ...);     // No plurals
+export const event = mongoose.model('event', ...);       // Must be capitalized
+```
+
+### Field Naming (MANDATORY)
+```javascript
+// ✅ CORRECT - Field Names
+{
+  event_id: String,              // Use snake_case for database fields
+  created_at: Date,              // Consistent timestamp naming
+  start_at: Date,                // Not startDate or start_date
+  is_public: Boolean,            // Boolean fields with 'is_' prefix
+  has_registration: Boolean,     // Or 'has_' prefix
+  logo_image_url: String,        // URL fields end with '_url'
+  registration_status: Boolean   // Status fields with '_status'
+}
+
+// ❌ INCORRECT - Field Names
+{
+  eventId: String,               // No camelCase in database
+  createdAt: Date,               // Use snake_case
+  startDate: Date,               // Use start_at
+  public: Boolean,               // Use is_public
+  logoImage: String              // Use logo_image_url
+}
+```
+
+## 🎨 Styling Consistency
+
+### CSS Custom Properties (MANDATORY)
+```css
+/* ✅ CORRECT - CSS Custom Properties Usage */
+.component {
+  background-color: var(--background--card);
+  color: var(--text-default);
+  border: 1px solid var(--border-container);
+  box-shadow: var(--container-shadow-m);
+}
+
+/* ✅ CORRECT - Variable Naming Pattern */
+--category--variant: value;
+--background--primary: #color;
+--text-default: #color;
+--accent: #color;
+
+/* ❌ INCORRECT - Hardcoded Values */
+.component {
+  background-color: #f2f2f8;    /* Use CSS variables */
+  color: #080811;               /* Use CSS variables */
+  border: 1px solid #ccc;      /* Use CSS variables */
+}
+```
+
+### Responsive Design (MANDATORY)
+```css
+/* ✅ CORRECT - Mobile-First Approach */
+.component {
+  /* Base styles for mobile */
+  padding: 1rem;
+  font-size: 1rem;
+}
+
+@media screen and (min-width: 720px) {
+  .component {
+    /* Tablet styles */
+    padding: 1.5rem;
+    font-size: 1.1rem;
+  }
+}
+
+@media screen and (min-width: 1280px) {
+  .component {
+    /* Desktop styles */
+    padding: 2rem;
+    font-size: 1.2rem;
+  }
+}
+
+/* ❌ INCORRECT - Desktop-First */
+@media screen and (max-width: 720px) {
+  /* Avoid max-width media queries */
+}
+```
+
+## 🔄 State Management Consistency
+
+### Vuex Module Structure (MANDATORY)
+```javascript
+// ✅ CORRECT - Vuex Module Pattern
+export default {
+  namespaced: true,              // Always namespaced
+  
+  state: {
+    items: [],                   // Use 'items' for collections
+    item: null,                  // Use 'item' for single item
+    loading: false,              // Use 'loading' for async states
+    error: null                  // Use 'error' for error states
+  },
+  
+  getters: {
+    getItems: (state) => state.items,
+    getItem: (state) => state.item,
+    isLoading: (state) => state.loading,
+    hasError: (state) => !!state.error
+  },
+  
+  mutations: {
+    SET_ITEMS: (state, items) => { state.items = items; },
+    SET_ITEM: (state, item) => { state.item = item; },
+    SET_LOADING: (state, loading) => { state.loading = loading; },
+    SET_ERROR: (state, error) => { state.error = error; }
+  },
+  
+  actions: {
+    async FETCH_ITEMS({ commit }) {
+      commit('SET_LOADING', true);
+      try {
+        const response = await api.get('/api/v1/items');
+        commit('SET_ITEMS', response.data.docs);
+      } catch (error) {
+        commit('SET_ERROR', error.message);
+      } finally {
+        commit('SET_LOADING', false);
+      }
+    }
+  }
+};
+```
+
+### Action Naming (MANDATORY)
+```javascript
+// ✅ CORRECT - Action Names
+FETCH_EVENTS     // For getting data
+CREATE_EVENT     // For creating
+UPDATE_EVENT     // For updating
+DELETE_EVENT     // For deleting
+SEARCH_EVENTS    // For searching
+
+// ❌ INCORRECT - Action Names
+getEvents        // Use FETCH_EVENTS
+addEvent         // Use CREATE_EVENT
+removeEvent      // Use DELETE_EVENT
+```
+
+## 🔒 Security Consistency
+
+### Authentication Patterns (MANDATORY)
+```javascript
+// ✅ CORRECT - Route Protection
+router.route('/events/:id')
+  .get(eventController.getEvent)                    // Public route
+  .put(authenticateToken, isSecretary, eventController.updateEvent) // Protected route
+  .delete(authenticateToken, eventController.deleteEvent); // Auth only
+
+// ✅ CORRECT - Controller Auth Check
+export const updateEvent = async (req, res) => {
+  try {
+    // User is already authenticated by middleware
+    const { id, role, region } = req.user;
+    
+    // Additional authorization logic if needed
+    if (role !== 'admin' && role !== 'secretary') {
+      return res.status(403).json({ message: 'Insufficient permissions' });
+    }
+    
+    // Business logic
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+```
+
+### Input Validation (MANDATORY)
+```javascript
+// ✅ CORRECT - Backend Validation
+export const createEvent = async (req, res) => {
+  try {
+    // Validate required fields
+    const { title, start_at, discipline } = req.body;
+    
+    if (!title || !start_at || !discipline) {
+      return res.status(400).json({ 
+        message: 'Missing required fields',
+        required: ['title', 'start_at', 'discipline']
+      });
+    }
+    
+    // Validate data types and formats
+    if (!Date.parse(start_at)) {
+      return res.status(400).json({ message: 'Invalid date format' });
+    }
+    
+    // Business logic
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+```
+
+## 📊 Error Handling Consistency
+
+### Error Response Format (MANDATORY)
+```javascript
+// ✅ CORRECT - Error Handling Pattern
+export const controllerMethod = async (req, res) => {
+  try {
+    // Business logic
+    const result = await someAsyncOperation();
+    res.status(200).json(result);
+    
+  } catch (error) {
+    console.error('Error in controllerMethod:', error);
+    
+    // Mongoose validation error
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({
+        message: 'Validation failed',
+        errors: Object.values(error.errors).map(e => e.message)
+      });
+    }
+    
+    // Duplicate key error
+    if (error.code === 11000) {
+      return res.status(409).json({
+        message: 'Duplicate entry'
+      });
+    }
+    
+    // Generic error
+    res.status(500).json({
+      message: 'Internal server error'
+    });
+  }
+};
+```
+
+### Frontend Error Handling (MANDATORY)
+```javascript
+// ✅ CORRECT - Frontend Error Handling
+actions: {
+  async FETCH_EVENTS({ commit }, params) {
+    commit('SET_LOADING', true);
+    commit('SET_ERROR', null);  // Clear previous errors
+    
+    try {
+      const response = await api.get('/api/v1/events', { params });
+      commit('SET_EVENTS', response.data.docs);
+      
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || 'Failed to fetch events';
+      commit('SET_ERROR', errorMessage);
+      
+      // Re-throw for component handling if needed
+      throw error;
+      
+    } finally {
+      commit('SET_LOADING', false);
+    }
+  }
+}
+```
+
+## 🧪 Testing Consistency
+
+### Test File Naming (MANDATORY)
+```bash
+# ✅ CORRECT - Test File Names
+backend/tests/controllers/event-controller.test.js
+backend/tests/models/event-model.test.js
+frontend/tests/unit/EventCard.spec.js
+frontend/tests/integration/event-flow.test.js
+
+# ❌ INCORRECT - Test File Names
+backend/tests/eventTest.js          # No clear category
+frontend/tests/event.js             # Missing .test or .spec
+```
+
+### Test Structure (MANDATORY)
+```javascript
+// ✅ CORRECT - Test Structure
+describe('Event Controller', () => {
+  beforeEach(() => {
+    // Setup before each test
+  });
+  
+  afterEach(() => {
+    // Cleanup after each test
+  });
+  
+  describe('GET /api/v1/events', () => {
+    test('should return paginated events', async () => {
+      // Arrange
+      const mockEvents = [...];
+      
+      // Act
+      const response = await request(app)
+        .get('/api/v1/events')
+        .expect(200);
+      
+      // Assert
+      expect(response.body.docs).toHaveLength(mockEvents.length);
+      expect(response.body.totalDocs).toBe(mockEvents.length);
+    });
+    
+    test('should handle search query', async () => {
+      // Test implementation
+    });
+  });
+});
+```
+
+## 📈 Performance Consistency
+
+### Database Query Optimization (MANDATORY)
+```javascript
+// ✅ CORRECT - Optimized Queries
+const events = await Event.find(query)
+  .select('title start_at location discipline')  // Only needed fields
+  .limit(parseInt(limit))
+  .skip((page - 1) * limit)
+  .sort({ start_at: -1 })
+  .lean()                                       // Return plain objects
+  .exec();
+
+// ❌ INCORRECT - Unoptimized Query
+const events = await Event.find();             // No limits or field selection
+```
+
+### Frontend Performance (MANDATORY)
+```vue
+<script>
+// ✅ CORRECT - Performance Patterns
+export default {
+  components: {
+    // Lazy load heavy components
+    HeavyComponent: () => import('./HeavyComponent.vue')
+  },
+  
+  computed: {
+    // Use computed for expensive operations
+    sortedItems() {
+      return this.items.sort((a, b) => a.name.localeCompare(b.name));
+    }
+  },
+  
+  methods: {
+    // Debounce user input
+    onSearch: debounce(function(query) {
+      this.$store.dispatch('search/SEARCH', query);
+    }, 300)
+  }
+};
+</script>
+```
+
+---
+
+*This architectural consistency guide ensures all agents maintain unified patterns and standards across the FFR Live platform. Adherence to these guidelines is mandatory for all development work.*

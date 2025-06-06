@@ -57,7 +57,7 @@
                   class="competitionImage__regionFlag"
                   :country-code="getCountryCode(event.country)"
                   :region-code="getRegionCode(event.region)"
-                  :is-region-flag="true"
+                  :is-region-flag="!!getRegionCode(event.region)"
                   height="1.25rem"
                   rounding="2px"
                 ></country-flag>
@@ -147,7 +147,13 @@
               <div class="eventFiles__title">Документы:</div>
               <div class="eventFiles__list">
                 <div v-for="(document, idx) in event.documents" :key="idx" class="eventFile__item">
-                  <a v-if="document?.file?.url" :href="`${uploadsFolderUrl}${document.file.url}`" target="_blank" class="eventFile__item__link">
+                  <a
+                    v-if="document?.file?.url"
+                    class="eventFile__item__link"
+                    :href="`${uploadsFolderUrl}${document.file.url}`"
+                    target="_blank"
+                    :title="document.title"
+                  >
                     <file-icon class="eventFile__item__icon"></file-icon>
                     {{ document.title }}
                   </a>
@@ -161,7 +167,16 @@
 
       <div class="event_emptyData" v-if="event && event['competitions'] && event['competitions'].length < 1">Результаты события ещё не добавлены</div>
 
-      <results-table v-if="competition && competition['races'].length > 0" :competition="competition" :selectedStage="selectedStage"></results-table>
+      {{ competition.competition_id }}||{{ selectedStage }}
+      <results-table-s-x-qual v-if="isSXQual(competition)" :competition="competition" :selectedStage="selectedStage"></results-table-s-x-qual>
+      <results-table-s-x-final v-else-if="isSXFinal(competition)" :competition="competition" :selectedStage="selectedStage"></results-table-s-x-final>
+      <results-table-d-m-o
+        v-else-if="isFinalOfDisciplines(competition, ['DM'])"
+        :competition="competition"
+        :selectedStage="selectedStage"
+      ></results-table-d-m-o>
+
+      <results-table v-else-if="competition && competition['races'].length > 0" :competition="competition" :selectedStage="selectedStage"></results-table>
     </div>
 
     <div v-if="!event && !eventIsLoading" class="status__container">Такого события не существует</div>
@@ -181,16 +196,22 @@ import CountryFlag from '@/components/ui-components/country-flag.vue';
 import EventTranslationIcon from '@/components/icons/eventTranslation-icon.vue';
 import InfoIcon from '@/components/icons/info-icon.vue';
 import FileIcon from '@/components/icons/file-icon.vue';
-import { getDisciplineCode, sports } from '@/store/data/sports';
+import { checkCompetitionDiscipline, getDisciplineCode, isFinal, isFinalOfDisciplines, sports } from '@/store/data/sports';
 import EventPedestal from '@/pages/events/event-page/eventPedestal.vue';
 import MedalIcon from '@/components/icons/medal-icon.vue';
 import EditButton from '@/components/ui-components/edit-button.vue';
 import { getCountryCode } from '@/store/data/countries';
 import { getRegionCode } from '@/store/data/russia-regions';
 import { mapGetters } from 'vuex';
+import ResultsTableSXQual from '@/pages/events/event-page/resultsTable-SX-qual.vue';
+import ResultsTableSXFinal from '@/pages/events/event-page/resultsTable-SX-final.vue';
+import ResultsTableDMO from '@/pages/events/event-page/resultsTable-DMO.vue';
 
 export default {
   components: {
+    ResultsTableDMO,
+    ResultsTableSXFinal,
+    ResultsTableSXQual,
     EditButton,
     MedalIcon,
     EventPedestal,
@@ -234,6 +255,8 @@ export default {
     },
     competition() {
       if (!this.event['competitions']) return;
+      console.log(this.event['competitions']);
+      console.log(this.selectedStage);
 
       const stage = this.event['competitions'].find((competition) => competition['competition_id'] === this.selectedStage);
       if (!stage) return null;
@@ -248,6 +271,9 @@ export default {
     },
   },
   methods: {
+    isFinal,
+    isFinalOfDisciplines,
+    checkCompetitionDiscipline,
     getRegionCode,
     getCountryCode,
     getDisciplineCode,
@@ -292,6 +318,22 @@ export default {
 
       this.additionalSection = section;
     },
+
+    isSXQual(competition) {
+      if (!competition || !competition['races'].length || !competition.stage || !competition.discipline_code) return false;
+
+      return competition.discipline_code === 'SX' && competition.stage.split(' ')[0] && competition.stage.split(' ')[0].trim().toLowerCase() === 'квалификация';
+    },
+    isSXFinal(competition) {
+      console.log(competition, competition['races'].length, competition.stage, competition.discipline_code);
+      if (!competition || !competition['races'].length || !competition.stage || !competition.discipline_code) return false;
+
+      return competition.discipline_code === 'SX' && competition.stage.split(' ')[0] && competition.stage.split(' ')[0].trim().toLowerCase() === 'финал';
+    },
+    isDMO(competition) {
+      if (!competition || !competition['races'].length || !competition.discipline_code) return false;
+      return competition.discipline_code === 'MO';
+    },
   },
 
   watch: {
@@ -313,18 +355,19 @@ export default {
 
 <style scoped lang="scss">
 .eventPage__wrapper {
-  flex: 1 1 auto;
-  display: flex;
+  flex: 1 1 0;
+  overflow-y: auto;
 
   .event__container {
-    flex: 1 1 auto;
+    position: relative;
+    flex: 1 0 auto;
     display: flex;
     flex-direction: column;
     height: 100%;
+
     max-width: var(--desktop-small);
     margin: 0 auto;
     padding: 4rem 64px 2rem;
-    position: relative;
 
     @media screen and (max-width: 1100px) {
       padding: 4rem 4rem 2rem;
@@ -404,7 +447,6 @@ export default {
           padding: 0.75rem;
 
           img {
-            flex: 1 1 0;
             max-width: 100%;
             max-height: 100%;
           }
@@ -629,7 +671,6 @@ export default {
           display: flex;
           flex-wrap: wrap;
           gap: 8px;
-          overflow: hidden;
           font-size: 0.85rem;
           color: var(--text-muted);
 
@@ -717,14 +758,14 @@ export default {
           }
 
           .eventFiles__wrapper {
-            flex: 0 0 auto;
+            flex: 1 1 0;
             display: flex;
             flex-direction: column;
             gap: 4px;
             padding: 8px;
 
             .eventFiles__title {
-              margin-left: 1.25rem;
+              margin: 0 auto 0.75rem 1.25rem;
             }
 
             .eventFiles__list {
@@ -740,7 +781,7 @@ export default {
                   display: flex;
                   align-items: center;
                   color: var(--text-muted);
-                  font-size: 1.15rem;
+                  font-size: 0.9rem;
                   transition: color 64ms;
 
                   .eventFile__item__icon {

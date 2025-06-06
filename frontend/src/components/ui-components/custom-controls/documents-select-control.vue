@@ -1,5 +1,5 @@
 <template>
-  <div class="documentsComponent">
+  <div class="documentsComponent" :class="horizontal ? 'horizontal' : 'vertical'">
     <div v-for="(document, index) in documents" :key="index" class="document__item">
       <div class="control__wrapper">
         <label>Название</label>
@@ -27,6 +27,10 @@ export default {
     initialDocuments: {
       type: Array,
       default: () => [],
+    },
+    horizontal: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -86,10 +90,21 @@ export default {
   flex: 1 1 auto;
   font-size: 0.75rem;
 
+  &.horizontal {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-gap: 0.5rem 0.75rem;
+    align-items: center;
+  }
+  &.vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem 0.75rem;
+  }
+
   .document__item {
     display: flex;
     flex-direction: column;
-    margin-bottom: 8px;
 
     button {
       align-self: flex-end;

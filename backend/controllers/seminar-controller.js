@@ -134,7 +134,7 @@ export const updateSeminar = async (req, res) => {
     const seminar = await Seminar.findById(req.params.id);
     if (!seminar) {
       return res.status(404).json({
-        status: 'error',
+        status: 'Err',
         message: 'Семинар с указанным id не найден',
       });
     }
@@ -162,7 +162,7 @@ export const updateSeminar = async (req, res) => {
 
     res.status(200).json({
       status: 'success',
-      data: seminar,
+      seminar,
     });
   } catch (error) {
     console.error('Error updating seminar:', error);

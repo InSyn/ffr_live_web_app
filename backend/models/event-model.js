@@ -4,6 +4,28 @@ import { documentSchema } from './document-model.js';
 import { competingJurySchema } from './jury-model.js';
 import { forerunnerSchema } from './athlete-model.js';
 
+export const cupEventSchema = new mongoose.Schema({
+  event_id: {
+    type: String,
+    required: [true, 'Event ID is required'],
+    unique: true,
+  },
+
+  created_at: Date,
+  logo_image_url: String,
+  track_image_url: String,
+  calendar_code: String,
+  season: String,
+  sport: String,
+  discipline: String,
+  country: String,
+
+  cupEvents: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Event' }],
+  allowed_secretaries: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Jury' }],
+
+  documents: [documentSchema],
+});
+
 export const eventSchema = new mongoose.Schema({
   event_id: {
     type: String,
@@ -61,3 +83,4 @@ eventSchema.index({
 });
 
 export const Event = mongoose.model('Event', eventSchema);
+export const CupEvent = mongoose.model('CupEvent', cupEventSchema);
