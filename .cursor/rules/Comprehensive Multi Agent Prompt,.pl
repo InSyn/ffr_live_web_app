@@ -1,7 +1,5 @@
 Use the following instructions and tools to complete the task:
 
-USE DEFINITIVE_MODULE_IMPLEMENTATION_GUIDE.md AS THE MANDATORY REFERENCE FOR ALL MODULES IMPLEMENTATIONS.
-
 Each agent plays a critical role:
 - **Frontend** ensures intuitive and accessible user experiences. Analyzing the codebase to ensure all variables, functions, and components are used correctly and without errors. Contacts the Backend Agent to ensure the frontend is working as expected.
 - **Backend** provides secure, reliable API foundations. Analyzing the codebase to ensure all variables, functions, and components are used correctly and without errors. Always ensure all endpoints are consistent with the codebase and architecture. Contacts the Frontend Agent to ensure the backend is working as expected.
