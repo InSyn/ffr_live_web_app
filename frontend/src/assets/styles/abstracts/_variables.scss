@@ -1,0 +1,225 @@
+// =============================================================================
+// ABSTRACTS/_VARIABLES.SCSS
+// -----------------------------------------------------------------------------
+// This file contains all global SASS variables and CSS custom properties.
+// It is organized into the following sections:
+//
+// 1. SASS-only variables (e.g., for mixins, functions)
+// 2. Raw Color Palette
+// 3. Semantic Color Aliases (Light & Dark Themes)
+// 4. Layout, Spacing, and Sizing
+// 5. Typography
+// 6. Transitions
+//
+// Style Guide:
+// - Use SASS variables (`$name`) for compile-time logic (e.g., mixins).
+// - Use CSS custom properties (`--name`) for runtime styling in components.
+// =============================================================================
+
+// ----------------------------------------
+// 1. SASS-Only Variables
+// These are available only during SCSS compilation.
+// ----------------------------------------
+
+// Breakpoints for the respond-to mixin
+$breakpoint-sm: 240px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+$breakpoint-xl: 1280px;
+$desktop-2k: 2560px; // Legacy
+
+// ----------------------------------------
+// 2. Raw Color Palette
+// Do not use these directly in components.
+// ----------------------------------------
+:root {
+	// Brand Colors
+	--raw-brand-blue-400: #009eda;
+	--raw-brand-blue-500: #009eda;
+	--raw-brand-blue-600: #1a9ad7;
+
+	--raw-brand-red-400: #f54247;
+	--raw-brand-red-500: #e13338;
+	--raw-brand-red-600: #c72b30;
+
+	// Neutral Colors (Greys)
+	--raw-neutral-900: #080811;
+	--raw-neutral-850: #0a0a13;
+	--raw-neutral-800: #111118;
+	--raw-neutral-700: #212125;
+	--raw-neutral-650: #2c2c31;
+	--raw-neutral-600: #2f2f34;
+	--raw-neutral-500: #757589;
+	--raw-neutral-400: #9898ab;
+	--raw-neutral-300: #c2c2c7;
+	--raw-neutral-200: #cfcfd6;
+	--raw-neutral-100: #dadadf;
+	--raw-neutral-50: #f2f2f7;
+
+	// Status & UI Colors
+	--raw-status-green-500: #46c289;
+	--raw-status-red-500: #d94d58;
+	--raw-status-blue-500: #6165b8; // athlete-blue
+	--raw-status-red-600: #9c3f40; // athlete-red
+	--raw-status-green-600: #2ba260; // athlete-green
+	--raw-status-yellow-500: #c7ad38; // athlete-yellow
+}
+
+:root {
+	// Text Colors
+	--color-text-primary: var(--raw-neutral-900);
+	--color-text-secondary: var(--raw-neutral-300);
+	--color-text-contrast: var(--raw-neutral-100);
+	--color-text-on-brand: var(--raw-neutral-50);
+	--color-text-accent: var(--raw-brand-blue-600);
+	--color-text-error: var(--raw-status-red-500);
+	--color-text-success: var(--raw-status-green-500);
+
+	// Background Colors
+	--color-bg-primary: var(--raw-neutral-100);
+	--color-bg-secondary: var(--raw-neutral-700);
+	--color-bg-tertiary: var(--raw-neutral-650);
+	--color-bg-surface: #f2f2f7;
+	--color-bg-surface-hover: color-mix(
+		in srgb,
+		var(--color-bg-surface),
+		var(--color-text-primary) 10%
+	);
+	--color-bg-surface-secondary: #e6e6ea;
+	--color-bg-brand: var(--raw-brand-blue-500);
+	--color-bg-image: color-mix(in srgb, var(--color-bg-primary), transparent 80%);
+
+	// Border Colors
+	--color-border-primary: #acafb6;
+	--color-border-photo: #e0e0e4;
+
+	// Shadow
+	--shadow-brand: 6px 4px 20px rgba(116, 141, 186, 0.6);
+
+	// Interactive Brand Colors
+	--color-interactive-brand-default: var(--raw-brand-blue-500);
+	--color-interactive-brand-hover: var(--raw-brand-blue-600);
+	--color-interactive-delete-default: rgba(195, 69, 56, 0.24);
+	--color-interactive-delete-hover: rgba(195, 69, 56, 0.78);
+}
+// ----------------------------------------
+// Semantic Color Aliases (Dark Theme)
+// ----------------------------------------
+:root.dark {
+	// Text Colors
+	--color-text-primary: var(--raw-neutral-50);
+	--color-text-secondary: var(--raw-neutral-300);
+	--color-text-contrast: var(--raw-neutral-800);
+
+	// Background Colors
+	--color-bg-primary: var(--raw-neutral-600);
+	--color-bg-secondary: var(--raw-neutral-800);
+	--color-bg-tertiary: var(--raw-neutral-850);
+	--color-bg-surface: #101018;
+	// --color-bg-surface-hover: #29292f;
+	--color-bg-surface-secondary: #24242a;
+
+	// Border Colors
+	--color-border-primary: #3e4044;
+	--color-border-photo: #2c2c30;
+
+	// Shadow
+	--shadow-brand: 7px 6px 23px -6px rgba(72, 92, 144, 0.18);
+
+	// Interactive Brand Colors
+	--color-interactive-brand-default: var(--raw-brand-blue-500);
+	--color-interactive-brand-hover: var(--raw-brand-blue-600);
+	--color-interactive-delete-default: rgba(195, 69, 56, 0.24);
+	--color-interactive-delete-hover: rgba(195, 69, 56, 0.78);
+}
+
+// ----------------------------------------
+// 5. Layout, Spacing, and Sizing
+// ----------------------------------------
+:root {
+	// Breakpoints
+	--breakpoint-sm: #{$breakpoint-sm};
+	--breakpoint-md: #{$breakpoint-md};
+	--breakpoint-lg: #{$breakpoint-lg};
+	--breakpoint-xl: #{$breakpoint-xl};
+
+	// Legacy Breakpoints
+	--desktop-2k: #{$desktop-2k};
+	--desktop-big: 1980px;
+	--desktop-medium: 1440px;
+	--desktop-small: 1280px;
+	--tablet-default: 920px;
+	--tablet-small: 720px;
+	--mobile-small: 480px;
+
+	// Border Radius
+	--radius-sm: 3px;
+	--radius-md: 6px;
+	--radius-lg: 12px;
+	--radius-full: 9999px;
+
+	// Spacing Units
+	--space-0: 0;
+	--space-1: 0.25rem;
+	/* 4px */
+	--space-2: 0.5rem;
+	/* 8px */
+	--space-3: 0.75rem;
+	/* 12px */
+	--space-4: 1rem;
+	/* 16px */
+	--space-5: 1.25rem;
+	/* 20px */
+	--space-6: 1.5rem;
+	/* 24px */
+	--space-8: 2rem;
+	/* 32px */
+	--space-12: 3rem;
+	/* 48px */
+	--space-16: 4rem;
+	/* 64px */
+	--space-24: 6rem;
+	/* 96px */
+	--space-32: 8rem;
+	/* 128px */
+	--space-48: 12rem;
+	/* 192px */
+	--space-64: 16rem;
+
+	// Page Paddings (Legacy)
+	--padd-page: 3.5rem 0 2rem;
+	--padd-entityPage-top: 3.25rem 0 0.25rem;
+	--padd-entityPage-card: 1.75rem 2rem 0.75rem;
+	--padd-card: 0;
+}
+
+// ----------------------------------------
+// 6. Opacity
+// ----------------------------------------
+:root {
+	--opacity-sm: 0.5;
+	--opacity-md: 0.75;
+	--opacity-lg: 0.9;
+}
+
+// ----------------------------------------
+// 7. Typography
+// ----------------------------------------
+:root {
+	--font-family-sans:
+		'Petrov Sans-Trial', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+	--font-family-bebas: 'Bebasneue-Regular', var(--font-family-sans);
+
+	--font-weight-normal: 400;
+	--font-weight-bold: 700;
+}
+
+// ----------------------------------------
+// 8. Transitions
+// ----------------------------------------
+:root {
+	--transition-duration-instant: 64ms;
+	--transition-duration-fast: 92ms;
+	--transition-duration-medium: 128ms;
+	--transition-duration-slow: 256ms;
+}

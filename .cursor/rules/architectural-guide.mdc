@@ -1,0 +1,441 @@
+---
+description: CORE ARCHITECTURAL PATTERNS AND DECISION TREES - Must be referenced for ANY architectural decisions, state management implementation, API design, database schema changes, component structuring, Vuex modules, ADR-001 centralized state pattern, search unification, backend controller patterns, mongoose-paginate-v2 implementation, code quality gates, problem-solving algorithms (supervised learning, classification, unsupervised exploration), Vue.js best practices, Node.js/Express patterns, MongoDB schema design, Vue 2→3 migration planning, multi-agent workflows, regression prevention, and technical debt prioritization. Essential for maintaining consistency across the FFR Live Platform.
+globs: 
+alwaysApply: false
+---
+# FFR Live Platform: Claude-Optimized Architectural Guide
+
+**Version:** 3.0
+**Status:** Active Reference - Claude 4 Sonnet Optimized
+**Purpose:** Single source of truth for architectural patterns, with AI-optimized decision trees and concrete examples
+
+---
+
+## 1. Problem-Solving Algorithms
+
+### Task Classification Tree
+```mermaid
+graph TD
+    A[New Task] --> B{Similar Pattern Exists?}
+    B -->|Yes| C[Supervised Learning: Copy & Adapt]
+    B -->|No| D{Clear Requirements?}
+    
+    D -->|Yes| E[Classification: Step-by-step]
+    D -->|No| F[Unsupervised: Explore & Discover]
+    
+    C --> G[Find Template → Modify → Test]
+    E --> H[Break Down → Implement → Validate]
+    F --> I[Analyze → Hypothesize → Experiment]
+```
+
+### Agent Selection Tree
+```mermaid
+graph TD
+    A[Task Input] --> B{Contains API Changes?}
+    B -->|Yes| C{Frontend Impact?}
+    B -->|No| D{UI/UX Changes?}
+    
+    C -->|Yes| E[Multi-Agent: Backend + Frontend]
+    C -->|No| F[Backend Agent Only]
+    
+    D -->|Yes| G{Complex State Logic?}
+    D -->|No| H[Simple Task - Any Agent]
+    
+    G -->|Yes| I[Multi-Agent: Frontend + QA]
+    G -->|No| J[Frontend Agent Only]
+```
+
+### Code Quality Decision Tree
+```mermaid
+graph TD
+    A[Code Change Request] --> B{Affects Multiple Files?}
+    B -->|Yes| C[Regression Risk: HIGH]
+    B -->|No| D{Touches Core Logic?}
+    
+    C --> E[Require: Tests + QA Review]
+    D -->|Yes| F[Regression Risk: MEDIUM]
+    D -->|No| G[Regression Risk: LOW]
+    
+    F --> H[Require: Unit Tests]
+    G --> I[Proceed with Caution]
+```
+
+---
+
+## 2. Core Architectural Principles (Copy-Paste Ready)
+
+### ADR-001: Centralized State Management (MANDATORY)
+```vue
+<!-- ✅ CORRECT: Dumb Component Pattern -->
+<template>
+  <div class="page-wrapper content-wrapper">
+    <aside class="page-sidebar">
+      <search />
+    </aside>
+    <div class="page-content">
+      <mobile-search-trigger />
+      <search-results />
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  computed: {
+    ...mapGetters('search', ['searchResults', 'isSearching'])
+  },
+  methods: {
+    ...mapActions('search', ['setSearchMode', 'clearSearch', 'performSearch'])
+  },
+  created() {
+    this.setSearchMode('ENTITY_NAME')
+    this.performSearch()
+  },
+  destroyed() {
+    this.clearSearch()
+  }
+}
+</script>
+```
+
+```vue
+<!-- ❌ WRONG: Smart Component Anti-pattern -->
+<script>
+export default {
+  data() {
+    return { 
+      localResults: [],        // ❌ Local state
+      isLoading: false        // ❌ Local loading state
+    }
+  },
+  methods: {
+    async fetchData() {        // ❌ API calls in component
+      // Direct API logic here
+    }
+  }
+}
+</script>
+```
+
+---
+
+## 3. Technology Stack & Migration Strategy
+
+### Current Stack (Maintenance Mode)
+- **Frontend:** Vue.js 2.7.16, Vuetify 2.7.2, Vuex 3.6.2
+- **Backend:** Node.js 18+ (ESM), Express.js 4.18.2
+- **Database:** MongoDB 7.0 + Mongoose 8.2.0
+- **Auth:** JWT + bcryptjs
+
+### Critical Technical Debt
+```
+🔥 PRIORITY 1: Vue 3 Migration (Security & Performance)
+🔶 PRIORITY 2: Validation Layer (express-validator)
+🔵 PRIORITY 3: Testing Coverage (50% → 80%+)
+```
+
+---
+
+## 4. Backend Standards (Enforcement Required)
+
+### Database Field Naming (CRITICAL)
+```javascript
+// ✅ CORRECT: snake_case (MANDATORY)
+const athleteSchema = {
+  ffr_id: String,
+  start_at: Date,
+  photo_url: String,
+  is_public: Boolean
+}
+
+// ❌ WRONG: camelCase (BREAKS PRODUCTION)
+const athleteSchema = {
+  ffrId: String,         // ❌ Critical error
+  startAt: Date,         // ❌ Critical error
+  photoUrl: String,      // ❌ Critical error
+  isPublic: Boolean      // ❌ Critical error
+}
+```
+
+### API Response Format (Copy-Paste Template)
+```javascript
+// ✅ CORRECT: Standardized mongoose-paginate-v2 format
+export const searchEntity = async (req, res) => {
+  try {
+    const query = buildEntityQuery(req)
+    const options = {
+      page: parseInt(req.query.page) || 1,
+      limit: parseInt(req.query.limit) || 20,
+      sort: { /* entity-specific sort */ }
+    }
+    
+    const result = await EntityModel.paginate(query, options)
+    
+    res.status(200).json({
+      docs: result.docs,
+      totalDocs: result.totalDocs,
+      limit: result.limit,
+      totalPages: result.totalPages,
+      page: result.page
+    })
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: `Ошибка во время поиска: ${error.message}`
+    })
+  }
+}
+
+// ❌ WRONG: Non-standard format
+res.status(200).json({
+  status: 'success',      // ❌ Inconsistent
+  results: data.length,   // ❌ Non-standard
+  data                    // ❌ Wrong field name
+})
+```
+
+### buildQuery Function Template
+```javascript
+// ✅ TEMPLATE: Copy and adapt for each entity
+const buildEntityQuery = req => {
+  const query = {}
+  
+  // Text search pattern
+  if (req.query.name) {
+    const parts = req.query.name.trim().split(' ')
+    if (parts.length === 1) {
+      query.$or = [
+        { lastname: new RegExp(parts[0], 'i') }, 
+        { name: new RegExp(parts[0], 'i') }
+      ]
+    } else {
+      query.lastname = new RegExp(parts[0], 'i')
+      query.name = new RegExp(parts[1], 'i')
+    }
+  }
+  
+  // Exact match filters
+  if (req.query.entity_id) query.entity_id = req.query.entity_id
+  if (req.query.category) query.category = req.query.category
+  if (req.query.status) query.status = req.query.status
+  
+  // Array/regex filters
+  if (req.query.discipline) query.disciplines = new RegExp(req.query.discipline, 'i')
+  if (req.query.region) query.regions = new RegExp(req.query.region, 'i')
+  
+  return query
+}
+```
+
+---
+
+## 5. Frontend Component Architecture
+
+### File Structure (Mandatory)
+```
+/pages/entity-name/
+  ├── index.vue                 # Main page (dumb component)
+  ├── entity-list-item.vue      # List item component
+  └── entity-page/
+      ├── index.vue             # Detail page
+      └── entity-*.vue          # Detail sub-components
+
+/components/ui-components/search/
+  ├── index.vue                 # Desktop search
+  ├── mobile-search-trigger.vue # Mobile trigger
+  ├── search-results.vue        # Unified results
+  └── search-inputs/            # Filter components
+```
+
+### Component Naming Convention
+```javascript
+// ✅ CORRECT: PascalCase files
+EventCard.vue
+AthleteListItem.vue
+SearchResults.vue
+
+// ✅ CORRECT: kebab-case in templates
+<event-card />
+<athlete-list-item />
+<search-results />
+```
+
+### Props Validation Template
+```javascript
+// ✅ TEMPLATE: Always validate props
+export default {
+  props: {
+    item: {
+      type: Object,
+      required: true,
+      validator: (value) => value && value._id
+    },
+    showDetails: {
+      type: Boolean,
+      default: false
+    },
+    maxItems: {
+      type: Number,
+      default: 10,
+      validator: (value) => value > 0
+    }
+  }
+}
+```
+
+---
+
+## 6. Vuex Module Pattern (Enforcement Template)
+
+### Module Structure (Copy-Paste Ready)
+```javascript
+// ✅ TEMPLATE: store/modules/entity.js
+const state = {
+  searchResults: [],
+  isSearching: false,
+  searchFilters: {},
+  searchMode: '',
+  totalPages: 0,
+  currentPage: 1,
+  error: null
+}
+
+const getters = {
+  searchResults: state => state.searchResults,
+  isSearching: state => state.isSearching,
+  hasResults: state => state.searchResults.length > 0,
+  resultCount: state => state.searchResults.length
+}
+
+const mutations = {
+  SET_SEARCH_RESULTS(state, { docs, totalPages, page }) {
+    state.searchResults = docs
+    state.totalPages = totalPages
+    state.currentPage = page
+  },
+  SET_SEARCH_LOADING(state, isLoading) {
+    state.isSearching = isLoading
+  },
+  SET_SEARCH_MODE(state, mode) {
+    state.searchMode = mode
+  },
+  SET_SEARCH_FILTERS(state, filters) {
+    state.searchFilters = { ...state.searchFilters, ...filters }
+  },
+  CLEAR_SEARCH(state) {
+    state.searchResults = []
+    state.searchFilters = {}
+    state.error = null
+  },
+  SET_ERROR(state, error) {
+    state.error = error
+  }
+}
+
+const actions = {
+  async performSearch({ commit, state }) {
+    commit('SET_SEARCH_LOADING', true)
+    commit('SET_ERROR', null)
+    
+    try {
+      const params = new URLSearchParams()
+      Object.entries(state.searchFilters).forEach(([key, value]) => {
+        if (value) params.append(key, value)
+      })
+      
+      const response = await this.$axios.get(`/api/v1/${state.searchMode}/find?${params}`)
+      
+      commit('SET_SEARCH_RESULTS', {
+        docs: response.data.docs,
+        totalPages: response.data.totalPages,
+        page: response.data.page
+      })
+    } catch (error) {
+      commit('SET_ERROR', error.message)
+    } finally {
+      commit('SET_SEARCH_LOADING', false)
+    }
+  },
+  
+  setSearchMode({ commit }, mode) {
+    commit('SET_SEARCH_MODE', mode)
+  },
+  
+  updateFilters({ commit, dispatch }, filters) {
+    commit('SET_SEARCH_FILTERS', filters)
+    dispatch('performSearch')
+  },
+  
+  clearSearch({ commit }) {
+    commit('CLEAR_SEARCH')
+  }
+}
+```
+
+---
+
+## 7. Success Metrics & Quality Gates
+
+### Primary Success Metric
+**Regression-Free Implementation Rate** = 
+(Successful implementations without fixes) / (Total implementations) × 100%
+
+### Success Criteria
+- 🎯 **Target:** >90% regression-free rate
+- 🔶 **Acceptable:** 80-90% 
+- 🚨 **Review needed:** <80%
+
+### Quality Gates (Automated Checks)
+```bash
+# Pre-commit validation
+npm run lint          # ESLint enforcement
+npm run test:unit     # Unit test coverage
+npm run build         # Build validation
+
+# Pre-merge validation  
+npm run test:integration
+npm run audit:security
+npm run lighthouse    # Performance check
+```
+
+---
+
+## 8. Context Loading Strategy for Claude
+
+### Always Load (Core Patterns)
+1. This architectural guide
+2. ADR-001 centralized state pattern
+3. snake_case database requirement
+4. API response format standard
+
+### Task-Dependent Loading
+- **Search Tasks:** Load search unification roadmap
+- **UI Tasks:** Load design system guide  
+- **Backend Tasks:** Load controller templates
+- **Testing Tasks:** Load QA workflows
+
+### Progressive Disclosure
+1. **Start:** High-level pattern (e.g., "use centralized state")
+2. **Drill Down:** Specific implementation (e.g., Vuex module template)
+3. **Validate:** Check against quality gates
+
+---
+
+## 9. Implementation Decision Matrix
+
+| Task Type | Approach | Required Files | Quality Gate |
+|:----------|:---------|:---------------|:-------------|
+| **Search Unification** | Supervised Learning | Roadmap + Templates | Regression tests |
+| **New Feature** | Classification | ADR-001 + Design guide | Code review |
+| **Bug Fix** | Regression Analysis | Error logs + Tests | No new failures |
+| **Refactoring** | Unsupervised Exploration | Full codebase context | Performance metrics |
+| **Architecture Change** | Multi-Agent Consensus | All guides + Stakeholder input | Team approval |
+
+---
+
+This guide provides concrete, copy-paste ready patterns for consistent implementation across the FFR Live Platform. All patterns are designed for Claude 4 Sonnet optimization with clear decision trees and success criteria.
+
+Rule Name: architectural-guide
+Description: CORE ARCHITECTURAL PATTERNS AND DECISION TREES - Must be referenced for ANY architectural decisions, state management implementation, API design, database schema changes, component structuring, Vuex modules, ADR-001 centralized state pattern, search unification, backend controller patterns, mongoose-paginate-v2 implementation, code quality gates, problem-solving algorithms (supervised learning, classification, unsupervised exploration), Vue.js best practices, Node.js/Express patterns, MongoDB schema design, Vue 2→3 migration planning, multi-agent workflows, regression prevention, and technical debt prioritization. Essential for maintaining consistency across the FFR Live Platform.
+
+

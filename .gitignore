@@ -1,4 +1,297 @@
-/export
-.idea
+# =============================================================================
+# FFR Live Platform - Git Ignore Configuration
+# =============================================================================
 
+# Environment Configuration
 .env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.staging
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+yarn.lock
+lerna-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+.env.test
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# Next.js build output
+.next
+
+# Nuxt.js build / generate output
+.nuxt
+dist
+
+# Gatsby files
+.cache/
+public
+
+# Storybook build outputs
+.out
+.storybook-out
+
+# Temporary folders
+tmp/
+temp/
+
+# Logs
+logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# =============================================================================
+# Frontend Specific
+# =============================================================================
+frontend/dist/
+frontend/node_modules/
+frontend/.DS_Store
+frontend/coverage/
+frontend/tests/e2e/videos/
+frontend/tests/e2e/screenshots/
+
+# =============================================================================
+# Backend Specific  
+# =============================================================================
+backend/node_modules/
+backend/uploads/
+backend/logs/
+backend/coverage/
+backend/dist/
+
+# =============================================================================
+# Database & Storage
+# =============================================================================
+# MongoDB
+*.db
+data/
+backups/
+
+# Redis
+dump.rdb
+
+# SQLite
+*.sqlite
+*.sqlite3
+
+# =============================================================================
+# Docker & Deployment
+# =============================================================================
+# Docker volumes
+data/
+logs/
+
+# Docker override for sensitive info
+docker-compose.override.production.yml
+
+# =============================================================================
+# Development Tools
+# =============================================================================
+# VS Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# IntelliJ
+.idea/
+*.iml
+*.iws
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# =============================================================================
+# Operating System
+# =============================================================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# =============================================================================
+# Build Artifacts
+# =============================================================================
+build/
+dist/
+out/
+target/
+
+# =============================================================================
+# Test Results
+# =============================================================================
+test-results/
+coverage/
+.nyc_output/
+junit.xml
+mochawesome-report/
+
+# =============================================================================
+# Security & Secrets
+# =============================================================================
+# SSL Certificates
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# SSH Keys
+id_rsa
+id_dsa
+*.pub
+
+# API Keys and secrets
+secrets.json
+.secrets
+.auth
+
+# =============================================================================
+# Monitoring & Performance
+# =============================================================================
+# Performance reports
+performance-report.html
+lighthouse-report.html
+bundle-analyzer-report.html
+
+# =============================================================================
+# Package Manager Lock Files (Standardized on npm)
+# =============================================================================
+yarn.lock
+pnpm-lock.yaml
+package-lock.json.backup
+
+# =============================================================================
+# Temporary and Generated Files
+# =============================================================================
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.#*
+
+# Generated documentation
+docs/api/
+docs/coverage/
+
+# =============================================================================
+# Project Specific
+# =============================================================================
+# FFR Live specific ignores
+frontend/src/assets/temp/
+backend/temp/
+*.ffr.backup
+
+# Development database dumps
+*.dump
+*.backup

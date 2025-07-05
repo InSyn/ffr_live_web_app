@@ -4,7 +4,7 @@
       Создать событие
     </router-link>
     <router-link class="adminPage__link" :to="{ name: 'createAthletePage' }">
-      Создать спортсмена
+      Создать спортсмена 1
     </router-link>
     <router-link class="adminPage__link" :to="{ name: 'createJuryPage' }">
       Создать судью

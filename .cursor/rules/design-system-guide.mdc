@@ -1,0 +1,503 @@
+---
+description: UI/UX DESIGN SYSTEM AND STYLING STANDARDS - Must be referenced for ALL frontend styling, component creation, CSS implementation, design token usage, responsive design, mobile-first development, color system implementation, spacing decisions, utility classes, Vue component styling, SCSS patterns, theme implementation, accessibility standards, performance optimization, asset management, image handling, icon components, typography, layout patterns, card components, search results styling, and ANY visual design decisions. Essential for maintaining consistent UI/UX across the FFR Live Platform.
+globs: 
+alwaysApply: false
+---
+# FFR Live Platform: Claude-Optimized Design System Guide
+
+**Version:** 3.0
+**Status:** Claude 4 Sonnet Optimized
+**Purpose:** Copy-paste ready styling patterns with AI-optimized decision trees
+
+---
+
+## 1. Styling Decision Trees
+
+### Component Styling Strategy
+```mermaid
+graph TD
+    A[New Component] --> B{Uses Existing Pattern?}
+    B -->|Yes| C[Copy Pattern + Adapt]
+    B -->|No| D{Repeated Across App?}
+    
+    D -->|Yes| E[Create Utility Class]
+    D -->|No| F[Scoped Component Style]
+    
+    C --> G[surface-card, search-results, etc.]
+    E --> H[Add to _utilities.scss]
+    F --> I[style lang="scss" scoped]
+```
+
+### Color Selection Tree
+```mermaid
+graph TD
+    A[Need Color] --> B{Semantic Purpose?}
+    B -->|Text| C[--color-text-*]
+    B -->|Background| D[--color-bg-*]
+    B -->|Interactive| E[--color-interactive-*]
+    B -->|Status/Brand| F{Common Use?}
+    
+    F -->|Yes| G[Create Semantic Variable]
+    F -->|No| H[Use --raw-* Palette]
+```
+
+### Spacing Decision Tree
+```mermaid
+graph TD
+    A[Need Spacing] --> B{Standard Increment?}
+    B -->|Yes| C[Use --space-* Token]
+    B -->|No| D{Component-Specific?}
+    
+    D -->|Yes| E[Create Component Variable]
+    D -->|No| F[Derive from Base Token]
+    
+    C --> G[--space-1 through --space-16]
+    E --> H[--component-padding: calc(var(--space-4) + 2px)]
+```
+
+---
+
+## 2. Hybrid Architecture (Copy-Paste Ready)
+
+### Layer 1: Design Tokens (Always Use)
+```scss
+// ✅ CORRECT: Semantic tokens only
+.component {
+  color: var(--color-text-primary);
+  background: var(--color-bg-surface);
+  padding: var(--space-4);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-primary);
+}
+
+// ❌ WRONG: Raw values or raw tokens
+.component {
+  color: #333333;                    // ❌ Hardcoded
+  background: var(--raw-blue-500);   // ❌ Raw token in component
+  padding: 16px;                     // ❌ Magic number
+  border-radius: 4px;                // ❌ Magic number
+}
+```
+
+### Layer 2: Utility Classes (Quick Implementation)
+```vue
+<!-- ✅ TEMPLATE: Utility-first approach -->
+<template>
+  <div class="surface-card d-flex flex-column gap-4">
+    <header class="d-flex justify-space-between align-center">
+      <h2 class="text-h6 color-text-primary">{{ title }}</h2>
+      <v-btn class="interactive-brand-default">Action</v-btn>
+    </header>
+    <main class="flex-grow-1">
+      <!-- Content -->
+    </main>
+  </div>
+</template>
+
+<!-- ❌ WRONG: Custom styles for standard patterns -->
+<template>
+  <div class="custom-container">
+    <header class="custom-header">
+      <h2 class="custom-title">{{ title }}</h2>
+    </header>
+  </div>
+</template>
+
+<style scoped>
+.custom-container {
+  background: var(--color-bg-surface);  /* Use surface-card instead */
+  padding: var(--space-4);              /* Utility class exists */
+  display: flex;                        /* d-flex utility exists */
+}
+</style>
+```
+
+### Layer 3: Scoped Styles (Last Resort)
+```vue
+<!-- ✅ CORRECT: Only truly unique styles -->
+<template>
+  <div class="surface-card">
+    <div class="custom-layout">
+      <!-- Complex component-specific layout -->
+    </div>
+  </div>
+</template>
+
+<style lang="scss" scoped>
+.custom-layout {
+  // Only unique positioning/layout logic
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    // Component-specific decorative elements
+  }
+  
+  // Complex responsive behavior unique to this component
+  @include respond-to(md) {
+    grid-template-columns: 1fr 2fr 1fr;
+  }
+}
+</style>
+```
+
+---
+
+## 3. Color System (Production Ready)
+
+### Semantic Color Categories
+```scss
+// ✅ TEXT COLORS: Copy-paste ready
+.element {
+  color: var(--color-text-primary);      // Main body text
+  color: var(--color-text-secondary);    // Less important text
+  color: var(--color-text-accent);       // Highlighted text
+  color: var(--color-text-success);      // Success messages
+  color: var(--color-text-error);        // Error messages
+  color: var(--color-text-on-brand);     // Text on brand backgrounds
+}
+
+// ✅ BACKGROUND COLORS: Copy-paste ready
+.element {
+  background: var(--color-bg-primary);          // Main page background
+  background: var(--color-bg-secondary);        // Section backgrounds
+  background: var(--color-bg-surface);          // Cards, modals
+  background: var(--color-bg-surface-hover);    // Hover states
+  background: var(--color-bg-surface-secondary); // Input fields
+}
+
+// ✅ INTERACTIVE COLORS: Copy-paste ready
+.element {
+  background: var(--color-interactive-brand-default);  // Primary buttons
+  border-color: var(--color-border-primary);           // Standard borders
+  border-color: var(--color-border-photo);             // Avatar borders
+}
+```
+
+### Color Migration Script
+```bash
+# ✅ AUTOMATED: Run this for legacy color migration
+find frontend/src -name "*.vue" -exec sed -i 's/var(--text-default)/var(--color-text-primary)/g' {} +
+find frontend/src -name "*.vue" -exec sed -i 's/var(--background-card)/var(--color-bg-surface)/g' {} +
+find frontend/src -name "*.vue" -exec sed -i 's/var(--border-container)/var(--color-border-primary)/g' {} +
+```
+
+---
+
+## 4. Utility Class System
+
+### Surface Card Pattern (Most Common)
+```vue
+<!-- ✅ TEMPLATE: Standard card layout -->
+<template>
+  <div class="surface-card">
+    <header class="d-flex justify-space-between align-center mb-4">
+      <h3 class="text-h6">{{ title }}</h3>
+      <slot name="actions" />
+    </header>
+    <main>
+      <slot />
+    </main>
+  </div>
+</template>
+```
+
+### Search Results Pattern
+```vue
+<!-- ✅ TEMPLATE: Unified search results -->
+<template>
+  <div class="search-results">
+    <div v-if="isSearching" class="d-flex justify-center py-8">
+      <loader-spinner />
+    </div>
+    
+    <div v-else-if="hasResults" class="results-grid">
+      <component 
+        :is="listItemComponent" 
+        v-for="item in searchResults" 
+        :key="item._id"
+        :item="item"
+      />
+    </div>
+    
+    <div v-else class="text-center py-8 color-text-secondary">
+      Результаты не найдены
+    </div>
+  </div>
+</template>
+```
+
+### Responsive Grid System
+```scss
+// ✅ TEMPLATE: Responsive patterns
+.responsive-grid {
+  display: grid;
+  gap: var(--space-4);
+  
+  // Mobile first
+  grid-template-columns: 1fr;
+  
+  @include respond-to(sm) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @include respond-to(md) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  @include respond-to(lg) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+```
+
+---
+
+## 5. Component Development Checklist
+
+### Pre-Implementation Check
+```markdown
+- [ ] Similar component exists? → Copy pattern
+- [ ] Uses surface-card for containers?
+- [ ] All colors use semantic tokens (--color-*)?
+- [ ] All spacing uses design tokens (--space-*)?
+- [ ] Responsive behavior defined?
+- [ ] Dark theme compatibility?
+```
+
+### Implementation Validation
+```vue
+<!-- ✅ VALIDATION TEMPLATE: Check your component -->
+<template>
+  <div class="component-name surface-card">  <!-- ✓ Uses utility -->
+    <h3 class="text-h6 color-text-primary">  <!-- ✓ Semantic color -->
+      {{ title }}
+    </h3>
+    <div class="mt-4 d-flex gap-2">          <!-- ✓ Utility spacing -->
+      <!-- Content with proper tokens -->
+    </div>
+  </div>
+</template>
+
+<style lang="scss" scoped>
+.component-name {
+  // ✓ Only truly unique styles here
+  // ✓ No hardcoded colors/spacing
+  // ✓ Uses mixins for media queries
+  
+  @include respond-to(md) {
+    // Responsive behavior
+  }
+}
+</style>
+```
+
+### Quality Gates
+```bash
+# ✅ AUTOMATED: Run before commit
+# Check for hardcoded values
+grep -r "px\|rem\|#[0-9a-fA-F]" frontend/src --include="*.vue" || echo "✓ No hardcoded values"
+
+# Check for non-semantic colors  
+grep -r "var(--raw-" frontend/src --include="*.vue" && echo "❌ Raw tokens in components" || echo "✓ Semantic tokens only"
+
+# Check for missing scoped styles
+grep -L "scoped" frontend/src/**/*.vue | grep -v "index.vue" && echo "⚠️ Missing scoped styles"
+```
+
+---
+
+## 6. Asset Management System
+
+### Icon Implementation Pattern
+```vue
+<!-- ✅ TEMPLATE: Icon component -->
+<template>
+  <svg 
+    class="icon" 
+    :class="iconClasses"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+  >
+    <path d="..." />
+  </svg>
+</template>
+
+<script>
+export default {
+  name: 'IconName',
+  props: {
+    size: {
+      type: String,
+      default: 'md',
+      validator: (value) => ['sm', 'md', 'lg', 'xl'].includes(value)
+    }
+  },
+  computed: {
+    iconClasses() {
+      return [`icon--${this.size}`]
+    }
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+.icon {
+  flex-shrink: 0;
+  
+  &--sm { width: var(--space-4); height: var(--space-4); }
+  &--md { width: var(--space-6); height: var(--space-6); }
+  &--lg { width: var(--space-8); height: var(--space-8); }
+  &--xl { width: var(--space-12); height: var(--space-12); }
+}
+</style>
+```
+
+### Image Handling Pattern
+```vue
+<!-- ✅ TEMPLATE: Responsive images -->
+<template>
+  <div class="image-container">
+    <img 
+      :src="imageSrc"
+      :alt="imageAlt"
+      class="responsive-image"
+      loading="lazy"
+      @error="handleImageError"
+    />
+  </div>
+</template>
+
+<style lang="scss" scoped>
+.image-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+}
+
+.responsive-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+</style>
+```
+
+---
+
+## 7. Mobile-First Responsive Patterns
+
+### Breakpoint Usage Template
+```scss
+// ✅ TEMPLATE: Mobile-first responsive
+.component {
+  // Mobile styles (default)
+  padding: var(--space-2);
+  font-size: var(--text-sm);
+  
+  @include respond-to(sm) {
+    // Tablet styles
+    padding: var(--space-4);
+    font-size: var(--text-base);
+  }
+  
+  @include respond-to(md) {
+    // Desktop styles
+    padding: var(--space-6);
+    font-size: var(--text-lg);
+  }
+  
+  @include respond-to(lg) {
+    // Large desktop styles
+    padding: var(--space-8);
+  }
+}
+```
+
+### Touch Target Standards
+```scss
+// ✅ TEMPLATE: Touch-friendly interfaces
+.interactive-element {
+  min-height: 48px;  // iOS/Android minimum
+  min-width: 48px;
+  
+  // Ensure adequate spacing between touch targets
+  margin: var(--space-1);
+}
+```
+
+---
+
+## 8. Performance & Optimization
+
+### CSS Performance Checklist
+```markdown
+- [ ] Uses CSS custom properties for theming
+- [ ] Avoids deep nesting (max 3 levels)
+- [ ] Uses efficient selectors (class over element)
+- [ ] No unused CSS (checked with audit)
+- [ ] Critical CSS inlined for above-the-fold content
+```
+
+### Lazy Loading Pattern
+```vue
+<!-- ✅ TEMPLATE: Performance-optimized components -->
+<template>
+  <div class="component">
+    <img 
+      :src="imageSrc"
+      loading="lazy"
+      :alt="imageAlt"
+    />
+    
+    <!-- Below-the-fold content -->
+    <lazy-component v-if="shouldLoad">
+      <expensive-component />
+    </lazy-component>
+  </div>
+</template>
+```
+
+---
+
+## 9. Accessibility Standards
+
+### ARIA Template
+```vue
+<!-- ✅ TEMPLATE: Accessible components -->
+<template>
+  <button 
+    class="custom-button"
+    :aria-label="buttonLabel"
+    :aria-pressed="isPressed"
+    :disabled="isDisabled"
+    @click="handleClick"
+  >
+    <icon-name :aria-hidden="true" />
+    <span class="sr-only">{{ screenReaderText }}</span>
+  </button>
+</template>
+
+<style lang="scss" scoped>
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+</style>
+```
+
+---
+
+This guide provides production-ready, copy-paste patterns optimized for Claude 4 Sonnet with clear decision trees and concrete examples for consistent implementation.
+
+Rule Name: design-system-guide
+Description: UI/UX DESIGN SYSTEM AND STYLING STANDARDS - Must be referenced for ALL frontend styling, component creation, CSS implementation, design token usage, responsive design, mobile-first development, color system implementation, spacing decisions, utility classes, Vue component styling, SCSS patterns, theme implementation, accessibility standards, performance optimization, asset management, image handling, icon components, typography, layout patterns, card components, search results styling, and ANY visual design decisions. Essential for maintaining consistent UI/UX across the FFR Live Platform.

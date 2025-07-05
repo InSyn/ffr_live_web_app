@@ -1,565 +1,591 @@
 <template>
-  <div v-if="jury" class="juryPage__wrapper">
-    <div class="juryPage__top">
-      <bg-mountains class="mountains_bg"></bg-mountains>
+	<div v-if="error" class="error-message">
+		{{ error }}
+	</div>
+	<div v-else-if="loadingState">
+		<loader-spinner v-if="loadingState" />
+	</div>
+	<div v-else-if="jury" class="juryPage__wrapper">
+		<div class="juryPage__top">
+			<bg-mountains class="mountains_bg" />
 
-      <div class="juryCard__wrapper">
-        <div class="juryCard__content">
-          <div class="juryCard__mainInfo">
-            <div class="juryPhoto__wrapper">
-              <img v-if="jury['photo_url']" class="juryPhoto" :src="uploadsFolderUrl + `${jury['photo_url']}`" alt="Event Logo" />
-              <athlete-photo-filler-icon v-else class="juryPhotoFiller__icon" :gender="jury.gender"></athlete-photo-filler-icon>
+			<div class="juryCard__wrapper">
+				<div class="juryCard__content bg-frozen-glass">
+					<div class="juryCard__mainInfo">
+						<div class="juryPhoto__wrapper bg-blur">
+							<lazy-image
+								v-if="jury['photo_url']"
+								:src="getImageUrl(jury['photo_url'])"
+								:alt="jury.lastname + ' ' + jury.name || 'Jury photo'"
+								img-class="juryPhoto"
+								rounding="50%"
+								variant="page"
+							/>
+							<athlete-photo-filler-icon
+								v-else
+								class="juryPhotoFiller__icon"
+								:gender="jury.gender"
+							/>
 
-              <edit-button class="edit__button" type="jury" :code="jury_code"></edit-button>
-            </div>
+							<edit-button class="edit__button" type="jury" :code="jury_code" />
+						</div>
 
-            <div class="juryInfo__wrapper">
-              <div class="juryInfo__header">
-                <div class="federation__wrapper">
-                  <img src="../../../assets/logo/FFR_logo_mini.png" alt="FFR_logo" />
-                  <span>Федерация фристайла России</span>
-                </div>
+						<div class="juryInfo__wrapper">
+							<div class="juryInfo__header">
+								<div class="federation__wrapper">
+									<img src="../../../assets/logo/FFR_logo_mini.png" alt="FFR_logo" />
+									<span>Федерация фристайла России</span>
+								</div>
 
-                <div class="jurySport">
-                  {{ jury.sport }}
+								<div class="jurySport">
+									{{ jury.sport }}
 
-                  <country-flag class="countryFlag" :country-code="getCountryCode(jury.country)" height="1.25rem"></country-flag>
-                </div>
-              </div>
+									<country-flag
+										class="countryFlag"
+										:country-code="getCountryCode(jury.country)"
+										height="1.25rem"
+									/>
+								</div>
+							</div>
 
-              <div class="juryInfo__nameLine">
-                <div class="juryName">
-                  {{ jury.lastname + ' ' + jury.name }}
-                </div>
-                <div v-if="jury.jury_category" class="juryCategory">
-                  {{ jury.jury_category }}
-                </div>
-              </div>
+							<div class="juryInfo__nameLine">
+								<div class="juryName">
+									{{ jury.lastname + ' ' + jury.name }}
+								</div>
+								<div v-if="jury.juryCategory" class="juryCategory">
+									{{ jury.juryCategory }}
+								</div>
+							</div>
 
-              <div v-if="jury.region" class="juryInfo__footer">
-                <div class="juryRegionInfo__wrapper">
-                  <country-flag
-                    class="regionFlag"
-                    is-region-flag="true"
-                    :country-code="getCountryCode(jury.country)"
-                    :region-code="getRegionCode(jury.region)"
-                    height="1.1rem"
-                  ></country-flag>
-                  <span class="juryRegion">
-                    {{ jury.region }}
-                  </span>
-                </div>
+							<div v-if="jury.region" class="juryInfo__footer">
+								<div class="juryRegionInfo__wrapper">
+									<country-flag
+										class="regionFlag"
+										is-region-flag="true"
+										:country-code="getCountryCode(jury.country)"
+										:region-code="getRegionCode(jury.region)"
+										height="1.1rem"
+									/>
+									<span class="juryRegion">
+										{{ jury.region }}
+									</span>
+								</div>
 
-                <div v-if="jury.birth_date" class="juryAge__wrapper">
-                  Возраст
-                  <div class="juryAge">
-                    {{ getAgeFromBirthdate(jury.birth_date) }}
-                  </div>
-                </div>
+								<div v-if="jury.birthDate" class="juryAge__wrapper">
+									Возраст
+									<div class="juryAge">
+										{{ getAgeFromBirthdate(jury.birthDate) }}
+									</div>
+								</div>
 
-                <div v-if="jury.disciplines.length" class="juryDisciplines__wrapper">
-                  <span> Дисциплины: </span>
-                  <div class="disciplines__wrapper">
-                    {{ jury.disciplines.map((disciplineName) => getDisciplineCode(disciplineName) || disciplineName).join(', ') }}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+								<div v-if="jury.disciplines.length" class="juryDisciplines__wrapper">
+									<span> Дисциплины: </span>
+									<div class="disciplines__wrapper">
+										{{
+											jury.disciplines
+												.map(disciplineName => getDisciplineCode(disciplineName) || disciplineName)
+												.join(', ')
+										}}
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 
-          <div class="juryAdditionalInfo__wrapper">
-            <div v-if="jury.jury_code" class="juryAdditionalInfo__group">
-              <b> FFR-ID: </b>
-              <span> {{ jury.jury_code }}</span>
-            </div>
-            <div v-if="jury.socials" class="socials">
-              <a class="socials__link" v-if="jury.socials.vk" :href="jury.socials.vk" target="_blank">
-                <socials-vk-icon class="socials__link__icon"></socials-vk-icon>
-              </a>
-              <a class="socials__link" v-if="jury.socials.telegram" :href="jury.socials.telegram" target="_blank">
-                <socials-telegram-icon class="socials__link__icon"></socials-telegram-icon>
-              </a>
-            </div>
-          </div>
-          <div class="jury__menu">
-            <button @click="bottomMenu = 'competitions'" class="jury__menu__item" type="button">Соревнования</button>
-            <button @click="bottomMenu = 'seminars'" class="jury__menu__item" type="button">Семинары</button>
-            <button class="jury__menu__item" type="button" disabled>Статистика</button>
-          </div>
-        </div>
-      </div>
-    </div>
+					<div class="juryAdditionalInfo__wrapper">
+						<div v-if="jury.jury_code" class="juryAdditionalInfo__group">
+							<b> FFR-ID: </b>
+							<span> {{ jury.jury_code }}</span>
+						</div>
+						<div v-if="jury.socials" class="socials">
+							<a
+								v-if="jury.socials.vk"
+								class="socials__link"
+								:href="jury.socials.vk"
+								target="_blank"
+							>
+								<socials-vk-icon class="socials__link__icon" />
+							</a>
+							<a
+								v-if="jury.socials.telegram"
+								class="socials__link"
+								:href="jury.socials.telegram"
+								target="_blank"
+							>
+								<socials-telegram-icon class="socials__link__icon" />
+							</a>
+						</div>
+					</div>
+					<div class="jury__menu">
+						<button class="jury__menu__item" type="button" @click="bottomMenu = 'competitions'">
+							Соревнования
+						</button>
+						<button class="jury__menu__item" type="button" @click="bottomMenu = 'seminars'">
+							Семинары
+						</button>
+						<button class="jury__menu__item" type="button" disabled>Статистика</button>
+					</div>
+				</div>
+			</div>
+		</div>
 
-    <div class="juryPage__bottom">
-      <div v-if="bottomMenu === 'competitions'" class="juryBottomSection__wrapper">
-        <div class="juryBottomSection__title">Соревнования</div>
-        <jury-competitions-list :jury_code="jury_code"></jury-competitions-list>
-      </div>
-      <div v-else-if="bottomMenu === 'seminars'" class="juryBottomSection__wrapper">
-        <div class="juryBottomSection__title">Семинары</div>
-        <jury-seminars-list :jury_code="jury_code"></jury-seminars-list>
-      </div>
-    </div>
-  </div>
+		<div class="juryPage__bottom">
+			<div v-if="bottomMenu === 'competitions'" class="juryBottomSection__wrapper">
+				<div class="juryBottomSection__title">Соревнования</div>
+				<jury-competitions-list :jury_code="jury_code" />
+			</div>
+			<div v-else-if="bottomMenu === 'seminars'" class="juryBottomSection__wrapper">
+				<div class="juryBottomSection__title">Семинары</div>
+				<jury-seminars-list :jury_code="jury_code" />
+			</div>
+		</div>
+	</div>
 </template>
 
 <script>
-import AthletePhotoFillerIcon from '@/assets/svg/athletePhotoFiller-icon.vue';
-import EditButton from '@/components/ui-components/edit-button.vue';
-import CountryFlag from '@/components/ui-components/country-flag.vue';
-import axios from 'axios';
-import { apiUrl, backendRootUrl } from '@/constants';
-import { getRegionCode } from '@/store/data/russia-regions';
-import { getDisciplineCode } from '@/store/data/sports';
-import { mdiImage } from '@mdi/js';
-import SocialsVkIcon from '@/components/icons/socials-vk-icon.vue';
-import SocialsTelegramIcon from '@/components/icons/socials-telegram-icon.vue';
-import { getCountryCode } from '@/store/data/countries';
-import { getAgeFromBirthdate } from '@/utils/data-formaters';
-import JurySeminarsList from '@/pages/jury/jury-page/jurySeminars-list.vue';
-import JuryCompetitionsList from '@/pages/jury/jury-page/juryCompetitions-list.vue';
-import BgMountains from '@/assets/riv/bg-mountains.vue';
+import AthletePhotoFillerIcon from '@/assets/svg/athletePhotoFiller-icon.vue'
+import EditButton from '@/components/ui-components/edit-button.vue'
+import CountryFlag from '@/components/ui-components/country-flag.vue'
+import axios from 'axios'
+import { apiUrl } from '@/constants'
+import { getRegionCode } from '@/store/data/russia-regions'
+import { getDisciplineCode } from '@/store/data/sports'
+import { mdiImage } from '@mdi/js'
+import SocialsVkIcon from '@/components/icons/socials-vk-icon.vue'
+import SocialsTelegramIcon from '@/components/icons/socials-telegram-icon.vue'
+import { getCountryCode } from '@/store/data/countries'
+import { getAgeFromBirthdate } from '@/utils/data-formaters'
+import JurySeminarsList from '@/pages/jury/jury-page/jurySeminars-list.vue'
+import JuryCompetitionsList from '@/pages/jury/jury-page/juryCompetitions-list.vue'
+import BgMountains from '@/assets/riv/bg-mountains.vue'
+import LazyImage from '@/components/ui-components/LazyImage.vue'
+import LoaderSpinner from '@/components/ui-components/loader-spinner.vue'
+import { getImageUrl } from '@/utils/url-helpers'
 
 export default {
-  name: 'index',
-  props: ['jury_code'],
-  components: {
-    BgMountains,
-    JuryCompetitionsList,
-    JurySeminarsList,
-    SocialsTelegramIcon,
-    SocialsVkIcon,
-    CountryFlag,
-    EditButton,
-    AthletePhotoFillerIcon,
-  },
-  data() {
-    return {
-      jury: null,
+	name: 'Index',
+	components: {
+		BgMountains,
+		JuryCompetitionsList,
+		JurySeminarsList,
+		SocialsTelegramIcon,
+		SocialsVkIcon,
+		CountryFlag,
+		EditButton,
+		AthletePhotoFillerIcon,
+		LazyImage,
+		LoaderSpinner
+	},
+	props: ['jury_code'],
+	data() {
+		return {
+			jury: null,
+			error: null,
+			loadingState: false,
+			updateTimeoutId: null,
+			bottomMenu: 'competitions',
+			imageFillerIcon: mdiImage
+		}
+	},
 
-      loadingState: false,
-      updateTimeoutId: null,
-      bottomMenu: 'competitions',
-
-      imageFillerIcon: mdiImage,
-    };
-  },
-  methods: {
-    getAgeFromBirthdate,
-    getCountryCode,
-    getDisciplineCode,
-    getRegionCode,
-    async getJuryByCode(id) {
-      try {
-        const data = await axios.get(apiUrl + '/jury/' + id);
-
-        if (data.status === 200) {
-          const juryData = data.data.jury;
-          if (juryData) this.jury = { ...juryData };
-        }
-
-        this.loadingState = false;
-      } catch (err) {
-        if (err) {
-          console.error(err);
-        }
-        this.loadingState = false;
-      }
-    },
-  },
-  computed: {
-    uploadsFolderUrl() {
-      return backendRootUrl;
-    },
-  },
-
-  mounted() {
-    if (this.$route.params.jury_code) {
-      try {
-        this.loadingState = true;
-        this.getJuryByCode(this.$route.params.jury_code);
-      } catch (e) {
-        this.loadingState = false;
-        throw new Error(e);
-      }
-    }
-  },
-};
+	mounted() {
+		const jury_code = this.$route.params.jury_code
+		if (!jury_code) {
+			this.error = 'Некорректная ссылка: отсутствует код судьи.'
+			return
+		}
+		this.loadingState = true
+		this.getJuryByCode(jury_code)
+	},
+	methods: {
+		getAgeFromBirthdate,
+		getCountryCode,
+		getDisciplineCode,
+		getRegionCode,
+		getImageUrl,
+		async getJuryByCode(jury_code) {
+			try {
+				const data = await axios.get(apiUrl + '/jury/' + jury_code)
+				if (data.status === 200 && data.data.jury) {
+					this.jury = { ...data.data.jury }
+					this.error = null
+				} else {
+					this.error = 'Судья не найден.'
+				}
+			} catch (err) {
+				this.error = 'Ошибка загрузки данных судьи.'
+			} finally {
+				this.loadingState = false
+			}
+		}
+	}
+}
 </script>
 
 <style scoped lang="scss">
 .juryPage__wrapper {
-  position: relative;
-  flex: 1 1 0;
-  display: flex;
-  flex-direction: column;
+	position: relative;
+	flex: 1 1 0;
+	display: flex;
+	flex-direction: column;
 
-  .juryPage__top {
-    position: relative;
-    isolation: isolate;
-    flex: 0 0 400px;
-    display: flex;
-    justify-content: center;
-    padding: var(--padd-entityPage-top);
+	.juryPage__top {
+		position: relative;
+		isolation: isolate;
+		flex: 0 0 400px;
+		display: flex;
+		justify-content: center;
+		padding: var(--padd-entityPage-top);
 
-    @media screen and (max-width: 640px) {
-      flex-basis: auto;
-    }
+		@media screen and (max-width: 640px) {
+			flex-basis: auto;
+		}
 
-    .mountains_bg {
-      position: absolute;
-      z-index: 1;
-      top: 0;
-      width: 100%;
-      height: 100%;
-    }
+		.mountains_bg {
+			position: absolute;
+			z-index: 1;
+			top: 0;
+			width: 100%;
+			height: 100%;
+		}
 
-    .juryCard__wrapper {
-      position: relative;
-      z-index: 2;
-      display: flex;
-      flex-wrap: wrap;
-      max-width: var(--desktop-small);
-      width: 100%;
-      margin: 16px 16px;
+		.juryCard__wrapper {
+			position: relative;
+			z-index: 2;
+			display: flex;
+			flex-wrap: wrap;
+			max-width: var(--desktop-small);
+			width: 100%;
+			margin: 16px 16px;
 
-      color: var(--text-contrast);
+			color: var(--color-text-secondary);
 
-      &::before {
-        position: absolute;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(2, 2, 6, 0.6);
-        backdrop-filter: blur(5px);
-        border: 1px solid rgb(255, 255, 255);
-        box-shadow: 0 0 6px -2px rgb(255, 255, 255) inset, 0 16px 32px 0 rgba(12, 14, 46, 0.48), -4px -8px 24px 0 rgba(255, 255, 255, 0.14) inset;
-        border-radius: 12px;
+			.juryCard__content {
+				position: relative;
+				flex: 1 1 0;
+				display: flex;
+				flex-direction: column;
+				padding: var(--padd-entityPage-card);
 
-        content: '';
-      }
+				.juryCard__mainInfo {
+					flex: 1 1 auto;
+					position: relative;
+					display: flex;
+					flex-wrap: wrap;
+					gap: 0.5rem 1rem;
+					padding: 1rem;
+					border-bottom: 1px solid var(--color-text-secondary);
 
-      .juryCard__content {
-        position: relative;
-        flex: 1 1 0;
-        display: flex;
-        flex-direction: column;
-        padding: var(--padd-entityPage-card);
+					.juryPhoto__wrapper {
+						--bg-radius: 50%;
+						position: relative;
+						flex: 0 0 auto;
+						display: flex;
+						flex-wrap: wrap;
+						align-items: center;
+						justify-content: center;
 
-        .juryCard__mainInfo {
-          flex: 1 1 auto;
-          position: relative;
-          display: flex;
-          flex-wrap: wrap;
-          gap: 0.5rem 1rem;
-          padding: 1rem;
-          border-bottom: 1px solid var(--text-contrast);
+						aspect-ratio: 1;
+						background-color: var(--color-bg-image);
+						border: 2px solid var(--color-text-secondary);
+						border-radius: 50%;
 
-          .juryPhoto__wrapper {
-            position: relative;
-            flex: 0 0 auto;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: center;
+						.juryPhoto {
+							flex: 1 1 0;
+							max-width: 100%;
+							max-height: 100%;
+							border-radius: 50%;
+						}
 
-            height: 168px;
-            aspect-ratio: 1;
-            background-color: var(--background--image);
-            border: 2px solid var(--text-contrast);
-            border-radius: 50%;
+						.juryPhotoFiller__icon {
+							height: 100%;
+							aspect-ratio: 1;
+							color: var(--color-text-primary);
+						}
 
-            .juryPhoto {
-              flex: 1 1 0;
-              max-width: 100%;
-              max-height: 100%;
-              border-radius: 50%;
-            }
+						.edit__button {
+							position: absolute;
+							bottom: 0;
+							right: 0;
+						}
 
-            .juryPhotoFiller__icon {
-              height: 100%;
-              aspect-ratio: 1;
-              color: var(--text-default);
-            }
+						@media screen and (max-width: 1200px) {
+							width: 144px;
+							height: 144px;
+						}
 
-            .edit__button {
-              position: absolute;
-              bottom: 0;
-              right: 0;
-            }
+						@media screen and (max-width: 900px) {
+							width: 122px;
+							height: 122px;
+						}
 
-            @media screen and (max-width: 1200px) {
-              width: 144px;
-              height: 144px;
-            }
-            @media screen and (max-width: 900px) {
-              width: 122px;
-              height: 122px;
-            }
-            @media screen and (max-width: 720px) {
-              width: 108px;
-              height: 108px;
-            }
-            @media screen and (max-width: 480px) {
-              width: 96px;
-              height: 96px;
-            }
-          }
+						@media screen and (max-width: 720px) {
+							width: 108px;
+							height: 108px;
+						}
 
-          .juryInfo__wrapper {
-            flex: 1 1 0;
-            display: flex;
-            flex-direction: column;
-            gap: 2rem 1.75rem;
+						@media screen and (max-width: 480px) {
+							width: 96px;
+							height: 96px;
+						}
+					}
 
-            .juryInfo__header {
-              flex: 0 0 auto;
-              display: flex;
-              align-items: center;
-              flex-wrap: wrap;
-              gap: 0.5rem 1rem;
+					.juryInfo__wrapper {
+						flex: 1 1 0;
+						display: flex;
+						flex-direction: column;
+						gap: 2rem 1.75rem;
 
-              .federation__wrapper {
-                flex: 1 1 0;
-                display: flex;
-                align-items: center;
-                font-size: 1.1rem;
+						.juryInfo__header {
+							flex: 0 0 auto;
+							display: flex;
+							align-items: center;
+							flex-wrap: wrap;
+							gap: 0.5rem 1rem;
 
-                img {
-                  height: 2rem;
-                  margin-right: 1rem;
-                }
-              }
+							.federation__wrapper {
+								flex: 1 1 0;
+								display: flex;
+								align-items: center;
+								font-size: 1.1rem;
 
-              .jurySport {
-                flex: 0 0 auto;
-                display: flex;
-                align-items: center;
-                margin-left: auto;
-                font-size: 1.2rem;
+								img {
+									height: 2rem;
+									margin-right: 1rem;
+								}
+							}
 
-                .countryFlag {
-                  margin-left: 12px;
-                }
-              }
-            }
+							.jurySport {
+								flex: 0 0 auto;
+								display: flex;
+								align-items: center;
+								margin-left: auto;
+								font-size: 1.2rem;
 
-            .juryInfo__nameLine {
-              flex: 0 0 auto;
-              display: flex;
-              align-items: center;
-              flex-wrap: wrap;
-              gap: 0.5rem 0.75rem;
-              margin-left: 0.75rem;
+								.countryFlag {
+									margin-left: 12px;
+								}
+							}
+						}
 
-              .juryName {
-                flex: 1 1 auto;
-                font-size: 1.5rem;
-                font-weight: bold;
-              }
+						.juryInfo__nameLine {
+							flex: 0 0 auto;
+							display: flex;
+							align-items: center;
+							flex-wrap: wrap;
+							gap: 0.5rem 0.75rem;
+							margin-left: 0.75rem;
 
-              .juryCategory {
-                flex: 0 1 auto;
-                font-size: 1.25rem;
-                font-weight: 300;
-              }
-            }
+							.juryName {
+								flex: 1 1 auto;
+								font-size: 1.5rem;
+								font-weight: bold;
+							}
 
-            .juryInfo__footer {
-              flex: 0 0 auto;
-              display: flex;
-              align-items: center;
-              flex-wrap: wrap;
-              gap: 0.5rem 1.25rem;
-              margin-top: auto;
-              font-size: 1.1rem;
+							.juryCategory {
+								flex: 0 1 auto;
+								font-size: 1.25rem;
+								font-weight: 300;
+							}
+						}
 
-              .juryRegionInfo__wrapper {
-                flex: 0 0 auto;
-                display: flex;
-                align-items: center;
-                margin-right: 0.5rem;
+						.juryInfo__footer {
+							flex: 0 0 auto;
+							display: flex;
+							align-items: center;
+							flex-wrap: wrap;
+							gap: 0.5rem 1.25rem;
+							margin-top: auto;
+							font-size: 1.1rem;
 
-                .regionFlag {
-                  margin-right: 0.5rem;
-                }
+							.juryRegionInfo__wrapper {
+								flex: 0 0 auto;
+								display: flex;
+								align-items: center;
+								margin-right: 0.5rem;
 
-                .juryRegion {
-                  display: flex;
-                  flex-wrap: wrap;
-                  gap: 4px;
-                }
-              }
+								.regionFlag {
+									margin-right: 0.5rem;
+								}
 
-              .juryAge__wrapper {
-                flex: 0 0 auto;
-                display: flex;
+								.juryRegion {
+									display: flex;
+									flex-wrap: wrap;
+									gap: 4px;
+								}
+							}
 
-                .juryAge {
-                  margin-left: 1rem;
-                }
-              }
+							.juryAge__wrapper {
+								flex: 0 0 auto;
+								display: flex;
 
-              .juryDisciplines__wrapper {
-                display: flex;
-                margin-left: auto;
+								.juryAge {
+									margin-left: 1rem;
+								}
+							}
 
-                .disciplines__wrapper {
-                  margin-left: 1rem;
-                }
-              }
+							.juryDisciplines__wrapper {
+								display: flex;
+								margin-left: auto;
 
-              @media screen and (max-width: 480px) {
-                .juryAge__wrapper {
-                  justify-content: flex-end;
-                }
-                .juryDisciplines__wrapper {
-                  flex: 1 1 100%;
-                  justify-content: flex-end;
-                }
-              }
-            }
-          }
-        }
+								.disciplines__wrapper {
+									margin-left: 1rem;
+								}
+							}
 
-        .juryAdditionalInfo__wrapper {
-          display: flex;
-          gap: 1rem;
-          padding: 1rem;
-          font-size: 0.9rem;
+							@media screen and (max-width: 480px) {
+								.juryAge__wrapper {
+									justify-content: flex-end;
+								}
 
-          .juryAdditionalInfo__group {
-            flex: 0 0 auto;
-            display: flex;
-            gap: 8px;
-            flex-wrap: nowrap;
+								.juryDisciplines__wrapper {
+									flex: 1 1 100%;
+									justify-content: flex-end;
+								}
+							}
+						}
+					}
+				}
 
-            b {
-              display: inline-block;
-              white-space: nowrap;
-              overflow: hidden;
-            }
+				.juryAdditionalInfo__wrapper {
+					display: flex;
+					gap: 1rem;
+					padding: 1rem;
+					font-size: 0.9rem;
 
-            span {
-              display: inline-block;
-              flex: 1 1 0;
-              white-space: nowrap;
-            }
+					.juryAdditionalInfo__group {
+						flex: 0 0 auto;
+						display: flex;
+						gap: 8px;
+						flex-wrap: nowrap;
 
-            .disciplines__wrapper {
-              flex: 1 1 0;
-              display: flex;
-              gap: 8px;
+						b {
+							display: inline-block;
+							white-space: nowrap;
+							overflow: hidden;
+						}
 
-              span {
-                flex: 0 0 auto;
-              }
-            }
-          }
+						span {
+							display: inline-block;
+							flex: 1 1 0;
+							white-space: nowrap;
+						}
 
-          .socials {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-left: auto;
-            padding-left: 1rem;
+						.disciplines__wrapper {
+							flex: 1 1 0;
+							display: flex;
+							gap: 8px;
 
-            .socials__link {
-              display: flex;
-              align-items: center;
+							span {
+								flex: 0 0 auto;
+							}
+						}
+					}
 
-              .socials__link__icon {
-                height: 2rem;
-                color: var(--text-contrast);
-              }
-            }
-          }
+					.socials {
+						display: flex;
+						align-items: center;
+						gap: 8px;
+						margin-left: auto;
+						padding-left: 1rem;
 
-          @media screen and (max-width: 900px) {
-            max-height: none;
-          }
-        }
+						.socials__link {
+							display: flex;
+							align-items: center;
 
-        .jury__menu {
-          display: flex;
-          justify-content: space-between;
-          gap: 2rem;
-          padding: 8px;
-          border-top: 1px solid var(--text-contrast);
+							.socials__link__icon {
+								height: 2rem;
+								color: var(--color-text-secondary);
+							}
+						}
+					}
 
-          button {
-            font-size: 1.1rem;
-            color: var(--text-contrast);
-            opacity: 0.8;
-            transition: opacity 120ms;
+					@media screen and (max-width: 900px) {
+						max-height: none;
+					}
+				}
 
-            &:hover {
-              opacity: 1;
-            }
-          }
+				.jury__menu {
+					display: flex;
+					justify-content: space-between;
+					gap: 2rem;
+					padding: 8px;
+					border-top: 1px solid var(--color-text-secondary);
 
-          button[disabled] {
-            font-weight: 300;
-            color: var(--text-muted);
-          }
-        }
-      }
+					button {
+						font-size: 1.1rem;
+						color: var(--color-text-secondary);
+						opacity: 0.8;
+						transition: opacity 120ms;
 
-      @media screen and (max-width: 640px) {
-        margin: 0;
-        width: 100%;
-        backdrop-filter: blur(12px);
+						&:hover {
+							opacity: 1;
+						}
+					}
 
-        &::before {
-          border-radius: 0;
-          border: none;
-          box-shadow: none;
-        }
-      }
-    }
-  }
+					button[disabled] {
+						font-weight: 300;
+						color: var(--color-text-secondary);
+					}
+				}
+			}
 
-  .juryPage__bottom {
-    flex: 1 1 300px;
-    display: flex;
-    flex-direction: column;
-    max-width: var(--desktop-small);
-    width: 100%;
-    margin: 0.75rem auto 0.5rem;
-    padding: 0 2rem;
+			@media screen and (max-width: 640px) {
+				margin: 0;
+				width: 100%;
+				backdrop-filter: blur(12px);
 
-    .juryBottomSection__wrapper {
-      display: flex;
-      flex-direction: column;
-      overflow-y: auto;
-      height: 100%;
-      background-color: var(--background--card);
-      backdrop-filter: blur(3px);
-      border-radius: 4px;
+				&::before {
+					border-radius: 0;
+					border: none;
+					box-shadow: none;
+				}
+			}
+		}
+	}
 
-      .juryBottomSection__title {
-        flex: 0 0 auto;
-        padding: 8px 12px;
-        font-size: 1.1rem;
-        font-weight: bold;
-      }
+	.juryPage__bottom {
+		flex: 1 1 300px;
+		display: flex;
+		flex-direction: column;
+		max-width: var(--desktop-small);
+		width: 100%;
+		margin: 0.75rem auto 0.5rem;
+		padding: 0 2rem;
 
-      .juryCompetitions__list {
-        flex: 1 1 200px;
-        display: flex;
-        flex-direction: column;
-        overflow-y: auto;
-        border-radius: 2px;
-      }
-    }
+		.juryBottomSection__wrapper {
+			display: flex;
+			flex-direction: column;
+			overflow-y: auto;
+			height: 100%;
+			background-color: var(--color-bg-surface);
+			backdrop-filter: blur(3px);
+			border-radius: 4px;
 
-    @media screen and (max-width: 720px) {
-      margin: 0;
-      padding: 0;
-      .juryBottomSection__wrapper {
-        border-radius: 0;
-      }
-    }
-  }
+			.juryBottomSection__title {
+				flex: 0 0 auto;
+				padding: 8px 12px;
+				font-size: 1.1rem;
+				font-weight: bold;
+			}
+
+			.juryCompetitions__list {
+				flex: 1 1 200px;
+				display: flex;
+				flex-direction: column;
+				overflow-y: auto;
+				border-radius: 2px;
+			}
+		}
+
+		@media screen and (max-width: 720px) {
+			margin: 0;
+			padding: 0;
+
+			.juryBottomSection__wrapper {
+				border-radius: 0;
+			}
+		}
+	}
 }
 </style>

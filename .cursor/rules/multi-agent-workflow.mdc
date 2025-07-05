@@ -1,0 +1,409 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Multi-Agent Development Workflow: Claude 4 Sonnet Optimized
+
+**Version:** 3.0
+**Status:** Active Reference - AI-Enhanced
+**Purpose:** Optimized collaborative workflow with decision trees and MCP integration
+
+---
+
+## !EVERY TASK MUST BE FOLLOWED BY A CHOICE OF ROLES!
+## 1. Agent Selection Algorithm. 
+
+### Primary Agent Decision Tree
+```mermaid
+graph TD
+    A[Task Input] --> B{Contains API Changes?}
+    B -->|Yes| C{Frontend Impact?}
+    B -->|No| D{UI/UX Changes?}
+    
+    C -->|Yes| E[Multi-Agent: Backend + Frontend]
+    C -->|No| F[Backend Agent Only]
+    
+    D -->|Yes| G{Complex State Logic?}
+    D -->|No| H[Simple Task - Any Agent]
+    
+    G -->|Yes| I[Multi-Agent: Frontend + QA]
+    G -->|No| J[Frontend Agent Only]
+```
+
+### Complexity Assessment Tree
+```mermaid
+graph TD
+    A[Task Complexity] --> B{Affects Multiple Entities?}
+    B -->|Yes| C[HIGH: Multi-Agent + QA]
+    B -->|No| D{Breaking Changes?}
+    
+    D -->|Yes| E[MEDIUM: Dual Agent]
+    D -->|No| F{Standard Pattern?}
+    
+    F -->|Yes| G[LOW: Single Agent]
+    F -->|No| H[MEDIUM: Exploration Required]
+```
+
+### Quality Gate Decision Tree
+```mermaid
+graph TD
+    A[Implementation Complete] --> B{Regression Risk?}
+    B -->|High| C[Mandatory QA Review]
+    B -->|Medium| D[Automated Tests Required]
+    B -->|Low| E[Peer Review Sufficient]
+    
+    C --> F[Full Test Suite + Manual Validation]
+    D --> G[Unit + Integration Tests]
+    E --> H[Code Review + Smoke Test]
+```
+
+---
+
+## 2. Enhanced Agent Roles & Responsibilities
+
+### Frontend Agent (UI/UX Specialist)
+**Core Competencies:**
+- Vue.js 2.7 → Vue 3 migration planning
+- Vuetify 2.7 component optimization
+- ADR-001 centralized state management
+- Design token implementation
+- Mobile-first responsive design
+
+**Decision Matrix:**
+| Task Type | Primary Role | Collaboration Required |
+|:----------|:-------------|:-----------------------|
+| **Component Creation** | Lead | Design validation with QA |
+| **State Management** | Lead | API contract with Backend |
+| **Performance Optimization** | Lead | Metrics validation with QA |
+| **Responsive Design** | Lead | Cross-browser testing with QA |
+
+**Quality Standards:**
+```javascript
+// ✅ Frontend Agent Success Criteria
+const frontendQuality = {
+  componentPattern: 'ADR-001 centralized state',
+  styling: 'Semantic design tokens only',
+  testing: 'Unit tests for business logic',
+  performance: 'Lighthouse score >90',
+  accessibility: 'WCAG 2.1 AA compliance'
+}
+```
+
+### Backend Agent (API/Database Specialist)
+**Core Competencies:**
+- Node.js 18+ ES Modules architecture
+- Express.js 4.18+ middleware patterns
+- MongoDB 7.0 + Mongoose 8.2 optimization
+- JWT + bcryptjs security implementation
+- mongoose-paginate-v2 standardization
+
+**Decision Matrix:**
+| Task Type | Primary Role | Collaboration Required |
+|:----------|:-------------|:-----------------------|
+| **API Design** | Lead | Contract validation with Frontend |
+| **Database Schema** | Lead | Query optimization with QA |
+| **Security Implementation** | Lead | Penetration testing with QA |
+| **Performance Tuning** | Lead | Load testing with QA |
+
+**Quality Standards:**
+```javascript
+// ✅ Backend Agent Success Criteria
+const backendQuality = {
+  fieldNaming: 'snake_case MANDATORY',
+  apiFormat: 'mongoose-paginate-v2 standard',
+  errorHandling: 'Global middleware pattern',
+  security: 'Helmet + rate limiting',
+  testing: 'Integration tests >80% coverage'
+}
+```
+
+### QA Agent (Quality & Validation Specialist)
+**Core Competencies:**
+- Jest unit testing frameworks
+- Regression testing automation
+- Performance benchmarking (<200ms API response)
+- Accessibility auditing (WCAG 2.1)
+- Cross-browser compatibility validation
+
+**Decision Matrix:**
+| Task Type | Primary Role | Collaboration Required |
+|:----------|:-------------|:-----------------------|
+| **Test Strategy** | Lead | Implementation with Frontend/Backend |
+| **Regression Prevention** | Lead | Pattern validation with agents |
+| **Performance Monitoring** | Lead | Optimization with relevant agent |
+| **Quality Gates** | Lead | Enforcement across all agents |
+
+**Quality Standards:**
+```javascript
+// ✅ QA Agent Success Criteria
+const qaQuality = {
+  regressionRate: '<10% (target <5%)',
+  testCoverage: '>80% unit + integration',
+  performanceBaseline: 'API <200ms, UI <3s load',
+  accessibilityScore: 'WCAG 2.1 AA compliance',
+  crossBrowser: 'Chrome, Firefox, Safari, Edge'
+}
+```
+
+---
+
+## 3. MCP Tool Integration Strategy
+
+### Docker MCP (docker-mcp) Usage - MANDATORY
+**Backend Agent Applications:**
+```bash
+# MANDATORY for every backend change:
+list-containers      # Service status validation
+get-logs            # Error detection and analysis
+create-container    # Environment testing (if needed)
+deploy-compose      # Stack management (if needed)
+```
+
+**QA Agent Applications:**
+```bash
+# MANDATORY for backend testing:
+list-containers     # Pre-test environment check
+get-logs           # Post-test error analysis
+```
+
+### Browser MCP (browsermcp) Usage - MANDATORY
+**Frontend Agent Applications:**
+```bash
+# MANDATORY for every UI change:
+browser_navigate    # Page navigation and loading
+browser_snapshot    # UI state validation
+browser_get_console_logs  # Error detection
+browser_type + browser_click  # Interaction testing
+browser_screenshot  # Documentation/regression testing
+```
+
+**QA Agent Applications:**
+```bash
+# MANDATORY for frontend validation:
+browser_snapshot    # Complete UI state analysis
+browser_get_console_logs  # JavaScript error detection
+browser_navigate    # Cross-page functionality testing
+```
+
+### Context7 MCP (context7) Usage - MANDATORY
+**All Agents Applications:**
+```bash
+# MANDATORY for technical decisions:
+resolve-library-id  # Find correct documentation
+get-library-docs   # Detailed technical guidance
+# Apply to: Vue 3 migration, library selection, best practices
+```
+
+**🚨 ANTI-PATTERN:** Any agent proceeding without MCP validation = VIOLATION
+
+---
+
+## 4. Collaborative Workflow Patterns
+
+### Search Unification Workflow (Template)
+```mermaid
+sequenceDiagram
+    participant User
+    participant Backend
+    participant Frontend
+    participant QA
+    
+    User->>Backend: Fix searchAthletes API format
+    Backend->>Backend: Implement mongoose-paginate-v2
+    Backend->>Frontend: API contract updated
+    Frontend->>Frontend: Refactor to centralized state
+    Frontend->>QA: Request regression testing
+    QA->>QA: Validate Events parity
+    QA->>User: Implementation verified
+```
+
+### Multi-Agent Communication Protocol
+
+#### Request Structure (Standardized)
+```markdown
+**To: Backend Agent**
+**Task:** Implement new endpoint for search functionality
+**Context:** Following ADR-001 centralized state pattern
+**Requirements:**
+- Endpoint: `GET /api/v1/athletes/find`
+- Response: mongoose-paginate-v2 format
+- Fields: All snake_case (MANDATORY)
+- Query: Support name, category, region filters
+
+**Success Criteria:**
+- Returns paginated results
+- <200ms response time
+- Follows existing searchEvents pattern
+
+**Collaboration:**
+- Frontend Agent: API contract validation needed
+- QA Agent: Integration testing required
+```
+
+#### Handoff Checklist
+```markdown
+**Backend → Frontend Handoff:**
+- [ ] API endpoint tested and documented
+- [ ] Response format validated
+- [ ] Error scenarios handled
+- [ ] Performance benchmarks met
+- [ ] Contract shared with Frontend Agent
+
+**Frontend → QA Handoff:**
+- [ ] Component follows ADR-001 pattern
+- [ ] Uses semantic design tokens
+- [ ] Responsive design implemented
+- [ ] Unit tests written
+- [ ] Ready for integration testing
+
+**QA → Team Handoff:**
+- [ ] Regression tests pass
+- [ ] Performance benchmarks met
+- [ ] Accessibility standards verified
+- [ ] Cross-browser compatibility confirmed
+- [ ] Implementation approved for merge
+```
+
+---
+
+## 5. Conflict Resolution & Consensus Building
+
+### Technical Disagreement Resolution Tree
+```mermaid
+graph TD
+    A[Technical Disagreement] --> B{Impact Level?}
+    B -->|Low| C[Lead Agent Decides]
+    B -->|Medium| D[Dual Agent Consensus]
+    B -->|High| E[Multi-Agent + Stakeholder]
+    
+    C --> F[Document Decision]
+    D --> G[Create ADR if Pattern]
+    E --> H[Team Vote + Documentation]
+```
+
+### Evidence-Based Decision Making
+```javascript
+// Decision Framework Template
+const technicalDecision = {
+  context: 'Search unification approach selection',
+  options: [
+    {
+      approach: 'Incremental migration (per entity)',
+      pros: ['Lower risk', 'Testable iterations'],
+      cons: ['Longer timeline', 'Temporary inconsistency'],
+      evidence: 'Events migration successful, 0 regressions'
+    },
+    {
+      approach: 'Big bang migration (all entities)',
+      pros: ['Faster completion', 'Immediate consistency'],
+      cons: ['Higher risk', 'Complex testing'],
+      evidence: 'No prior experience with large migrations'
+    }
+  ],
+  consensus: 'Incremental migration based on evidence',
+  reasoning: 'Proven success pattern with measurable risk reduction'
+}
+```
+
+---
+
+## 6. Performance & Quality Metrics
+
+### Agent Performance Dashboard
+```javascript
+const agentMetrics = {
+  backend: {
+    apiResponseTime: 150, // ms average
+    regressionRate: 0.05, // 5% (target <10%)
+    testCoverage: 85,     // % (target >80%)
+    securityScore: 95     // % security best practices
+  },
+  frontend: {
+    lighthouseScore: 92,  // Performance (target >90)
+    regressionRate: 0.03, // 3% (target <10%)
+    componentReuse: 88,   // % pattern adherence
+    accessibilityScore: 94 // WCAG compliance
+  },
+  qa: {
+    bugDetectionRate: 92, // % bugs caught pre-production
+    testAutomation: 78,   // % automated vs manual
+    falsePositiveRate: 12, // % (target <15%)
+    avgResolutionTime: 2.3 // days
+  }
+}
+```
+
+### Collaborative Success Metrics
+```javascript
+const teamMetrics = {
+  handoffEfficiency: 95,    // % smooth agent transitions
+  consensusTime: 1.2,       // days average for decisions
+  reworkRate: 8,            // % implementations requiring changes
+  knowledgeSharing: 89,     // % documented patterns/decisions
+  stakeholderSatisfaction: 9.1 // 1-10 scale
+}
+```
+
+---
+
+## 7. Continuous Improvement Process
+
+### Weekly Agent Retrospective
+```markdown
+**Workflow Optimization Review:**
+1. **What worked well?**
+   - Successful patterns and collaboration models
+   - Effective tool usage (MCP integration)
+   - Quality achievements and metric improvements
+
+2. **What could improve?**
+   - Communication bottlenecks
+   - Tool limitation discoveries
+   - Process inefficiencies
+
+3. **Action items:**
+   - Workflow adjustments
+   - Tool configuration updates
+   - Training/knowledge sharing needs
+```
+
+### Monthly Pattern Evolution
+```javascript
+// Pattern Effectiveness Analysis
+const patternAnalysis = {
+  adr001Implementation: {
+    successRate: 94,
+    timeToImplement: 3.2, // hours average
+    regressionRate: 0.02,
+    teamSatisfaction: 9.0,
+    evolution: 'Add more concrete examples for edge cases'
+  },
+  
+  multiAgentHandoffs: {
+    smoothTransitions: 91,
+    communicationClarity: 87,
+    workDuplication: 8, // % (target <10%)
+    evolution: 'Implement standardized handoff templates'
+  }
+}
+```
+
+### Quarterly Strategy Review
+```markdown
+**Technology Evolution Planning:**
+- Vue 3 migration timeline and agent role distribution
+- Testing strategy advancement (E2E automation)
+- Performance optimization initiatives
+- Tool ecosystem evolution (new MCP integrations)
+
+**Process Maturity Assessment:**
+- Agent specialization effectiveness
+- Collaboration pattern optimization
+- Quality gate automation opportunities
+- Stakeholder feedback integration
+```
+
+---
+
+This workflow guide provides concrete, measurable collaboration patterns optimized for Claude 4 Sonnet with integrated MCP tooling and continuous improvement processes.

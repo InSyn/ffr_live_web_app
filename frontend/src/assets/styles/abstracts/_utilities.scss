@@ -1,0 +1,845 @@
+//
+// Utility Class Generator
+// This file uses SCSS loops to generate a suite of reusable utility classes
+// from the design tokens defined in the /variables/ directory.
+//
+// Now supports responsive prefixes, e.g., 'md:p-4' or 'lg:text-lg'.
+//
+
+// Re-defining breakpoints here for use in selector generation.
+// This map must be kept in sync with the one in _mixins.scss.
+$breakpoints-for-utilities: (
+	'sm': $breakpoint-sm,
+	'md': $breakpoint-md,
+	'lg': $breakpoint-lg,
+	'xl': $breakpoint-xl
+);
+
+// ------------------------------
+// Spacing System (Margins, Padding, Gaps)
+// ------------------------------
+$space-properties: (
+	'p': 'padding',
+	'pt': 'padding-top',
+	'pr': 'padding-right',
+	'pb': 'padding-bottom',
+	'pl': 'padding-left',
+	'm': 'margin',
+	'mt': 'margin-top',
+	'mr': 'margin-right',
+	'mb': 'margin-bottom',
+	'ml': 'margin-left',
+	'gap': 'gap'
+);
+
+$space-values: (0, 1, 2, 3, 4, 5, 6, 8, 12, 16, 24, 32, 48, 64);
+
+$size-values: (
+	'sm': 60px,
+	'md': 72px,
+	'lg': 88px,
+	'xl': 120px
+);
+
+// ------------------------------
+// Utility Spacing Classes with Responsive Support
+//
+// WARNING: $breakpoints-for-utilities must be kept in sync with the main breakpoint system in _variables.scss and _mixins.scss.
+//
+// This section generates both escaped (e.g., md\:p-4) and unescaped (e.g., md-p-4) responsive utility classes for maximum compatibility.
+// If your build system fully supports escaped colons, you may disable the unescaped version for smaller CSS output.
+//
+// ---
+
+// Helper mixin to generate both escaped and unescaped selectors
+@mixin responsive-utility($selector, $property, $value, $bp-name: null, $bp-value: null) {
+	@if $bp-name == null {
+		.#{$selector} {
+			#{$property}: #{$value};
+		}
+	} @else {
+		@media (min-width: #{$bp-value}) {
+			// Escaped colon (e.g., md\:p-4)
+			.#{$bp-name}\:#{$selector} {
+				#{$property}: #{$value};
+			}
+			// Unescaped version (e.g., md-p-4)
+			.#{$bp-name}-#{$selector} {
+				#{$property}: #{$value};
+			}
+		}
+	}
+}
+
+@each $prop-abbr, $prop-full in $space-properties {
+	@each $space-key in $space-values {
+		// Base class (e.g., .p-4)
+		@include responsive-utility(
+			'#{$prop-abbr}-#{$space-key}',
+			$prop-full,
+			'var(--space-#{$space-key})'
+		);
+
+		// Responsive classes (e.g., md:p-4)
+		@each $bp-name, $bp-value in $breakpoints-for-utilities {
+			@include responsive-utility(
+				'#{$prop-abbr}-#{$space-key}',
+				$prop-full,
+				'var(--space-#{$space-key})',
+				$bp-name,
+				$bp-value
+			);
+		}
+	}
+
+	// Handle x/y axes for padding and margin
+	@if $prop-abbr == 'p' or $prop-abbr == 'm' {
+		@each $space-key in $space-values {
+			// Base classes (e.g., .px-4)
+			@include responsive-utility(
+				'#{$prop-abbr}x-#{$space-key}',
+				'#{$prop-full}-left',
+				'var(--space-#{$space-key})'
+			);
+			@include responsive-utility(
+				'#{$prop-abbr}x-#{$space-key}',
+				'#{$prop-full}-right',
+				'var(--space-#{$space-key})'
+			);
+			@include responsive-utility(
+				'#{$prop-abbr}y-#{$space-key}',
+				'#{$prop-full}-top',
+				'var(--space-#{$space-key})'
+			);
+			@include responsive-utility(
+				'#{$prop-abbr}y-#{$space-key}',
+				'#{$prop-full}-bottom',
+				'var(--space-#{$space-key})'
+			);
+
+			// Responsive classes (e.g., lg:px-4)
+			@each $bp-name, $bp-value in $breakpoints-for-utilities {
+				@include responsive-utility(
+					'#{$prop-abbr}x-#{$space-key}',
+					'#{$prop-full}-left',
+					'var(--space-#{$space-key})',
+					$bp-name,
+					$bp-value
+				);
+				@include responsive-utility(
+					'#{$prop-abbr}x-#{$space-key}',
+					'#{$prop-full}-right',
+					'var(--space-#{$space-key})',
+					$bp-name,
+					$bp-value
+				);
+				@include responsive-utility(
+					'#{$prop-abbr}y-#{$space-key}',
+					'#{$prop-full}-top',
+					'var(--space-#{$space-key})',
+					$bp-name,
+					$bp-value
+				);
+				@include responsive-utility(
+					'#{$prop-abbr}y-#{$space-key}',
+					'#{$prop-full}-bottom',
+					'var(--space-#{$space-key})',
+					$bp-name,
+					$bp-value
+				);
+			}
+		}
+	}
+}
+
+// ----------------------------------------
+// Responsive Image Utilities (Token-Driven, Semantic, Scalable)
+// ----------------------------------------
+// Usage: Add class="img-avatar", "img-thumbnail", etc. to your <img> or <div>.
+// Responsive variants are handled automatically via breakpoints.
+// All sizes are design-token driven. Extend $image-variants as needed.
+//
+// Aspect ratio and object-fit helpers are also provided for flexibility.
+
+$image-variants: (
+	'avatar': (
+		sm: 32px,
+		md: 48px,
+		lg: 64px,
+		xl: 80px
+	),
+	'thumbnail': (
+		sm: 60px,
+		md: 80px,
+		lg: 100px,
+		xl: 120px
+	),
+	'card': (
+		sm: 120px,
+		md: 180px,
+		lg: 240px,
+		xl: 320px
+	),
+	'banner': (
+		sm: 240px,
+		md: 320px,
+		lg: 480px,
+		xl: 640px
+	)
+);
+
+@each $variant, $sizes in $image-variants {
+	.img-#{$variant} {
+		width: map-get($sizes, 'sm') !important;
+		height: map-get($sizes, 'sm') !important;
+		object-fit: cover !important;
+		aspect-ratio: 1 / 1 !important;
+		@media (min-width: $breakpoint-md) {
+			width: map-get($sizes, 'md') !important;
+			height: map-get($sizes, 'md') !important;
+		}
+		@media (min-width: $breakpoint-lg) {
+			width: map-get($sizes, 'lg') !important;
+			height: map-get($sizes, 'lg') !important;
+		}
+		@media (min-width: $breakpoint-xl) {
+			width: map-get($sizes, 'xl') !important;
+			height: map-get($sizes, 'xl') !important;
+		}
+	}
+}
+
+// Aspect ratio and object-fit helpers
+.aspect-square {
+	aspect-ratio: 1 / 1;
+}
+.aspect-16-9 {
+	aspect-ratio: 16 / 9;
+}
+.object-cover {
+	object-fit: cover;
+}
+.object-contain {
+	object-fit: contain;
+}
+
+// ------------------------------
+// Display & Layout
+// ------------------------------
+.d-flex {
+	display: flex;
+
+	&-col {
+		flex-direction: column;
+	}
+}
+
+.d-grid {
+	display: grid;
+}
+
+.d-block {
+	display: block;
+}
+
+.d-inline-block {
+	display: inline-block;
+}
+
+.hidden {
+	display: none;
+}
+
+.flex-row {
+	flex-direction: row;
+}
+
+.flex-col {
+	flex-direction: column;
+}
+
+.flex-wrap {
+	flex-wrap: wrap;
+}
+
+.flex-nowrap {
+	flex-wrap: nowrap;
+}
+
+.flex-1 {
+	flex: 1 1 0%;
+}
+
+.flex-auto {
+	flex: 1 1 auto;
+}
+
+.flex-initial {
+	flex: 0 1 auto;
+}
+
+.flex-none {
+	flex: none;
+}
+
+.items-start {
+	align-items: flex-start;
+}
+
+.items-end {
+	align-items: flex-end;
+}
+
+.items-center {
+	align-items: center;
+}
+
+.items-baseline {
+	align-items: baseline;
+}
+
+.items-stretch {
+	align-items: stretch;
+}
+
+.justify-start {
+	justify-content: flex-start;
+}
+
+.justify-end {
+	justify-content: flex-end;
+}
+
+.justify-center {
+	justify-content: center;
+}
+
+.justify-between {
+	justify-content: space-between;
+}
+
+.justify-around {
+	justify-content: space-around;
+}
+
+.justify-evenly {
+	justify-content: space-evenly;
+}
+
+// ------------------------------
+// Typography
+// ------------------------------
+.text-xs {
+	@include fluid-type(12px, 14px);
+}
+
+.text-sm {
+	@include fluid-type(14px, 16px);
+}
+
+.text-md {
+	@include fluid-type(16px, 20px);
+}
+
+.text-lg {
+	@include fluid-type(20px, 25px);
+}
+
+.text-xl {
+	@include fluid-type(25px, 31px);
+}
+
+.text-xxl {
+	@include fluid-type(31px, 39px);
+}
+
+.font-normal {
+	font-weight: var(--font-weight-normal);
+}
+
+.font-bold {
+	font-weight: var(--font-weight-bold);
+}
+
+.text-primary {
+	color: var(--color-text-primary);
+}
+
+.text-secondary {
+	color: var(--color-text-secondary);
+}
+
+.text-accent {
+	color: var(--color-text-accent);
+}
+
+.text-error {
+	color: var(--color-text-error);
+}
+
+// ------------------------------
+// Borders
+// ------------------------------
+.rounded-sm {
+	border-radius: var(--radius-sm);
+}
+
+.rounded-md {
+	border-radius: var(--radius-md);
+}
+
+.rounded-lg {
+	border-radius: var(--radius-lg);
+}
+
+.rounded-full {
+	border-radius: var(--radius-full);
+}
+
+// TODO: Add border width and color utilities if needed
+.border {
+	border: 1px solid var(--border-container);
+}
+
+.border-b-contrast {
+	border-bottom: 1px solid var(--text-contrast);
+}
+
+// ------------------------------
+// Wrappers
+// ------------------------------
+
+.content-wrapper {
+	flex: 1 1 0;
+	overflow-y: auto;
+	max-width: var(--desktop-small);
+	width: 100%;
+	margin: 0 auto;
+}
+
+// ------------------------------
+// Sizing
+// ------------------------------
+.w-full {
+	width: 100%;
+}
+
+.h-full {
+	height: 100%;
+}
+
+// ------------------------------
+// Positioning
+// ------------------------------
+.relative {
+	position: relative;
+}
+
+.absolute {
+	position: absolute;
+}
+
+.fixed {
+	position: fixed;
+}
+
+.sticky {
+	position: sticky;
+}
+
+// ------------------------------
+// Page Layout System (Design System Guide)
+// ------------------------------
+
+// Page wrapper - consistent across all entity pages
+.page-wrapper {
+	@include apply-page-spacing();
+	display: flex;
+	flex: 1 1 0;
+	gap: var(--space-4);
+}
+
+// Page sidebar - consistent positioning and responsive behavior
+.page-sidebar {
+	flex: 0 0 320px;
+	position: sticky;
+	top: var(--space-4);
+	align-self: flex-start;
+	height: fit-content;
+
+	@include respond-to('md') {
+		display: block;
+	}
+
+	@media (max-width: 960px) {
+		display: none;
+	}
+}
+
+// Page content - main content area
+.page-content {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+	border-radius: var(--radius-md);
+	overflow: hidden;
+}
+
+// Search results layout
+.search-results {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-4);
+}
+
+// Results grid - responsive grid for list items
+.results-grid {
+	display: grid;
+	gap: var(--space-4);
+	grid-template-columns: 1fr;
+
+	@include respond-to('sm') {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	@include respond-to('md') {
+		grid-template-columns: repeat(3, 1fr);
+	}
+
+	@include respond-to('lg') {
+		grid-template-columns: repeat(4, 1fr);
+	}
+}
+
+// Interactive elements
+.interactive-brand-default {
+	background-color: var(--color-interactive-brand-default);
+	color: var(--color-text-on-brand);
+	border: none;
+	border-radius: var(--radius-md);
+	padding: var(--space-2) var(--space-4);
+	cursor: pointer;
+	transition: background-color var(--transition-duration-fast);
+
+	&:hover {
+		background-color: var(--color-interactive-brand-hover);
+	}
+}
+
+// Text colors (semantic)
+.color-text-primary {
+	color: var(--color-text-primary);
+}
+
+.color-text-secondary {
+	color: var(--color-text-secondary);
+}
+
+.color-text-accent {
+	color: var(--color-text-accent);
+}
+
+// Background colors
+.bg-surface {
+	background-color: var(--color-bg-surface);
+}
+
+.bg-surface-hover:hover {
+	background-color: var(--color-bg-surface-hover);
+}
+
+.surface-card {
+	background-color: var(--color-bg-surface);
+	border: 1px solid var(--color-border-primary);
+	box-shadow:
+		0 1px 3px rgba(0, 0, 0, 0.1),
+		0 1px 2px rgba(0, 0, 0, 0.06);
+	transition: box-shadow var(--transition-duration-fast);
+
+	&:hover {
+		box-shadow:
+			0 4px 12px rgba(0, 0, 0, 0.1),
+			0 2px 8px rgba(0, 0, 0, 0.06);
+	}
+}
+
+// Gap utilities following design system
+.gap-1 {
+	gap: var(--space-1);
+}
+.gap-2 {
+	gap: var(--space-2);
+}
+.gap-3 {
+	gap: var(--space-3);
+}
+.gap-4 {
+	gap: var(--space-4);
+}
+.gap-6 {
+	gap: var(--space-6);
+}
+.gap-8 {
+	gap: var(--space-8);
+}
+
+// Enhanced Flexbox utilities
+.d-flex {
+	display: flex;
+}
+.d-inline-flex {
+	display: inline-flex;
+}
+.flex-column {
+	flex-direction: column;
+}
+.flex-row {
+	flex-direction: row;
+}
+.flex-grow-1 {
+	flex-grow: 1;
+}
+.flex-shrink-0 {
+	flex-shrink: 0;
+}
+
+.justify-space-between {
+	justify-content: space-between;
+}
+.justify-center {
+	justify-content: center;
+}
+.align-center {
+	align-items: center;
+}
+.align-start {
+	align-items: flex-start;
+}
+.align-end {
+	align-items: flex-end;
+}
+
+// Text alignment
+.text-center {
+	text-align: center;
+}
+.text-left {
+	text-align: left;
+}
+.text-right {
+	text-align: right;
+}
+
+// Display utilities
+.d-none {
+	display: none;
+}
+.d-block {
+	display: block;
+}
+.d-inline {
+	display: inline;
+}
+.d-inline-block {
+	display: inline-block;
+}
+
+// Position utilities
+.position-relative {
+	position: relative;
+}
+.position-absolute {
+	position: absolute;
+}
+.position-sticky {
+	position: sticky;
+}
+
+// Enhanced responsive utilities for mobile-first approach
+@include respond-to('sm') {
+	.sm\:d-none {
+		display: none;
+	}
+	.sm\:d-block {
+		display: block;
+	}
+	.sm\:flex-row {
+		flex-direction: row;
+	}
+	.sm\:flex-column {
+		flex-direction: column;
+	}
+}
+
+@include respond-to('md') {
+	.md\:d-none {
+		display: none;
+	}
+	.md\:d-block {
+		display: block;
+	}
+	.md\:flex-row {
+		flex-direction: row;
+	}
+	.md\:flex-column {
+		flex-direction: column;
+	}
+}
+
+// ----------------------------------------
+// RESPONSIVE HEADER UTILITY PATTERNS
+// ----------------------------------------
+// Modern mobile-first responsive patterns for header-type components
+// Usage: Apply these classes to create consistent responsive behavior
+
+// Base responsive header container
+.responsive-header {
+	display: flex;
+	border-radius: var(--radius-md);
+	background-color: var(--color-bg-surface);
+	box-shadow: var(--surface-shadow-m);
+	border: 1px solid var(--color-border-primary);
+
+	// Mobile-first: Vertical stacking with optimized spacing
+	flex-direction: column;
+	padding: var(--space-4);
+	gap: var(--space-3);
+
+	// Tablet and up: Horizontal layout
+	@media screen and (min-width: 768px) {
+		flex-direction: row;
+		flex-wrap: wrap;
+		gap: 0;
+	}
+}
+
+// Responsive header content wrapper
+.responsive-header__content {
+	flex: 1 1 0;
+	display: flex;
+	flex-direction: column;
+
+	// Mobile: Remove side margins
+	margin-left: 0;
+
+	// Desktop: Add spacing
+	@media screen and (min-width: 768px) {
+		margin-left: var(--space-1);
+	}
+}
+
+// Responsive header sections (title, info, etc.)
+.responsive-header__section {
+	display: flex;
+	align-items: flex-start;
+
+	// Mobile: Stack vertically
+	flex-direction: column;
+	gap: var(--space-2);
+
+	// Desktop: Horizontal layout
+	@media screen and (min-width: 768px) {
+		flex-direction: row;
+		flex-wrap: wrap;
+		gap: 0;
+	}
+}
+
+// Responsive header actions (buttons, links)
+.responsive-header__actions {
+	display: flex;
+	align-items: center;
+	margin-top: auto;
+
+	// Mobile: Allow wrapping with smaller gaps
+	flex-wrap: wrap;
+	gap: var(--space-3);
+
+	// Desktop: Prevent wrapping with larger gaps
+	@media screen and (min-width: 768px) {
+		flex-wrap: nowrap;
+		gap: var(--space-6);
+	}
+}
+
+// Responsive header image/media container
+.responsive-header__media {
+	position: relative;
+	flex: 0 0 auto;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	aspect-ratio: 1;
+
+	// Mobile: Compact size
+	height: 80px;
+
+	// Desktop: Full size
+	@media screen and (min-width: 768px) {
+		height: 128px;
+	}
+
+	// Responsive image scaling
+	img {
+		max-width: 100%;
+		max-height: 100%;
+		object-fit: contain;
+	}
+}
+
+// Responsive header media minimized state
+.responsive-header.minimized .responsive-header__media {
+	// Mobile minimized: Extra compact
+	height: 48px;
+
+	// Desktop minimized: Moderate reduction
+	@media screen and (min-width: 768px) {
+		height: 96px;
+	}
+}
+
+// Responsive typography helpers for headers
+.responsive-header__title {
+	@include fluid-type(18px, 24px, 320px, 1280px);
+	font-weight: bold;
+	line-height: 1.2;
+}
+
+.responsive-header__subtitle {
+	@include fluid-type(14px, 16px, 320px, 1280px);
+	color: var(--color-text-secondary);
+}
+
+.responsive-header__meta {
+	@include fluid-type(12px, 14px, 320px, 1280px);
+	color: var(--color-text-secondary);
+}
+
+// Sport/activity specific header variant
+.responsive-header--sport {
+	.responsive-header__section {
+		// Sport headers need more space for flags and discipline info
+		@media screen and (min-width: 768px) {
+			gap: var(--space-4);
+		}
+	}
+}
+
+// Compact header variant for list items
+.responsive-header--compact {
+	padding: var(--space-3);
+	gap: var(--space-2);
+
+	@media screen and (min-width: 768px) {
+		padding: var(--space-4);
+	}
+
+	.responsive-header__media {
+		height: 60px;
+
+		@media screen and (min-width: 768px) {
+			height: 80px;
+		}
+	}
+}

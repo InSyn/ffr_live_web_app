@@ -1,0 +1,68 @@
+// =============================================================================
+// BASE/_TYPOGRAPHY.SCSS
+// -----------------------------------------------------------------------------
+// This file sets up the base typography styles for the application, including
+// global font sizes, heading styles, and link behaviors.
+// =============================================================================
+
+// Import font definitions
+@import url('./../../assets/fonts/Petrov Sans-Trial/petrov-sans-trial.css');
+
+body {
+	font-family: var(--font-family-sans);
+	color: var(--color-text-primary);
+	background-color: var(--color-bg-primary);
+}
+
+h3 {
+	font-size: 1.2rem;
+}
+
+h4 {
+	font-size: 1.05rem;
+}
+
+.v-application a {
+	text-decoration: none;
+	color: var(--color-text-primary) !important;
+	&:hover {
+		color: var(--color-text-secondary);
+	}
+	&:visited {
+		color: var(--color-text-primary) !important;
+	}
+}
+
+// Enhanced Legacy Responsive Typography System
+// Provides immediate mobile readability improvements with refined scaling
+html {
+	font-size: 16px; // Base desktop size
+
+	// Large desktop - slightly smaller for better readability
+	@media screen and (max-width: 1440px) {
+		font-size: 15px;
+	}
+
+	// Tablet landscape - moderate reduction
+	@media screen and (max-width: 1024px) {
+		font-size: 14px;
+	}
+
+	// Tablet portrait - mobile preparation
+	@media screen and (max-width: 768px) {
+		font-size: 13px;
+	}
+
+	// Mobile landscape - smaller but readable
+	@media screen and (max-width: 480px) {
+		font-size: 12px;
+	}
+
+	// Small mobile - minimum readable size
+	@media screen and (max-width: 360px) {
+		font-size: 11px;
+	}
+}
+
+// Future-proof: Modern fluid typography mixin usage will replace this system
+// See `abstracts/_mixins.scss` fluid-type mixin for the next evolution

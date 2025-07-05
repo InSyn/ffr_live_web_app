@@ -1,170 +1,180 @@
 <template>
-  <div class="updateSeminarPage__wrapper">
-    <seminar-form @update-seminar="updateSeminar" @delete-seminar="deleteSeminar" :seminar="seminar" action="update"></seminar-form>
+	<div class="updateSeminarPage__wrapper">
+		<seminar-form
+			:seminar="seminar"
+			action="update"
+			@update-seminar="updateSeminar"
+			@delete-seminar="deleteSeminar"
+		/>
 
-    <message-container :messages="messages" :errors="errors"></message-container>
-  </div>
+		<message-container :messages="messages" :errors="errors" />
+	</div>
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex';
-import MessageContainer from '@/components/ui-components/message-container.vue';
-import SeminarForm from '@/pages/admin-pages/seminars/form-seminar.vue';
-import axios from 'axios';
-import { apiUrl } from '@/constants';
+import { mapActions, mapGetters } from 'vuex'
+import MessageContainer from '@/components/ui-components/message-container.vue'
+import SeminarForm from '@/pages/admin-pages/seminars/form-seminar.vue'
+import axios from 'axios'
+import { apiUrl } from '@/constants'
 
 export default {
-  name: 'editSeminar-page',
-  components: { SeminarForm, MessageContainer },
-  props: {
-    seminar_id: String,
-  },
-  data() {
-    return {
-      seminar: {
-        title: '',
-        date: '',
-        sport: '',
-        disciplines: [],
-        country: '',
-        region: '',
-        location: '',
-        format: '',
-        contacts: [],
-        documents: [],
-      },
+	name: 'EditSeminarPage',
+	components: { SeminarForm, MessageContainer },
+	props: {
+		seminar_id: String
+	},
+	data() {
+		return {
+			seminar: {
+				title: '',
+				date: '',
+				sport: '',
+				disciplines: [],
+				country: '',
+				region: '',
+				location: '',
+				format: '',
+				contacts: [],
+				documents: []
+			},
 
-      messages: [],
-      errors: [],
-    };
-  },
-  computed: {
-    ...mapGetters('authorization', {
-      userData: 'getUserData',
-    }),
-  },
-  methods: {
-    ...mapActions('seminars', {
-      fetchSeminars: 'LOAD_SEMINARS',
-    }),
+			messages: [],
+			errors: []
+		}
+	},
+	computed: {
+		...mapGetters('authorization', {
+			userData: 'getUserData'
+		})
+	},
+	methods: {
+		...mapActions('seminars', {
+			fetchSeminars: 'LOAD_SEMINARS'
+		}),
 
-    async loadSeminarData() {
-      try {
-        const response = await axios.get(`${apiUrl}/seminars/${this.seminar_id}`);
-        if (response.status === 200) {
-          const seminarData = response.data.seminar;
-          Object.keys(this.seminar).forEach((key) => {
-            if (key in seminarData) {
-              this.seminar[key] = seminarData[key];
-            }
-          });
+		async loadSeminarData() {
+			try {
+				const response = await axios.get(`${apiUrl}/seminars/${this.seminar_id}`)
+				if (response.status === 200) {
+					const seminarData = response.data.seminar
+					Object.keys(this.seminar).forEach(key => {
+						if (key in seminarData) {
+							this.seminar[key] = seminarData[key]
+						}
+					})
 
-          if (seminarData.date) {
-            this.seminar.date = seminarData.date.substring(0, 10);
-          }
-        }
-      } catch (err) {
-        if (err) {
-          this.errors.push(err.response?.data?.message || err.message);
-        }
-      }
-    },
-    async updateSeminar() {
-      const formData = new FormData();
+					if (seminarData.date) {
+						this.seminar.date = seminarData.date.substring(0, 10)
+					}
+				}
+			} catch (err) {
+				if (err) {
+					this.errors.push(err.response?.data?.message || err.message)
+				}
+			}
+		},
+		async updateSeminar() {
+			const formData = new FormData()
 
-      Object.keys(this.seminar).forEach((key) => {
-        const value = this.seminar[key];
+			Object.keys(this.seminar).forEach(key => {
+				const value = this.seminar[key]
 
-        if (key === 'documents') return;
+				if (key === 'documents') return
 
-        if (Array.isArray(value) || typeof value === 'object') {
-          formData.append(key, JSON.stringify(value));
-        } else if (value !== undefined && value !== null) {
-          formData.append(key, value);
-        }
-      });
+				if (Array.isArray(value) || typeof value === 'object') {
+					formData.append(key, JSON.stringify(value))
+				} else if (value !== undefined && value !== null) {
+					formData.append(key, value)
+				}
+			})
 
-      if (this.seminar.documents.length) {
-        const documents = this.seminar.documents.filter((doc) => doc.file);
+			if (this.seminar.documents.length) {
+				const documents = this.seminar.documents.filter(doc => doc.file)
 
-        const filteredDocuments = documents.filter((doc) => doc.file?.url || doc.file?.newFile);
+				const filteredDocuments = documents.filter(doc => doc.file?.url || doc.file?.newFile)
 
-        formData.append(
-          'documents',
-          JSON.stringify(
-            filteredDocuments.map((doc) => {
-              const file = doc.file?.newFile ? {} : doc.file;
-              return {
-                title: doc.title,
-                created_at: doc.created_at,
-                file: file,
-              };
-            })
-          )
-        );
+				formData.append(
+					'documents',
+					JSON.stringify(
+						filteredDocuments.map(doc => {
+							const file = doc.file?.newFile ? {} : doc.file
+							return {
+								title: doc.title,
+								created_at: doc.created_at,
+								file
+							}
+						})
+					)
+				)
 
-        filteredDocuments.forEach((doc, index) => {
-          if (doc.file?.newFile) {
-            formData.append(`document${index}`, doc.file?.newFile);
-          }
-        });
-      }
+				filteredDocuments.forEach((doc, index) => {
+					if (doc.file?.newFile) {
+						formData.append(`document${index}`, doc.file?.newFile)
+					}
+				})
+			}
 
-      try {
-        const response = await axios.patch(`${apiUrl}/seminars/${this.seminar_id}`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            authorization: `Bearer ${this.userData.token}`,
-          },
-        });
+			try {
+				const response = await axios.patch(`${apiUrl}/seminars/${this.seminar_id}`, formData, {
+					headers: {
+						'Content-Type': 'multipart/form-data',
+						authorization: `Bearer ${this.userData.token}`
+					}
+				})
 
-        if (response.status === 200) {
-          this.messages.push('Семинар обновлен успешно');
-          await this.fetchSeminars();
+				if (response.status === 200) {
+					this.messages.push('Семинар обновлен успешно')
+					await this.fetchSeminars()
 
-          setTimeout(() => {
-            if (this.$route.name === 'editSeminarPage') this.$router.push({ name: 'seminarPage', params: { seminar_id: response.data.seminar._id } });
-          }, 2000);
-        }
-      } catch (error) {
-        console.error('Error updating form:', error);
-        this.errors.push(error.response?.data?.message);
-      }
-    },
-    async deleteSeminar() {
-      try {
-        const response = await axios.delete(`${apiUrl}/seminars/${this.seminar_id}`, {
-          headers: {
-            authorization: `Bearer ${this.userData.token}`,
-          },
-        });
-        if (response.data.status === 'success') {
-          this.messages.push('Семинар был успешно удалён');
-          await this.fetchSeminars();
+					setTimeout(() => {
+						if (this.$route.name === 'editSeminarPage') {
+							this.$router.push({
+								name: 'seminarPage',
+								params: { seminar_id: response.data.seminar._id }
+							})
+						}
+					}, 2000)
+				}
+			} catch (error) {
+				console.error('Error updating form:', error)
+				this.errors.push(error.response?.data?.message)
+			}
+		},
+		async deleteSeminar() {
+			try {
+				const response = await axios.delete(`${apiUrl}/seminars/${this.seminar_id}`, {
+					headers: {
+						authorization: `Bearer ${this.userData.token}`
+					}
+				})
+				if (response.data.status === 'success') {
+					this.messages.push('Семинар был успешно удалён')
+					await this.fetchSeminars()
 
-          setTimeout(() => {
-            if (this.$route.name === 'editSeminarPage') this.$router.push({ name: 'seminarsPage' });
-          }, 2000);
-        }
-      } catch (e) {
-        console.error('Не удалось удалить семинар:', e);
-        this.errors.push('Не удалось удалить семинар:' + e?.response.data.message);
-      }
-    },
-  },
+					setTimeout(() => {
+						if (this.$route.name === 'editSeminarPage') this.$router.push({ name: 'seminarsPage' })
+					}, 2000)
+				}
+			} catch (e) {
+				console.error('Не удалось удалить семинар:', e)
+				this.errors.push('Не удалось удалить семинар:' + e?.response.data.message)
+			}
+		}
+	},
 
-  mounted() {
-    if (this.seminar_id) this.loadSeminarData();
-  },
-};
+	mounted() {
+		if (this.seminar_id) this.loadSeminarData()
+	}
+}
 </script>
 
 <style scoped>
 .updateSeminarPage__wrapper {
-  flex: 1 1 0;
-  display: flex;
-  flex-direction: column;
-  padding: 2rem;
-  overflow-y: auto;
+	flex: 1 1 0;
+	display: flex;
+	flex-direction: column;
+	padding: 2rem;
+	overflow-y: auto;
 }
 </style>

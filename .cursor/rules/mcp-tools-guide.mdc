@@ -1,0 +1,197 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# MCP Tools Integration Guide: Cursor IDE Optimization
+
+**Version:** 1.0
+**Status:** Active Reference - Mandatory Application
+**Purpose:** Enforce systematic MCP usage for maximum development efficiency
+
+---
+
+## 🎯 CORE PRINCIPLE: MCP-FIRST DEVELOPMENT
+
+**Every development action MUST be validated through appropriate MCP tools**
+
+### Success Metrics
+- **Primary KPI**: 100% MCP usage for UI/Backend/Research tasks
+- **Quality Gate**: Zero manual debugging without MCP validation
+- **Efficiency Boost**: 3-5x faster problem detection and resolution
+
+---
+
+## 📱 BROWSER MCP (browsermcp) - UI Development
+
+### MANDATORY Usage For:
+```bash
+✅ Any frontend code changes
+✅ Component testing and validation  
+✅ Form interaction verification
+✅ Responsive design checks
+✅ JavaScript error detection
+✅ Performance analysis
+✅ Accessibility audits
+✅ Cross-page navigation testing
+```
+
+### Standard Workflow:
+```markdown
+1. browser_navigate → Target page
+2. browser_snapshot → Current state analysis  
+3. browser_get_console_logs → Error detection
+4. browser_type + browser_click → Interaction testing
+5. browser_screenshot → Documentation
+6. browser_wait → State change validation
+```
+
+### Real Success Case:
+```
+🎯 Athletes Search Bug Detection:
+- browser_navigate(/athletes) → Page loaded
+- browser_type("Adams") + browser_click("Search") → Test interaction  
+- browser_snapshot → "Results not found" detected
+- 🚀 Issue found in 30 seconds vs hours of manual testing
+```
+
+---
+
+## 🐳 DOCKER MCP (docker-mcp) - Backend Development  
+
+### MANDATORY Usage For:
+```bash
+✅ Any backend code changes
+✅ Container status monitoring
+✅ Application log analysis
+✅ Database connection issues
+✅ Performance troubleshooting  
+✅ Deployment validation
+✅ Environment debugging
+✅ Service dependency checks
+```
+
+### Standard Workflow:
+```markdown
+1. list-containers → Service status check
+2. get-logs → Detailed error analysis
+3. create-container → Testing environments (if needed)
+4. deploy-compose → Stack management (if needed)
+```
+
+### Real Success Case:
+```
+🎯 mongoose-paginate-v2 Missing Error:
+- list-containers → Backend running ✅
+- get-logs → "Cannot find package" detected
+- 🚀 Root cause identified in 10 seconds
+```
+
+---
+
+## 📚 CONTEXT7 MCP (context7) - Technical Research
+
+### MANDATORY Usage For:
+```bash
+✅ Library research and selection
+✅ Migration guides (Vue 2→3, etc)
+✅ Best practices documentation
+✅ API reference lookup
+✅ Architecture decision making
+✅ Troubleshooting guides
+✅ Performance optimization strategies
+```
+
+### Standard Workflow:
+```markdown
+1. resolve-library-id → Find correct library
+2. get-library-docs → Detailed documentation
+3. Apply learnings → Implementation
+4. Validate → Browser/Docker MCP testing
+```
+
+---
+
+## 🚨 ANTI-PATTERNS (FORBIDDEN)
+
+### ❌ NEVER DO:
+```bash
+❌ Manual UI testing without Browser MCP
+❌ Guessing backend issues without Docker MCP logs
+❌ Google searches instead of Context7 MCP  
+❌ "It doesn't work" without MCP diagnostics
+❌ Code commits without MCP validation
+❌ Production deploys without MCP checks
+```
+
+### ✅ ALWAYS DO:
+```bash
+✅ MCP tools FIRST for any investigation
+✅ Document MCP findings in .notes/
+✅ Share MCP discoveries with team
+✅ Use MCP for both development AND debugging
+✅ MCP validation before any major changes
+```
+
+---
+
+## 📊 IMPLEMENTATION CHECKLIST
+
+### Pre-Development:
+- [ ] Browser MCP ready for UI testing
+- [ ] Docker MCP connected for backend monitoring  
+- [ ] Context7 MCP available for research
+
+### During Development:
+- [ ] Every UI change → Browser MCP validation
+- [ ] Every backend change → Docker MCP log check
+- [ ] Every technical question → Context7 MCP research
+
+### Post-Development:
+- [ ] Full MCP regression testing completed
+- [ ] All MCP findings documented
+- [ ] Team knowledge sharing updated
+
+---
+
+## 🏆 SUCCESS EXAMPLES
+
+### ✅ Fast Problem Resolution:
+```
+Issue: Athletes search not working
+Traditional: 2-3 hours debugging
+MCP Approach: 5 minutes total
+• browser_navigate + browser_click = Issue reproduced ✅
+• docker_get_logs = Root cause found ✅  
+• Solution applied and validated ✅
+```
+
+### ✅ Proactive Quality Assurance:
+```
+Change: Frontend component update
+MCP Validation:
+• browser_snapshot = UI state verified ✅
+• browser_get_console_logs = No errors ✅
+• browser_type interactions = Functionality confirmed ✅
+• Zero regressions introduced ✅
+```
+
+---
+
+## 🔄 CONTINUOUS IMPROVEMENT
+
+### Weekly MCP Review:
+- Count MCP tool usage vs manual methods
+- Identify missed MCP opportunities  
+- Update team on MCP discoveries
+- Refine MCP workflows based on findings
+
+### Monthly MCP Optimization:
+- Analyze MCP efficiency gains
+- Document new MCP usage patterns
+- Share success stories with broader team
+- Evolve MCP integration strategies
+
+---
+
+**BOTTOM LINE: MCP tools are not optional extras - they are CORE development infrastructure for the FFR Live Platform.**

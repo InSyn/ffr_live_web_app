@@ -1,0 +1,67 @@
+{
+	"name": "ffr-live-platform",
+	"version": "1.0.0",
+	"description": "FFR Live - Comprehensive Sports Timing and Event Management Platform",
+	"private": true,
+	"type": "module",
+	"engines": {
+		"node": ">=16.0.0",
+		"npm": ">=8.0.0"
+	},
+	"scripts": {
+		"//": "Test comment",
+		"preinstall": "npx only-allow npm",
+		"install:all": "npm install && npm run install:front && npm run install:back",
+		"install:front": "cd frontend && npm install",
+		"install:back": "cd backend && npm install",
+		"dev": "concurrently \"npm run dev:back\" \"npm run dev:front\"",
+		"dev:front": "cd frontend && npm run serve",
+		"dev:back": "docker compose down && docker compose -f docker-compose.dev.yml up -d",
+		"dev:db": "docker-compose up live_db",
+		"dev:full": "docker-compose up",
+		"build": "npm run build:front",
+		"build:front": "cd frontend && npm run build",
+		"test": "npm run test:front && npm run test:back",
+		"test:front": "cd frontend && npm run test",
+		"test:back": "cd backend && npm run test",
+		"test:e2e": "npm run test:front -- --e2e",
+		"format": "prettier --write .",
+		"clean": "npm run clean:front && npm run clean:back && npm run clean:docker",
+		"clean:front": "cd frontend && rmdir /s /q node_modules dist",
+		"clean:back": "cd backend && rmdir /s /q node_modules",
+		"clean:docker": "docker-compose down -v && docker system prune -f",
+		"security:audit": "npm audit --audit-level moderate",
+		"security:fix": "npm audit fix",
+		"docker:build": "docker-compose build",
+		"docker:up": "docker-compose up -d",
+		"docker:down": "docker-compose down",
+		"docker:logs": "docker-compose logs -f",
+		"prepare": "husky install",
+		"bt:start": "pm2 start ecosystem.config.cjs --name bts",
+		"bt:stop": "pm2 stop ecosystem.config.cjs --name bts",
+		"bt:restart": "pm2 restart ecosystem.config.cjs --name bts",
+		"bt:logs": "pm2 logs ecosystem.config.cjs --name bts",
+		"bt:delete": "pm2 delete ecosystem.config.cjs --name bts"
+	},
+	"devDependencies": {
+		"concurrently": "^8.2.2",
+		"husky": "^9.0.11",
+		"prettier": "^3.2.5"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/your-org/ffr-live-platform.git"
+	},
+	"keywords": [
+		"sports",
+		"timing",
+		"event-management",
+		"vue",
+		"nodejs",
+		"mongodb",
+		"ffr",
+		"freestyle"
+	],
+	"author": "FFR Development Team",
+	"license": "UNLICENSED"
+}

@@ -1,9 +1,9 @@
-import mongoose from 'mongoose';
+import mongoose from 'mongoose'
 
 export const documentSchema = new mongoose.Schema({
-  title: String,
-  created_at: Date,
-  file: {
-    url: { required: true, type: String },
-  },
-});
+	title: String,
+	created_at: Date,
+	file: {
+		url: { required: true, type: String }
+	}
+})

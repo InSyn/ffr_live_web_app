@@ -1,0 +1,11 @@
+// =============================================================================
+// GLOBAL.SCSS
+// -----------------------------------------------------------------------------
+// This file serves as the single entry point for all global SCSS variables,
+// mixins, and functions. It is injected into every component and SCSS file
+// via vue.config.js, making these resources available project-wide without
+// the need for manual imports.
+// =============================================================================
+
+@import 'abstracts/variables';
+@import 'abstracts/mixins';

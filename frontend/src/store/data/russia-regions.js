@@ -5,7 +5,7 @@ export const russiaRegions = [
     name: 'Адыгея',
     typeShort: 'Респ',
     name_en: 'Republic of Adygea',
-    federal: 'YFO',
+    federal: 'YFO'
   },
   {
     fullname: 'Республика Башкортостан',
@@ -13,7 +13,7 @@ export const russiaRegions = [
     name: 'Башкортостан',
     typeShort: 'Респ',
     name_en: 'Republic of Bashkortostan',
-    federal: 'PFO',
+    federal: 'PFO'
   },
   {
     fullname: 'Республика Бурятия',
@@ -21,7 +21,7 @@ export const russiaRegions = [
     name: 'Бурятия',
     typeShort: 'Респ',
     name_en: 'Republic of Buryatia',
-    federal: 'SFO',
+    federal: 'SFO'
   },
   {
     fullname: 'Республика Алтай',
@@ -29,7 +29,7 @@ export const russiaRegions = [
     name: 'Алтай',
     typeShort: 'Респ',
     name_en: 'Altai Republic',
-    federal: 'SFO',
+    federal: 'SFO'
   },
   {
     fullname: 'Республика Дагестан',
@@ -37,7 +37,7 @@ export const russiaRegions = [
     name: 'Дагестан',
     typeShort: 'Респ',
     name_en: 'Dagestan',
-    federal: 'SKFO',
+    federal: 'SKFO'
   },
   {
     fullname: 'Республика Ингушетия',
@@ -45,7 +45,7 @@ export const russiaRegions = [
     name: 'Ингушетия',
     typeShort: 'Респ',
     name_en: 'Ingushetia',
-    federal: 'SKFO',
+    federal: 'SKFO'
   },
   {
     fullname: 'Кабардино-Балкарская Республика',
@@ -53,7 +53,7 @@ export const russiaRegions = [
     name: 'Кабардино-Балкарская',
     typeShort: 'Респ',
     name_en: 'Kabardino-Balkarian Republic',
-    federal: 'SKFO',
+    federal: 'SKFO'
   },
   {
     fullname: 'Республика Калмыкия',
@@ -61,7 +61,7 @@ export const russiaRegions = [
     name: 'Калмыкия',
     typeShort: 'Респ',
     name_en: 'Kalmykia',
-    federal: 'YFO',
+    federal: 'YFO'
   },
   {
     fullname: 'Карачаево-Черкесская Республика',
@@ -69,7 +69,7 @@ export const russiaRegions = [
     name: 'Карачаево-Черкесская',
     typeShort: 'Респ',
     name_en: 'Karachay-Cherkessia',
-    federal: 'SKFO',
+    federal: 'SKFO'
   },
   {
     fullname: 'Республика Карелия',
@@ -77,7 +77,7 @@ export const russiaRegions = [
     name: 'Карелия',
     typeShort: 'Респ',
     name_en: 'Karelia',
-    federal: 'SZFO',
+    federal: 'SZFO'
   },
   {
     fullname: 'Республика Коми',
@@ -85,7 +85,7 @@ export const russiaRegions = [
     name: 'Коми',
     typeShort: 'Респ',
     name_en: 'Komi Republic',
-    federal: 'SZFO',
+    federal: 'SZFO'
   },
   {
     fullname: 'Республика Марий Эл',
@@ -93,7 +93,7 @@ export const russiaRegions = [
     name: 'Марий Эл',
     typeShort: 'Респ',
     name_en: 'Mari El',
-    federal: 'PFO',
+    federal: 'PFO'
   },
   {
     fullname: 'Республика Мордовия',
@@ -101,7 +101,7 @@ export const russiaRegions = [
     name: 'Мордовия',
     typeShort: 'Респ',
     name_en: 'Republic of Mordovia',
-    federal: 'PFO',
+    federal: 'PFO'
   },
   {
     fullname: 'Республика Саха /Якутия/',
@@ -109,7 +109,7 @@ export const russiaRegions = [
     name: 'Саха /Якутия/',
     typeShort: 'Респ',
     name_en: 'Republic of Sakha (Yakutia)',
-    federal: 'DFO',
+    federal: 'DFO'
   },
   {
     fullname: 'Республика Северная Осетия - Алания',
@@ -117,7 +117,7 @@ export const russiaRegions = [
     name: 'Северная Осетия - Алания',
     typeShort: 'Респ',
     name_en: 'Republic of North Ossetia–Alania',
-    federal: 'SKFO',
+    federal: 'SKFO'
   },
   {
     fullname: 'Республика Татарстан',
@@ -125,7 +125,7 @@ export const russiaRegions = [
     name: 'Татарстан',
     typeShort: 'Респ',
     name_en: 'Republic of Tatarstan',
-    federal: 'PFO',
+    federal: 'PFO'
   },
   {
     fullname: 'Республика Тыва',
@@ -133,7 +133,7 @@ export const russiaRegions = [
     name: 'Тыва',
     typeShort: 'Респ',
     name_en: 'Tuva Republic',
-    federal: 'SFO',
+    federal: 'SFO'
   },
   {
     fullname: 'Удмуртская Республика',
@@ -141,7 +141,7 @@ export const russiaRegions = [
     name: 'Удмуртская',
     typeShort: 'Респ',
     name_en: 'Udmurtia',
-    federal: 'PFO',
+    federal: 'PFO'
   },
   {
     fullname: 'Республика Хакасия',
@@ -149,7 +149,7 @@ export const russiaRegions = [
     name: 'Хакасия',
     typeShort: 'Респ',
     name_en: 'Republic of Khakassia',
-    federal: 'SFO',
+    federal: 'SFO'
   },
   {
     fullname: 'Чеченская Республика',
@@ -157,7 +157,7 @@ export const russiaRegions = [
     name: 'Чеченская',
     typeShort: 'Респ',
     name_en: 'Chechen Republic',
-    federal: 'SKFO',
+    federal: 'SKFO'
   },
   {
     fullname: 'Чувашская Республика',
@@ -165,7 +165,7 @@ export const russiaRegions = [
     name: 'Чувашская',
     typeShort: 'Респ',
     name_en: 'Chuvash Republic',
-    federal: 'PFO',
+    federal: 'PFO'
   },
   {
     fullname: 'Алтайский край',
@@ -173,7 +173,7 @@ export const russiaRegions = [
     name: 'Алтайский',
     typeShort: 'край',
     name_en: 'Altai Krai',
-    federal: 'SFO',
+    federal: 'SFO'
   },
   {
     fullname: 'Краснодарский край',
@@ -181,7 +181,7 @@ export const russiaRegions = [
     name: 'Краснодарский',
     typeShort: 'край',
     name_en: 'Krasnodar Krai',
-    federal: 'YFO',
+    federal: 'YFO'
   },
   {
     fullname: 'Красноярский край',
@@ -189,7 +189,7 @@ export const russiaRegions = [
     name: 'Красноярский',
     typeShort: 'край',
     name_en: 'Krasnoyarsk Krai',
-    federal: 'SFO',
+    federal: 'SFO'
   },
   {
     fullname: 'Приморский край',
@@ -197,7 +197,7 @@ export const russiaRegions = [
     name: 'Приморский',
     typeShort: 'край',
     name_en: 'Primorsky Krai',
-    federal: 'DFO',
+    federal: 'DFO'
   },
   {
     fullname: 'Ставропольский край',
@@ -205,7 +205,7 @@ export const russiaRegions = [
     name: 'Ставропольский',
     typeShort: 'край',
     name_en: 'Stavropol Krai',
-    federal: 'SKFO',
+    federal: 'SKFO'
   },
   {
     fullname: 'Хабаровский край',
@@ -213,7 +213,7 @@ export const russiaRegions = [
     name: 'Хабаровский',
     typeShort: 'край',
     name_en: 'Khabarovsk Krai',
-    federal: 'DFO',
+    federal: 'DFO'
   },
   {
     fullname: 'Амурская область',
@@ -221,7 +221,7 @@ export const russiaRegions = [
     name: 'Амурская',
     typeShort: 'обл',
     name_en: 'Amur Oblast',
-    federal: 'DFO',
+    federal: 'DFO'
   },
   {
     fullname: 'Архангельская область',
@@ -229,7 +229,7 @@ export const russiaRegions = [
     name: 'Архангельская',
     typeShort: 'обл',
     name_en: 'Arkhangelsk Oblast',
-    federal: 'SZFO',
+    federal: 'SZFO'
   },
   {
     fullname: 'Астраханская область',
@@ -237,7 +237,7 @@ export const russiaRegions = [
     name: 'Астраханская',
     typeShort: 'обл',
     name_en: 'Astrakhan Oblast',
-    federal: 'YFO',
+    federal: 'YFO'
   },
   {
     fullname: 'Белгородская область',
@@ -245,7 +245,7 @@ export const russiaRegions = [
     name: 'Белгородская',
     typeShort: 'обл',
     name_en: 'Belgorod Oblast',
-    federal: 'CFO',
+    federal: 'CFO'
   },
   {
     fullname: 'Брянская область',
@@ -253,7 +253,7 @@ export const russiaRegions = [
     name: 'Брянская',
     typeShort: 'обл',
     name_en: 'Bryansk Oblast',
-    federal: 'CFO',
+    federal: 'CFO'
   },
   {
     fullname: 'Владимирская область',
@@ -261,7 +261,7 @@ export const russiaRegions = [
     name: 'Владимирская',
     typeShort: 'обл',
     name_en: 'Vladimir Oblast',
-    federal: 'CFO',
+    federal: 'CFO'
   },
   {
     fullname: 'Волгоградская область',
@@ -269,7 +269,7 @@ export const russiaRegions = [
     name: 'Волгоградская',
     typeShort: 'обл',
     name_en: 'Volgograd Oblast',
-    federal: 'YFO',
+    federal: 'YFO'
   },
   {
     fullname: 'Вологодская область',
@@ -277,7 +277,7 @@ export const russiaRegions = [
     name: 'Вологодская',
     typeShort: 'обл',
     name_en: 'Vologda Oblast',
-    federal: 'SZFO',
+    federal: 'SZFO'
   },
   {
     fullname: 'Воронежская область',
@@ -285,7 +285,7 @@ export const russiaRegions = [
     name: 'Воронежская',
     typeShort: 'обл',
     name_en: 'Voronezh Oblast',
-    federal: 'CFO',
+    federal: 'CFO'
   },
   {
     fullname: 'Ивановская область',
@@ -293,7 +293,7 @@ export const russiaRegions = [
     name: 'Ивановская',
     typeShort: 'обл',
     name_en: 'Ivanovo Oblast',
-    federal: 'CFO',
+    federal: 'CFO'
   },
   {
     fullname: 'Иркутская область',
@@ -301,7 +301,7 @@ export const russiaRegions = [
     name: 'Иркутская',
     typeShort: 'обл',
     name_en: 'Irkutsk Oblast',
-    federal: 'SFO',
+    federal: 'SFO'
   },
   {
     fullname: 'Калининградская область',
@@ -309,7 +309,7 @@ export const russiaRegions = [
     name: 'Калининградская',
     typeShort: 'обл',
     name_en: 'Kaliningrad Oblast',
-    federal: 'SZFO',
+    federal: 'SZFO'
   },
   {
     fullname: 'Калужская область',
@@ -317,7 +317,7 @@ export const russiaRegions = [
     name: 'Калужская',
     typeShort: 'обл',
     name_en: 'Kaluga Oblast',
-    federal: 'CFO',
+    federal: 'CFO'
   },
   {
     fullname: 'Камчатский край',
@@ -325,7 +325,7 @@ export const russiaRegions = [
     name: 'Камчатский',
     typeShort: 'край',
     name_en: 'Kamchatka Krai',
-    federal: 'DFO',
+    federal: 'DFO'
   },
   {
     fullname: 'Кемеровская область',
@@ -333,7 +333,7 @@ export const russiaRegions = [
     name: 'Кемеровская',
     typeShort: 'обл',
     name_en: 'Kemerovo Oblast',
-    federal: 'SFO',
+    federal: 'SFO'
   },
   {
     fullname: 'Кировская область',
@@ -341,7 +341,7 @@ export const russiaRegions = [
     name: 'Кировская',
     typeShort: 'обл',
     name_en: 'Kirov Oblast',
-    federal: 'PFO',
+    federal: 'PFO'
   },
   {
     fullname: 'Костромская область',
@@ -349,7 +349,7 @@ export const russiaRegions = [
     name: 'Костромская',
     typeShort: 'обл',
     name_en: 'Kostroma Oblast',
-    federal: 'CFO',
+    federal: 'CFO'
   },
   {
     fullname: 'Курганская область',
@@ -357,7 +357,7 @@ export const russiaRegions = [
     name: 'Курганская',
     typeShort: 'обл',
     name_en: 'Kurgan Oblast',
-    federal: 'UFO',
+    federal: 'UFO'
   },
   {
     fullname: 'Курская область',
@@ -365,7 +365,7 @@ export const russiaRegions = [
     name: 'Курская',
     typeShort: 'обл',
     name_en: 'Kursk Oblast',
-    federal: 'CFO',
+    federal: 'CFO'
   },
   {
     fullname: 'Ленинградская область',
@@ -373,7 +373,7 @@ export const russiaRegions = [
     name: 'Ленинградская',
     typeShort: 'обл',
     name_en: 'Leningrad Oblast',
-    federal: 'SZFO',
+    federal: 'SZFO'
   },
   {
     fullname: 'Липецкая область',
@@ -381,7 +381,7 @@ export const russiaRegions = [
     name: 'Липецкая',
     typeShort: 'обл',
     name_en: 'Lipetsk Oblast',
-    federal: 'CFO',
+    federal: 'CFO'
   },
   {
     fullname: 'Магаданская область',
@@ -389,7 +389,7 @@ export const russiaRegions = [
     name: 'Магаданская',
     typeShort: 'обл',
     name_en: 'Magadan Oblast',
-    federal: 'DFO',
+    federal: 'DFO'
   },
   {
     fullname: 'Московская область',
@@ -397,7 +397,7 @@ export const russiaRegions = [
     name: 'Московская',
     typeShort: 'обл',
     name_en: 'Moscow Oblast',
-    federal: 'CFO',
+    federal: 'CFO'
   },
   {
     fullname: 'Мурманская область',
@@ -405,7 +405,7 @@ export const russiaRegions = [
     name: 'Мурманская',
     typeShort: 'обл',
     name_en: 'Murmansk Oblast',
-    federal: 'SZFO',
+    federal: 'SZFO'
   },
   {
     fullname: 'Нижегородская область',
@@ -413,7 +413,7 @@ export const russiaRegions = [
     name: 'Нижегородская',
     typeShort: 'обл',
     name_en: 'Nizhny Novgorod Oblast',
-    federal: 'PFO',
+    federal: 'PFO'
   },
   {
     fullname: 'Новгородская область',
@@ -421,7 +421,7 @@ export const russiaRegions = [
     name: 'Новгородская',
     typeShort: 'обл',
     name_en: 'Novgorod Oblast',
-    federal: 'SZFO',
+    federal: 'SZFO'
   },
   {
     fullname: 'Новосибирская область',
@@ -429,7 +429,7 @@ export const russiaRegions = [
     name: 'Новосибирская',
     typeShort: 'обл',
     name_en: 'Novosibirsk Oblast',
-    federal: 'SFO',
+    federal: 'SFO'
   },
   {
     fullname: 'Омская область',
@@ -437,7 +437,7 @@ export const russiaRegions = [
     name: 'Омская',
     typeShort: 'обл',
     name_en: 'Omsk Oblast',
-    federal: 'SFO',
+    federal: 'SFO'
   },
   {
     fullname: 'Оренбургская область',
@@ -445,7 +445,7 @@ export const russiaRegions = [
     name: 'Оренбургская',
     typeShort: 'обл',
     name_en: 'Orenburg Oblast',
-    federal: 'PFO',
+    federal: 'PFO'
   },
   {
     fullname: 'Орловская область',
@@ -453,7 +453,7 @@ export const russiaRegions = [
     name: 'Орловская',
     typeShort: 'обл',
     name_en: 'Oryol Oblast',
-    federal: 'CFO',
+    federal: 'CFO'
   },
   {
     fullname: 'Пензенская область',
@@ -461,7 +461,7 @@ export const russiaRegions = [
     name: 'Пензенская',
     typeShort: 'обл',
     name_en: 'Penza Oblast',
-    federal: 'PFO',
+    federal: 'PFO'
   },
   {
     fullname: 'Пермский край',
@@ -469,7 +469,7 @@ export const russiaRegions = [
     name: 'Пермский',
     typeShort: 'край',
     name_en: 'Perm Krai',
-    federal: 'PFO',
+    federal: 'PFO'
   },
   {
     fullname: 'Псковская область',
@@ -477,7 +477,7 @@ export const russiaRegions = [
     name: 'Псковская',
     typeShort: 'обл',
     name_en: 'Pskov Oblast',
-    federal: 'SZFO',
+    federal: 'SZFO'
   },
   {
     fullname: 'Ростовская область',
@@ -485,7 +485,7 @@ export const russiaRegions = [
     name: 'Ростовская',
     typeShort: 'обл',
     name_en: 'Rostov Oblast',
-    federal: 'YFO',
+    federal: 'YFO'
   },
   {
     fullname: 'Рязанская область',
@@ -493,7 +493,7 @@ export const russiaRegions = [
     name: 'Рязанская',
     typeShort: 'обл',
     name_en: 'Ryazan Oblast',
-    federal: 'CFO',
+    federal: 'CFO'
   },
   {
     fullname: 'Самарская область',
@@ -501,7 +501,7 @@ export const russiaRegions = [
     name: 'Самарская',
     typeShort: 'обл',
     name_en: 'Samara Oblast',
-    federal: 'PFO',
+    federal: 'PFO'
   },
   {
     fullname: 'Саратовская область',
@@ -509,7 +509,7 @@ export const russiaRegions = [
     name: 'Саратовская',
     typeShort: 'обл',
     name_en: 'Saratov Oblast',
-    federal: 'PFO',
+    federal: 'PFO'
   },
   {
     fullname: 'Сахалинская область',
@@ -517,7 +517,7 @@ export const russiaRegions = [
     name: 'Сахалинская',
     typeShort: 'обл',
     name_en: 'Sakhalin Oblast',
-    federal: 'DFO',
+    federal: 'DFO'
   },
   {
     fullname: 'Свердловская область',
@@ -525,7 +525,7 @@ export const russiaRegions = [
     name: 'Свердловская',
     typeShort: 'обл',
     name_en: 'Sverdlovsk Oblast',
-    federal: 'UFO',
+    federal: 'UFO'
   },
   {
     fullname: 'Смоленская область',
@@ -533,7 +533,7 @@ export const russiaRegions = [
     name: 'Смоленская',
     typeShort: 'обл',
     name_en: 'Smolensk Oblast',
-    federal: 'CFO',
+    federal: 'CFO'
   },
   {
     fullname: 'Тамбовская область',
@@ -541,7 +541,7 @@ export const russiaRegions = [
     name: 'Тамбовская',
     typeShort: 'обл',
     name_en: 'Tambov Oblast',
-    federal: 'CFO',
+    federal: 'CFO'
   },
   {
     fullname: 'Тверская область',
@@ -549,7 +549,7 @@ export const russiaRegions = [
     name: 'Тверская',
     typeShort: 'обл',
     name_en: 'Tver Oblast',
-    federal: 'CFO',
+    federal: 'CFO'
   },
   {
     fullname: 'Томская область',
@@ -557,7 +557,7 @@ export const russiaRegions = [
     name: 'Томская',
     typeShort: 'обл',
     name_en: 'Tomsk Oblast',
-    federal: 'SFO',
+    federal: 'SFO'
   },
   {
     fullname: 'Тульская область',
@@ -565,7 +565,7 @@ export const russiaRegions = [
     name: 'Тульская',
     typeShort: 'обл',
     name_en: 'Tula Oblast',
-    federal: 'CFO',
+    federal: 'CFO'
   },
   {
     fullname: 'Тюменская область',
@@ -573,7 +573,7 @@ export const russiaRegions = [
     name: 'Тюменская',
     typeShort: 'обл',
     name_en: 'Tyumen Oblast',
-    federal: 'UFO',
+    federal: 'UFO'
   },
   {
     fullname: 'Ульяновская область',
@@ -581,7 +581,7 @@ export const russiaRegions = [
     name: 'Ульяновская',
     typeShort: 'обл',
     name_en: 'Ulyanovsk Oblast',
-    federal: 'PFO',
+    federal: 'PFO'
   },
   {
     fullname: 'Челябинская область',
@@ -589,7 +589,7 @@ export const russiaRegions = [
     name: 'Челябинская',
     typeShort: 'обл',
     name_en: 'Chelyabinsk Oblast',
-    federal: 'UFO',
+    federal: 'UFO'
   },
   {
     fullname: 'Забайкальский край',
@@ -597,7 +597,7 @@ export const russiaRegions = [
     name: 'Забайкальский',
     typeShort: 'край',
     name_en: 'Zabaykalsky Krai',
-    federal: 'SFO',
+    federal: 'SFO'
   },
   {
     fullname: 'Ярославская область',
@@ -605,7 +605,7 @@ export const russiaRegions = [
     name: 'Ярославская',
     typeShort: 'обл',
     name_en: 'Yaroslavl Oblast',
-    federal: 'CFO',
+    federal: 'CFO'
   },
   {
     fullname: 'Москва',
@@ -613,7 +613,7 @@ export const russiaRegions = [
     name: 'Москва',
     typeShort: 'г',
     name_en: 'Moscow',
-    federal: 'CFO',
+    federal: 'CFO'
   },
   {
     fullname: 'Санкт-Петербург',
@@ -621,7 +621,7 @@ export const russiaRegions = [
     name: 'Санкт-Петербург',
     typeShort: 'г',
     name_en: 'Saint Petersburg',
-    federal: 'SZFO',
+    federal: 'SZFO'
   },
   {
     fullname: 'Еврейская автономная область',
@@ -629,7 +629,7 @@ export const russiaRegions = [
     name: 'Еврейская',
     typeShort: 'Аобл',
     name_en: 'Jewish Autonomous Oblast',
-    federal: 'DFO',
+    federal: 'DFO'
   },
   {
     fullname: 'Ханты-Мансийский Автономный округ - Югра',
@@ -637,7 +637,7 @@ export const russiaRegions = [
     name: 'Ханты-Мансийский',
     typeShort: 'АО',
     name_en: 'Khanty-Mansi Autonomous Okrug',
-    federal: 'UFO',
+    federal: 'UFO'
   },
   {
     fullname: 'Ненецкий автономный округ',
@@ -645,7 +645,7 @@ export const russiaRegions = [
     name: 'Ненецкий',
     typeShort: 'АО',
     name_en: 'Nenets Autonomous Okrug',
-    federal: 'SZFO',
+    federal: 'SZFO'
   },
   {
     fullname: 'Чукотский автономный округ',
@@ -653,7 +653,7 @@ export const russiaRegions = [
     name: 'Чукотский',
     typeShort: 'АО',
     name_en: 'Chukotka Autonomous Okrug',
-    federal: 'DFO',
+    federal: 'DFO'
   },
   {
     fullname: 'Ямало-Ненецкий автономный округ',
@@ -661,36 +661,36 @@ export const russiaRegions = [
     name: 'Ямало-Ненецкий',
     typeShort: 'АО',
     name_en: 'Yamalo-Nenets Autonomous Okrug',
-    federal: 'UFO',
-  },
-];
+    federal: 'UFO'
+  }
+]
 
 export const getSortedRegions = () => {
-  return russiaRegions.sort((reg_a, reg_b) => {
-    return reg_a.fullname.toString().localeCompare(reg_b.fullname.toString());
-  });
-};
+  return russiaRegions.sort((regA, regB) => {
+    return regA.fullname.toString().localeCompare(regB.fullname.toString())
+  })
+}
 
-export const getRegionCode = (regionName) => {
-  if (typeof regionName !== 'string') return null;
+export const getRegionCode = regionName => {
+  if (typeof regionName !== 'string') return null
 
-  const region = russiaRegions.find((region) => region.fullname === regionName);
-  if (!region) return null;
+  const region = russiaRegions.find(region => region.fullname === regionName)
+  if (!region) return null
 
-  return region.code;
-};
+  return region.code
+}
 
-export const parseCompetitorRegions = (regionsData) => {
-  if (typeof regionsData !== 'string') return [];
+export const parseCompetitorRegions = regionsData => {
+  if (typeof regionsData !== 'string') return []
 
-  const parsedRegions = regionsData.split(',').map((region) => region.trim());
+  const parsedRegions = regionsData.split(',').map(region => region.trim())
 
-  return parsedRegions;
-};
+  return parsedRegions
+}
 
-export const getRegionFederal = (regionName) => {
-  const region = russiaRegions.find((region) => region.fullname === regionName);
-  if (!region) return null;
+export const getRegionFederal = regionName => {
+  const region = russiaRegions.find(region => region.fullname === regionName)
+  if (!region) return null
 
-  return region.federal;
-};
+  return region.federal
+}

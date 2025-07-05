@@ -1,0 +1,25 @@
+@keyframes brand-gradient {
+	0% {
+		background-size: 100% 100%;
+		background-position: 0 0;
+	}
+	25% {
+		background-size: 125% 100%;
+		background-position: 25% 0;
+	}
+
+	50% {
+		background-size: 105% 100%;
+		background-position: 5% 0;
+	}
+
+	75% {
+		background-size: 140% 100%;
+		background-position: 40% 0;
+	}
+
+	100% {
+		background-size: 105% 100%;
+		background-position: 5% 0;
+	}
+}

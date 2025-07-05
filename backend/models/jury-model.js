@@ -1,41 +1,44 @@
-import mongoose from 'mongoose';
+import mongoose from 'mongoose'
+import mongoosePaginate from 'mongoose-paginate-v2'
 
 export const competingJurySchema = new mongoose.Schema({
-  jury_code: String,
-  role: String,
-  name: String,
-  lastname: String,
-  category: String,
-});
+	jury_code: String,
+	role: String,
+	name: String,
+	lastname: String,
+	category: String
+})
 
 export const jurySchema = new mongoose.Schema({
-  jury_code: { type: String, unique: true, required: true },
-  is_secretary: { type: Boolean, default: false },
+	jury_code: { type: String, unique: true, required: true },
+	is_secretary: { type: Boolean, default: false },
 
-  photo_url: String,
+	photo_url: String,
 
-  name: { type: String, required: true },
-  lastname: { type: String, required: true },
-  gender: String,
-  birth_date: Date || null,
+	name: { type: String, required: true },
+	lastname: { type: String, required: true },
+	gender: String,
+	birth_date: Date || null,
 
-  country: String,
-  region: String,
+	country: String,
+	region: String,
 
-  jury_category: String,
-  sport: String,
-  disciplines: [String],
+	jury_category: String,
+	sport: String,
+	disciplines: [String],
 
-  socials: {
-    vk: String,
-    telegram: String,
-  },
-});
+	socials: {
+		vk: String,
+		telegram: String
+	}
+})
 
 jurySchema.index({
-  jury_code: 1,
-  name: 'text',
-  lastname: 'text',
-});
+	jury_code: 1,
+	name: 'text',
+	lastname: 'text'
+})
 
-export const Jury = mongoose.model('Jury', jurySchema);
+jurySchema.plugin(mongoosePaginate)
+
+export const Jury = mongoose.model('Jury', jurySchema)

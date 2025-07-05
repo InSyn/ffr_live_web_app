@@ -1,76 +1,233 @@
-version: '3'
-
 services:
-  ffr_live_back:
+  # Backend Service
+  ffr_live_backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: ffr_live_back
+      target: production
+    container_name: ffr_live_backend
     restart: unless-stopped
     env_file: .env
     environment:
-      - DB_USER=$DB_USER
-      - DB_PWD=$DB_PWD
-      - DB_HOSTNAME=$DB_HOSTNAME
-      - DB_PORT=$DB_PORT
-      - DB=$DB
+      - NODE_ENV=production
+      - DB_USER=${DB_USER}
+      - DB_PWD=${DB_PWD}
+      - DB_HOSTNAME=ffr_live_db
+      - DB_PORT=27017
+      - DB=${DB}
+      - JWT_SECRET=${JWT_SECRET}
+      - PORT=8080
     ports:
-      - "8081:8080"
+      - '8081:8080'
     volumes:
-      - ./backend/uploads:/home/ffr_live_back/uploads
-    links:
-      - live_db
+      - ./backend/uploads:/app/uploads:rw
+      - ./backend/logs:/app/logs:rw
     networks:
       - app-network
     depends_on:
-      - live_db
+      ffr_live_db:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/api/v1/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    security_opt:
+      - no-new-privileges:true
+    user: '1000:1000'
 
-#  certbot:
-#    image: certbot/certbot
-#    container_name: certbot
-#    volumes:
-#      - /etc/letsencrypt:/etc/letsencrypt
-#      - /var/lib/letsencrypt:/var/lib/letsencrypt
-#      - /var/log/letsencrypt:/var/log/letsencrypt
-#    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
-#    networks:
-#      - app-network
+  # Frontend Service (uncomment for production deployment)
+  ffr_live_frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - NODE_ENV=production
+        - VUE_APP_BASE_URL=${API_URL}
+        - VUE_APP_UPLOADS_URL=${SERVER_URL}
+        - VUE_APP_PROJECT_MODE=${PROJECT_MODE}
+    container_name: ffr_live_frontend
+    restart: unless-stopped
+    ports:
+      - '8080:80'
+    networks:
+      - app-network
+    depends_on:
+      - ffr_live_backend
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:80/']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 128M
+        reservations:
+          cpus: '0.25'
+          memory: 64M
+    security_opt:
+      - no-new-privileges:true
 
-#  ffr_live_front:
-#    build:
-#      context: ./frontend
-#      dockerfile: Dockerfile
-#      args:
-#        - VUE_APP_BASE_URL=$API_URL
-#        - VUE_APP_UPLOADS_URL=$SERVER_URL
-#        - VUE_APP_PROJECT_MODE=$PROJECT_MODE
-#    container_name: ffr_live_front
-#    restart: unless-stopped
-#    ports:
-#      - "8083:80"
-#    networks:
-#      - app-network
-
-  live_db:
-    image: mongo:5.0-focal
+  # MongoDB Database
+  ffr_live_db:
+    image: mongo:7.0
     container_name: ffr_live_db
     restart: unless-stopped
     env_file: .env
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=$DB_USER
-      - MONGO_INITDB_ROOT_PASSWORD=$DB_PWD
-      - MONGO_INITDB_DATABASE=$DB
+      - MONGO_INITDB_ROOT_USERNAME=${DB_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${DB_PWD}
+      - MONGO_INITDB_DATABASE=${DB}
     volumes:
-      - dbdata:/data/db
-      - ./backend/db/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js
+      - ffr_db_data:/data/db:rw
+      - ffr_db_config:/data/configdb:rw
+      - ./backend/db/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+      - ./backups:/backups:rw
     networks:
       - app-network
-    ports:
-      - "27017:27017"
+    # Security: DO NOT expose MongoDB port to host in production
+    # ports:
+    #   - "27017:27017"
+    healthcheck:
+      test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    security_opt:
+      - no-new-privileges:true
+    command: ['mongod', '--auth', '--bind_ip_all']
 
+  # Nginx Reverse Proxy (for production)
+  nginx:
+    image: nginx:alpine
+    container_name: ffr_live_nginx
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./nginx/logs:/var/log/nginx:rw
+    networks:
+      - app-network
+    depends_on:
+      - ffr_live_frontend
+      - ffr_live_backend
+    healthcheck:
+      test: ['CMD', 'nginx', '-t']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 128M
+        reservations:
+          cpus: '0.25'
+          memory: 64M
+    security_opt:
+      - no-new-privileges:true
+
+  # Redis Cache (for session management)
+  redis:
+    image: redis:7-alpine
+    container_name: ffr_live_redis
+    restart: unless-stopped
+    command:
+      [
+        'redis-server',
+        '--requirepass',
+        '${REDIS_PASSWORD}',
+        '--maxmemory',
+        '256mb',
+        '--maxmemory-policy',
+        'allkeys-lru'
+      ]
+    volumes:
+      - ffr_redis_data:/data:rw
+    networks:
+      - app-network
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+    security_opt:
+      - no-new-privileges:true
+
+  # SSL Certificate Management
+  certbot:
+    image: certbot/certbot
+    container_name: ffr_live_certbot
+    volumes:
+      - ./nginx/ssl:/etc/letsencrypt:rw
+      - ./nginx/webroot:/var/www/certbot:rw
+    networks:
+      - app-network
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    depends_on:
+      - nginx
+
+# Networks
 networks:
   app-network:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
 
+# Volumes
 volumes:
-  dbdata:
+  ffr_db_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./data/mongodb
+  ffr_db_config:
+    driver: local
+  ffr_redis_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./data/redis
+
+# Health Check Script
+x-healthcheck-config: &healthcheck-config
+  interval: 30s
+  timeout: 10s
+  retries: 3
+  start_period: 40s

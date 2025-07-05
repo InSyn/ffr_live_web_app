@@ -14,9 +14,9 @@ export const sports = [
       { code: 'HP', name_rus: 'Хаф-пайп' },
       { code: 'SS', name_rus: 'Слоуп-стайл' },
       { code: 'BA', name_rus: 'Биг-эйр' },
-      { code: 'RE', name_rus: 'Рэйл' },
-    ],
-  },
+      { code: 'RE', name_rus: 'Рэйл' }
+    ]
+  }
   // {
   //   code: 'SB',
   //   name: 'Snowboard',
@@ -35,53 +35,57 @@ export const sports = [
   //     { code: 'BXT', name_rus: 'Командный сноуборд-кросс' },
   //   ],
   // },
-];
+]
 
 export const checkCompetitionDiscipline = (competition, dscCodesArr) => {
-  if (!competition || !dscCodesArr || !dscCodesArr.length) return false;
+  if (!competition || !dscCodesArr || !dscCodesArr.length) return false
 
-  const dscName = (competition && competition.discipline_code) || '';
-  return dscCodesArr.some((dscCode) => dscName === dscCode);
-};
+  const dscName = (competition && competition.discipline_code) || ''
+  return dscCodesArr.some(dscCode => dscName === dscCode)
+}
 
-export const getDisciplines = (athleteSport) => {
-  if (!athleteSport) return;
-  const sport = sports.find((sport) => {
-    return sport.name_rus.toLowerCase() === athleteSport.toString().toLowerCase();
-  });
-  if (!sport) return [];
+export const getDisciplines = athleteSport => {
+  if (!athleteSport) return
+  const sport = sports.find(sport => {
+    return sport.name_rus.toLowerCase() === athleteSport.toString().toLowerCase()
+  })
+  if (!sport) return []
 
-  return sport.disciplines;
-};
+  return sport.disciplines
+}
 
-export const getDisciplineCode = (discipline) => {
-  if (!discipline) return '';
+export const getDisciplineCode = discipline => {
+  if (!discipline) return ''
 
-  const sport = sports.find((spt) => spt.disciplines.some((dsc) => dsc.name_rus.toLowerCase() === discipline.toLowerCase()));
-  if (!sport) return '';
+  const sport = sports.find(spt =>
+    spt.disciplines.some(dsc => dsc.name_rus.toLowerCase() === discipline.toLowerCase())
+  )
+  if (!sport) return ''
 
-  const dscCode = sport.disciplines.find((dsc) => dsc.name_rus.toLowerCase() === discipline.toLowerCase()).code;
-  if (!dscCode) return '';
+  const dscCode = sport.disciplines.find(
+    dsc => dsc.name_rus.toLowerCase() === discipline.toLowerCase()
+  ).code
+  if (!dscCode) return ''
 
-  return dscCode;
-};
+  return dscCode
+}
 
-export const isQualification = (competition) => {
-  if (!competition) return false;
+export const isQualification = competition => {
+  if (!competition) return false
 
-  const stage = competition.stage ? competition.stage.split(' ')[0] : '';
-  return stage === 'Квалификация';
-};
+  const stage = competition.stage ? competition.stage.split(' ')[0] : ''
+  return stage === 'Квалификация'
+}
 export const isQualificationOfDisciplines = (competition, dscCodes) => {
-  return isQualification(competition) && checkCompetitionDiscipline(competition, dscCodes);
-};
+  return isQualification(competition) && checkCompetitionDiscipline(competition, dscCodes)
+}
 
-export const isFinal = (competition) => {
-  if (!competition) return false;
+export const isFinal = competition => {
+  if (!competition) return false
 
-  const stage = competition.stage ? competition.stage.split(' ')[0] : '';
-  return stage.toLowerCase() === 'финал';
-};
+  const stage = competition.stage ? competition.stage.split(' ')[0] : ''
+  return stage.toLowerCase() === 'финал'
+}
 export const isFinalOfDisciplines = (competition, dscCodes) => {
-  return isFinal(competition) && checkCompetitionDiscipline(competition, dscCodes);
-};
+  return isFinal(competition) && checkCompetitionDiscipline(competition, dscCodes)
+}

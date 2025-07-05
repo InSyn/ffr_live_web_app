@@ -1,342 +1,479 @@
-import { Event } from '../models/event-model.js';
-import { deleteFileIfExists, flushDocuments } from '../utils/filesUtils.js';
-import { createEntityDocuments, extractDocumentFiles, parseDocuments, updateDocuments } from '../utils/documentsHandlers.js';
-import * as crypto from 'crypto';
-import { getSeason } from '../utils/formatters.js';
-import { buildDateRangeQuery } from '../utils/dateUtils.js';
+import { nanoid } from 'nanoid'
+import { Event, CupEvent } from '../models/event-model.js'
+import { deleteFileIfExists, extractFilesByPrefix, parseJsonFields } from '../utils/filesUtils.js'
 
-const buildEventQuery = (req) => {
-  const query = {};
+const buildEventQuery = req => {
+	const query = {}
 
-  if (req.query.title) query.$text = { $search: req.query.title };
-  if (req.query.sport) query.sport = req.query.sport;
-  if (req.query.discipline) query.discipline = req.query.discipline;
-  if (req.query.season) query.season = req.query.season;
-  if (req.query.date) query.start_at = buildDateRangeQuery(req.query.date);
-  if (req.query.location) query.location = new RegExp(req.query.location, 'i');
-  if (req.query.calendar_code) query.calendar_code = req.query.calendar_code;
+	// ✅ ИСПРАВЛЕНО: Frontend отправляет 'title', backend ищет по 'title' в БД
+	if (req.query.title) query.title = new RegExp(req.query.title, 'i')
+	// ✅ ИСПРАВЛЕНО: Frontend отправляет 'discipline', backend ищет по 'discipline' в БД (не disciplines)
+	if (req.query.discipline) query.discipline = new RegExp(req.query.discipline, 'i')
+	if (req.query.season) query.season = req.query.season
 
-  return query;
-};
+	const dateQuery = {}
+	// ✅ ИСПРАВЛЕНИЕ: Точная дата - фильтр событий на конкретный день с UTC
+	if (req.query.date) {
+		const inputDate = req.query.date
+		// Принудительно используем UTC для избежания сдвигов часовых поясов
+		const selectedDate = new Date(inputDate + 'T00:00:00.000Z')
+		const startOfDay = new Date(selectedDate)
+		startOfDay.setUTCHours(0, 0, 0, 0)
+		const endOfDay = new Date(selectedDate)
+		endOfDay.setUTCHours(23, 59, 59, 999)
+
+		console.log(
+			`🔍 Date Search - Input: ${inputDate}, Start: ${startOfDay.toISOString()}, End: ${endOfDay.toISOString()}`
+		)
+
+		dateQuery.$gte = startOfDay
+		dateQuery.$lte = endOfDay
+	} else {
+		// Диапазон дат - существующая логика с UTC исправлением
+		if (req.query.date_from) {
+			const fromDate = new Date(req.query.date_from + 'T00:00:00.000Z')
+			dateQuery.$gte = fromDate
+		}
+		if (req.query.date_to) {
+			const toDate = new Date(req.query.date_to + 'T00:00:00.000Z')
+			toDate.setUTCHours(23, 59, 59, 999)
+			dateQuery.$lte = toDate
+		}
+	}
+
+	if (Object.keys(dateQuery).length > 0) {
+		query.start_at = dateQuery
+	}
+
+	if (req.query.location) query.location = new RegExp(req.query.location, 'i')
+	if (req.query.calendar_code) query.calendar_code = req.query.calendar_code
+
+	return query
+}
 
 export const getAllEvents = async (req, res) => {
-  try {
-    const events = await Event.find({}, { competitions: 0 }).sort({
-      start_at: -1,
-    });
+	try {
+		const events = await Event.find({}, { competitions: 0 }).sort({ start_at: -1 })
 
-    res.status(200).json({
-      status: 'success',
-      events,
-    });
-  } catch (e) {
-    res.status(500).json({
-      status: 'Err',
-      message: 'Ошибка загрузки событий',
-      err: e,
-    });
-  }
-};
+		res.status(200).json({
+			status: 'success',
+			events
+		})
+	} catch (error) {
+		res.status(500).json({
+			status: 'Err',
+			message: `Ошибка во время поиска: ${error.message}`,
+			error
+		})
+	}
+}
 
 export const searchEvents = async (req, res) => {
-  try {
-    const query = buildEventQuery(req);
-    const events = await Event.find(query).sort({ start_at: -1 });
+	try {
+		const query = buildEventQuery(req)
+		const options = {
+			page: parseInt(req.query.page) || 1,
+			limit: parseInt(req.query.limit) || 20,
+			sort: { start_at: -1 }
+		}
 
-    res.status(200).json({ status: 'success', results: events.length, events });
-  } catch (error) {
-    res.status(500).json({ status: 'error', message: 'Failed to search events', error: error.message });
-  }
-};
+		// ✅ УЛУЧШЕННОЕ ЛОГИРОВАНИЕ: Показываем детали поиска
+		console.log('🔍 Search Events Query:', JSON.stringify(query, null, 2))
+		console.log('🔍 Search Parameters:', req.query)
+
+		const result = await Event.paginate(query, options)
+
+		// ✅ УЛУЧШЕННОЕ ЛОГИРОВАНИЕ: Показываем результаты с датами
+		if (result.docs.length > 0) {
+			console.log('🔍 Found events with dates:')
+			result.docs.forEach(event => {
+				console.log(`  - ${event.title}: ${event.start_at}`)
+			})
+		} else {
+			console.log('🔍 No events found for query')
+		}
+
+		res.status(200).json({
+			docs: result.docs,
+			totalDocs: result.totalDocs,
+			limit: result.limit,
+			totalPages: result.totalPages,
+			page: result.page
+		})
+	} catch (error) {
+		res.status(500).json({
+			status: 'error',
+			message: `Ошибка во время поиска: ${error.message}`
+		})
+	}
+}
 
 export const getEventByDate = async (req, res) => {
-  try {
-    const date = new Date(req.params.date);
-    const year = date.getFullYear();
-    const month = date.getMonth();
+	try {
+		// ✅ ИСПРАВЛЕНИЕ: Корректная работа с UTC для избежания сдвигов часовых поясов
+		const inputDate = req.params.date
+		const date = new Date(inputDate + 'T00:00:00.000Z') // Принудительно UTC
+		const year = date.getUTCFullYear()
+		const month = date.getUTCMonth()
 
-    const startDate = new Date(year, month, 1);
-    const endDate = month === 11 ? new Date(year + 1, 0, 0, 23, 59, 59, 999) : new Date(year, month + 1, 0, 23, 59, 59, 999);
+		// Получаем ТОЛЬКО события за месяц для календарных индикаторов
+		const startDate = new Date(Date.UTC(year, month, 1, 0, 0, 0, 0))
+		const endDate =
+			month === 11
+				? new Date(Date.UTC(year + 1, 0, 0, 23, 59, 59, 999))
+				: new Date(Date.UTC(year, month + 1, 0, 23, 59, 59, 999))
 
-    const events = await Event.find({
-      start_at: {
-        $gte: startDate,
-        $lte: endDate,
-      },
-    }).sort({
-      start_at: -1,
-    });
+		console.log(
+			`📅 Calendar Search - Input: ${inputDate}, Start: ${startDate.toISOString()}, End: ${endDate.toISOString()}`
+		)
 
-    res.status(200).json({
-      status: 'success',
-      events,
-    });
-  } catch (e) {
-    res.status(404).json({
-      status: 'Err',
-      message: 'События не найдены',
-      err: e,
-    });
-  }
-};
+		const events = await Event.find({
+			start_at: {
+				$gte: startDate,
+				$lte: endDate
+			}
+		}).sort({
+			start_at: -1
+		})
+
+		console.log(`📅 Found ${events.length} events for month ${month + 1}/${year}`)
+
+		res.status(200).json({
+			status: 'success',
+			events
+		})
+	} catch (e) {
+		res.status(404).json({
+			status: 'Err',
+			message: 'События не найдены',
+			err: e
+		})
+	}
+}
 
 export const getEventsWithRegistration = async (req, res) => {
-  try {
-    const events = await Event.find({ registration_status: true }, { competitions: 0 }).sort({
-      start_at: -1,
-    });
-
-    res.status(200).json({
-      status: 'success',
-      events,
-    });
-  } catch (e) {
-    res.status(404).json({
-      status: 'Err',
-      message: 'Ошибка загрузки событий',
-      err: e,
-    });
-  }
-};
+	try {
+		const events = await Event.find({ registration_status: true }).sort({ start_at: -1 })
+		res.status(200).json({
+			status: 'success',
+			events
+		})
+	} catch (error) {
+		res.status(500).json({
+			status: 'Err',
+			message: 'Нет соревнований с открытой онлайн-регистрацией',
+			error
+		})
+	}
+}
 
 export const getEvent = async (req, res) => {
-  try {
-    const event = await Event.findOne({ event_id: req.params.id });
+	try {
+		const event = await Event.findOne({ event_id: req.params.id })
 
-    res.status(200).json({
-      status: 'success',
-      event,
-    });
-  } catch (e) {
-    res.status(404).json({
-      status: 'Err',
-      message: 'Событие не найдено',
-      err: e,
-    });
-  }
-};
+		if (!event) {
+			return res.status(404).json({ message: 'Event not found' })
+		}
+
+		res.status(200).json({
+			status: 'success',
+			event
+		})
+	} catch (e) {
+		res.status(404).json({
+			status: 'Err',
+			message: e.message
+		})
+	}
+}
 
 export const addNewEvent = async (req, res) => {
-  try {
-    const logoImage = req.files['logo_image_url'] ? `/uploads/images/${req.files['logo_image_url'][0].filename}` : '';
-    const trackImage = req.files['track_image_url'] ? `/uploads/images/${req.files['track_image_url'][0].filename}` : '';
-    const organizationLogo = req.files['organization_logo'] ? `/uploads/images/${req.files['organization_logo'][0].filename}` : '';
+	try {
+		const logo_image_url = req.files.logo_image_url
+			? `/uploads/images/${req.files.logo_image_url[0].filename}`
+			: null
+		const documentFiles = extractFilesByPrefix(req.files, 'document')
+		const startProtocolsFiles = extractFilesByPrefix(req.files, 'start_protocol')
+		const resultProtocolsFiles = extractFilesByPrefix(req.files, 'result_protocol')
 
-    const documents = parseDocuments(req.body);
-    const documentFiles = extractDocumentFiles(req.files);
-    const eventDocuments = createEntityDocuments(documents, documentFiles);
+		const parsedFields = parseJsonFields(req.body, [
+			'jury',
+			'track_info',
+			'conditions',
+			'forerunners',
+			'competitions',
+			'contacts',
+			'allowed_secretaries',
+			'athletes_groups'
+		])
 
-    const eventObj = {
-      is_public: req.body.is_public,
-      event_id: req.body.event_id || crypto.randomUUID(),
-      created_at: new Date(),
-      logo_image_url: logoImage,
-      track_image_url: trackImage,
-      calendar_code: req.body.calendar_code,
-      title: req.body.title,
-      international: req.body.international,
-      start_at: req.body.start_at,
-      season: req.body.start_at ? getSeason(req.body.start_at) : '',
-      sport: req.body.sport,
-      discipline: req.body.discipline,
-      country: req.body.country,
-      region: req.body.region,
-      location: req.body.location,
-      organization: req.body.organization,
-      organization_logo: organizationLogo,
-      timing_provider: req.body.timing_provider,
+		const event = new Event({
+			...req.body,
+			event_id: nanoid(5),
+			created_at: Date.now(),
+			logo_image_url,
+			...parsedFields,
+			documents: req.body.documents
+				? JSON.parse(req.body.documents).map((doc, idx) => ({
+						...doc,
+						file: documentFiles[`document${idx}`] || ''
+					}))
+				: [],
+			start_protocols: req.body.start_protocols
+				? JSON.parse(req.body.start_protocols).map((doc, idx) => ({
+						...doc,
+						file: startProtocolsFiles[`start_protocol${idx}`] || ''
+					}))
+				: [],
+			result_protocols: req.body.result_protocols
+				? JSON.parse(req.body.result_protocols).map((doc, idx) => ({
+						...doc,
+						file: resultProtocolsFiles[`result_protocol${idx}`] || ''
+					}))
+				: []
+		})
 
-      translation_url: req.body.translation_url,
-      documents: eventDocuments,
-    };
-
-    const event = new Event(eventObj);
-
-    await event.save();
-
-    res.status(200).json({
-      status: 'success',
-      event,
-    });
-  } catch (e) {
-    console.log('ADD ERR', e);
-    res.status(500).json({
-      status: 'Err',
-      message: `Ошибка, событие не было добавлено: ${e.message}`,
-      err: e,
-    });
-  }
-};
+		await event.save()
+		res.status(200).json({
+			status: 'success',
+			event
+		})
+	} catch (e) {
+		res.status(400).json({ message: e.message })
+	}
+}
 
 export const updateEvent = async (req, res) => {
-  try {
-    const event = await Event.findOne({ event_id: req.params.id });
-    if (!event) {
-      return res.status(404).json({
-        status: 'error',
-        message: 'Событие с указанным id не найдено',
-      });
-    }
+	try {
+		const event = await Event.findOne({ event_id: req.params.id })
+		if (!event) {
+			return res.status(404).json({ message: 'Event not found' })
+		}
+		const originalLogoUrl = event.logo_image_url
+		const logo_image_url = req.files.logo_image_url
+			? `/uploads/images/${req.files.logo_image_url[0].filename}`
+			: event.logo_image_url
 
-    const originalLogoImage = event.logo_image_url;
-    const originalTrackImage = event.track_image_url;
-    const originalOrganizationLogo = event.organization_logo;
+		const documentFiles = extractFilesByPrefix(req.files, 'document')
+		const startProtocolsFiles = extractFilesByPrefix(req.files, 'start_protocol')
+		const resultProtocolsFiles = extractFilesByPrefix(req.files, 'result_protocol')
 
-    const logoImageUrl = req.files['logo_image_url'] ? `/uploads/images/${req.files['logo_image_url'][0].filename}` : event.logo_image_url;
-    const trackImageUrl = req.files['track_image_url'] ? `/uploads/images/${req.files['track_image_url'][0].filename}` : event.track_image_url;
-    const organizationLogo = req.files['organization_logo'] ? `/uploads/images/${req.files['organization_logo'][0].filename}` : event.organization_logo;
+		const parsedFields = parseJsonFields(req.body, [
+			'jury',
+			'track_info',
+			'conditions',
+			'forerunners',
+			'competitions',
+			'contacts',
+			'allowed_secretaries',
+			'athletes_groups'
+		])
 
-    const documentFiles = extractDocumentFiles(req.files);
-    const documents = req.body.documents ? JSON.parse(req.body.documents) : event.documents;
-    const updatedDocuments = await updateDocuments(documents, documentFiles);
+		const updatedEventData = {
+			...req.body,
+			logo_image_url,
+			...parsedFields,
+			documents: req.body.documents
+				? JSON.parse(req.body.documents).map((doc, idx) => ({
+						...doc,
+						file: documentFiles[`document${idx}`] || doc.file
+					}))
+				: event.documents,
+			start_protocols: req.body.start_protocols
+				? JSON.parse(req.body.start_protocols).map((doc, idx) => ({
+						...doc,
+						file: startProtocolsFiles[`start_protocol${idx}`] || doc.file
+					}))
+				: event.start_protocols,
+			result_protocols: req.body.result_protocols
+				? JSON.parse(req.body.result_protocols).map((doc, idx) => ({
+						...doc,
+						file: resultProtocolsFiles[`result_protocol${idx}`] || doc.file
+					}))
+				: event.result_protocols
+		}
+		const updatedEvent = await Event.findOneAndUpdate(
+			{ event_id: req.params.id },
+			updatedEventData,
+			{ new: true }
+		)
 
-    event.set({
-      logo_image_url: logoImageUrl,
-      track_image_url: trackImageUrl,
-      organization_logo: organizationLogo,
-      documents: updatedDocuments,
-      is_public: req.body.is_public ?? event.is_public,
-      calendar_code: req.body.calendar_code || event.calendar_code,
-      title: req.body.title || event.title,
-      start_at: req.body.start_at || event.start_at,
-      season: req.body.start_at ? getSeason(req.body.start_at) : event.season,
-      sport: req.body.sport || event.sport,
-      discipline: req.body.discipline || event.discipline,
-      country: req.body.country || event.country,
-      region: req.body.region || event.region,
-      location: req.body.location || event.location,
-      organization: req.body.organization || event.organization,
-      timing_provider: req.body.timing_provider || event.timing_provider,
-      translation_url: req.body.translation_url || event.translation_url,
-      international: req.body.international !== undefined ? req.body.international : event.international,
-    });
+		if (logo_image_url !== originalLogoUrl && originalLogoUrl) {
+			await deleteFileIfExists(originalLogoUrl)
+		}
 
-    await event.save();
-
-    if (logoImageUrl !== originalLogoImage && originalLogoImage) {
-      await deleteFileIfExists(originalLogoImage);
-    }
-    if (trackImageUrl !== originalTrackImage && originalTrackImage) {
-      await deleteFileIfExists(originalTrackImage);
-    }
-    if (organizationLogo !== originalOrganizationLogo && originalOrganizationLogo) {
-      await deleteFileIfExists(originalOrganizationLogo);
-    }
-
-    res.status(200).json({
-      status: 'success',
-      event,
-    });
-  } catch (e) {
-    res.status(500).json({
-      status: 'Err',
-      message: `Не удалось обновить данные события: ${e.message}`,
-      err: e,
-    });
-  }
-};
+		res.status(200).json({
+			status: 'success',
+			event: updatedEvent
+		})
+	} catch (e) {
+		res.status(500).json({ message: e.message })
+	}
+}
 
 export const updateEventRegistrationSettings = async (req, res) => {
-  try {
-    const { id: event_id } = req.params;
+	try {
+		const { event_id } = req.params
 
-    const updateFields = {};
+		const updateFields = {}
 
-    if ('registration_status' in req.body) updateFields.registration_status = req.body.registration_status;
-    if ('allow_registration_by_trainer' in req.body) updateFields.allow_registration_by_trainer = req.body.allow_registration_by_trainer;
-    if ('allow_registration_by_organization' in req.body) updateFields.allow_registration_by_organization = req.body.allow_registration_by_organization;
-    if ('allowed_secretaries' in req.body) updateFields.allowed_secretaries = req.body.allowed_secretaries;
-    if ('athletes_groups' in req.body) updateFields.athletes_groups = req.body.athletes_groups;
+		if ('registration_status' in req.body)
+			updateFields.registration_status = req.body.registration_status
+		if ('allow_registration_by_trainer' in req.body)
+			updateFields.allow_registration_by_trainer = req.body.allow_registration_by_trainer
+		if ('allow_registration_by_organization' in req.body)
+			updateFields.allow_registration_by_organization = req.body.allow_registration_by_organization
+		if ('allowed_secretaries' in req.body)
+			updateFields.allowed_secretaries = req.body.allowed_secretaries
+		if ('athletes_groups' in req.body) updateFields.athletes_groups = req.body.athletes_groups
 
-    const event = await Event.findOneAndUpdate({ event_id }, { $set: updateFields }, { new: true });
+		if (Object.keys(updateFields).length === 0) {
+			return res.status(400).json({ status: 'Err', message: 'Нет данных для обновления' })
+		}
 
-    if (!event) {
-      return res.status(404).json({
-        status: 'Error',
-        message: 'Event not found',
-      });
-    }
+		const updatedEvent = await Event.findOneAndUpdate(
+			{ event_id },
+			{ $set: updateFields },
+			{ new: true }
+		)
 
-    res.status(200).json({
-      status: 'success',
-      event,
-    });
-  } catch (e) {
-    console.error('Update Event Registration Settings Error', e);
-    res.status(500).json({
-      status: 'Error',
-      message: `Failed to update event registration settings: ${e.message}`,
-    });
-  }
-};
+		if (!updatedEvent) {
+			return res.status(404).json({ status: 'Err', message: 'Событие не найдено' })
+		}
+		res.status(200).json({ status: 'success', event: updatedEvent })
+	} catch (e) {
+		res
+			.status(500)
+			.json({ status: 'Err', message: `Не удалось обновить событие: ${e.message}`, err: e })
+	}
+}
 
 export const updateEventResults = async (req, res) => {
-  try {
-    const updateFields = {};
+	const { event_id } = req.body
 
-    if (req.body.competitions !== undefined) {
-      updateFields.competitions = req.body.competitions;
-    }
-    if (req.body.jury !== undefined) {
-      updateFields.jury = req.body.jury;
-    }
-    if (req.body.forerunners !== undefined) {
-      updateFields.forerunners = req.body.forerunners;
-    }
-    if (req.body.track_info !== undefined) {
-      updateFields.track_info = req.body.track_info;
-    }
-    if (req.body.conditions !== undefined) {
-      updateFields.conditions = req.body.conditions;
-    }
+	try {
+		const event = await Event.findOne({ event_id })
 
-    await Event.updateOne(
-      { event_id: req.body.event_id },
-      {
-        $set: updateFields,
-      }
-    );
+		if (!event) {
+			return res.status(404).json({ message: 'Событие не найдено' })
+		}
 
-    res.status(200).json({
-      status: 'success',
-      data: `Данные события ID-${req.params.id} обновлены`,
-    });
-  } catch (e) {
-    res.status(500).json({
-      status: 'Err',
-      message: `Не удалось обновить данные события. ${e.message}`,
-      err: e,
-    });
-  }
-};
+		const updateFields = {}
+
+		if (req.body.competitions !== undefined) {
+			updateFields.competitions = req.body.competitions
+		}
+		if (req.body.jury !== undefined) {
+			updateFields.jury = req.body.jury
+		}
+		if (req.body.forerunners !== undefined) {
+			updateFields.forerunners = req.body.forerunners
+		}
+		if (req.body.track_info !== undefined) {
+			updateFields.track_info = req.body.track_info
+		}
+		if (req.body.conditions !== undefined) {
+			updateFields.conditions = req.body.conditions
+		}
+
+		await Event.updateOne(
+			{ event_id },
+			{
+				$set: updateFields
+			}
+		)
+
+		res.status(200).json({ status: 'success', message: 'Результаты успешно обновлены' })
+	} catch (error) {
+		res
+			.status(500)
+			.json({ status: 'error', message: `Ошибка при обновлении результатов: ${error.message}` })
+	}
+}
 
 export const deleteEvent = async (req, res) => {
-  try {
-    const event = await Event.findOne({ event_id: req.params.id });
+	try {
+		const event = await Event.findOne({ event_id: req.params.id })
+		if (event.logo_image_url) {
+			deleteFileIfExists(event.logo_image_url)
+		}
+		await Event.findOneAndDelete({ event_id: req.params.id })
+		res.status(200).json({
+			status: 'success',
+			message: 'Event deleted successfully!'
+		})
+	} catch (e) {
+		res.status(500).json({ message: e.message })
+	}
+}
 
-    if (!event) {
-      return res.status(404).json({
-        status: 'error',
-        message: 'Событие с указанным id не найдено',
-      });
-    }
+export const addRace = async (req, res) => {
+	try {
+		const event = await Event.findOne({ event_id: req.params.id })
+		const competition = event.competitions.find(c => c._id.toString() === req.body.competition_id)
+		competition.races.push(req.body.race)
+		await event.save()
+		res.status(200).json({ message: 'Race added successfully' })
+	} catch (e) {
+		res.status(500).json({ message: e.message })
+	}
+}
 
-    const filesToDelete = [event.logo_image_url, event.track_image_url, event.organization_logo];
-    await Promise.all(filesToDelete.map((filePath) => filePath && deleteFileIfExists(filePath)));
+export const getRaces = async (req, res) => {
+	try {
+		const event = await Event.findOne({ event_id: req.params.id })
+		res.status(200).json({ races: event.races })
+	} catch (e) {
+		res.status(500).json({ message: e.message })
+	}
+}
 
-    await flushDocuments(event);
+export const getRace = async (req, res) => {
+	try {
+		const event = await Event.findOne({ event_id: req.params.id })
+		const race = event.races.id(req.params.race_id)
+		res.status(200).json({ race })
+	} catch (e) {
+		res.status(500).json({ message: e.message })
+	}
+}
 
-    await Event.deleteOne({ event_id: req.params.id });
+export const updateRace = async (req, res) => {
+	try {
+		await Event.updateOne(
+			{ 'competitions.races._id': req.params.race_id },
+			{ $set: { 'competitions.$[].races.$[race]': req.body.race } },
+			{ arrayFilters: [{ 'race._id': req.params.race_id }] }
+		)
+		res.status(200).json({ message: 'Race updated successfully' })
+	} catch (e) {
+		res.status(500).json({ message: e.message })
+	}
+}
 
-    res.status(200).json({
-      status: 'success',
-      data: 'Событие было успешно удалено',
-    });
-  } catch (e) {
-    res.status(500).json({
-      status: 'Err',
-      message: `Не удалось удалить событие: ${e.message}`,
-      err: e,
-    });
-  }
-};
+export const deleteRace = async (req, res) => {
+	try {
+		const event = await Event.findOne({ event_id: req.params.id })
+		const competition = event.competitions.find(c => c._id.toString() === req.body.competition_id)
+		competition.races.pull(req.params.race_id)
+		await event.save()
+		res.status(200).json({ message: 'Race deleted successfully' })
+	} catch (e) {
+		res.status(500).json({ message: e.message })
+	}
+}
+
+export const getCupEvents = async (req, res) => {
+	try {
+		const cupEvents = await CupEvent.find().populate('cup_events')
+		res.status(200).json({
+			status: 'success',
+			cupEvents
+		})
+	} catch (e) {
+		res.status(404).json({
+			status: 'Err',
+			message: e.message
+		})
+	}
+}

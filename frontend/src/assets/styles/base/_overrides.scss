@@ -1,0 +1,173 @@
+// =============================================================================
+// BASE/_OVERRIDES.SCSS
+// -----------------------------------------------------------------------------
+// This file contains global style overrides for native HTML elements and
+// third-party library components (e.g., Vuetify).
+// =============================================================================
+
+// ----------------------------------------
+// Native Element Overrides
+// ----------------------------------------
+
+select {
+	line-height: 1.375 !important;
+}
+
+// Invert date picker icon color based on theme
+input[type='date']::-webkit-calendar-picker-indicator,
+input[type='dateTime-local']::-webkit-calendar-picker-indicator {
+	filter: invert(1);
+}
+
+.dark input[type='date']::-webkit-calendar-picker-indicator,
+.dark input[type='dateTime-local']::-webkit-calendar-picker-indicator {
+	filter: invert(0);
+}
+
+// Helper for spinner positioning
+*:has(> .spinner__wrapper) {
+	position: relative;
+}
+
+// ----------------------------------------
+// Custom Button Styles
+// ----------------------------------------
+button.actionButton {
+	display: flex;
+	align-items: center;
+	gap: 0.25rem;
+	padding: 0.25rem 0.75rem;
+	background-color: var(--color-bg-surface-hover);
+	border-radius: 4px;
+	transition:
+		background-color var(--transition-duration-instant),
+		color var(--transition-duration-instant);
+
+	&:hover {
+		background-color: var(--color-bg-brand);
+		color: white;
+	}
+
+	&:active {
+		opacity: 0.75;
+		scale: 0.95;
+	}
+
+	&:disabled {
+		cursor: not-allowed;
+		opacity: 0.5;
+	}
+
+	&.action-delete {
+		background-color: var(--color-interactive-delete-default);
+		color: var(--color-bg-surface);
+		&:hover {
+			background-color: var(--color-interactive-delete-hover);
+			color: white;
+		}
+	}
+}
+
+button.downloadButton {
+	padding: 0.25rem 0.75rem;
+	color: var(--text-muted);
+	background: var(--color-bg-surface-hover);
+	border-radius: 4px;
+	transition:
+		background-color var(--transition-duration-instant),
+		color var(--transition-duration-instant);
+
+	& > * {
+		color: inherit !important;
+		transition: color var(--transition-duration-instant) linear 0ms !important;
+	}
+
+	&:hover {
+		color: var(--color-text-success);
+	}
+
+	&:active {
+		opacity: 0.75;
+		scale: 0.95;
+	}
+}
+
+// ----------------------------------------
+// Custom Input Styles
+// ----------------------------------------
+input,
+select {
+	color: inherit;
+	border: none;
+	font-size: 1rem;
+	font-family: inherit;
+}
+
+input.input-text {
+	width: 100%;
+	padding: 4px 8px;
+	border-radius: 2px;
+	background-color: var(--color-bg-surface-secondary);
+	outline: transparent;
+
+	&:focus {
+		outline: 1px solid var(--color-bg-brand);
+		background-color: var(--color-bg-surface-hover);
+	}
+}
+
+select.input-select {
+	width: 100%;
+	padding: 4px 8px;
+	border-radius: 2px;
+	background-color: var(--color-bg-surface-secondary);
+	outline: transparent;
+
+	&:focus {
+		outline: 1px solid var(--color-bg-brand);
+		background-color: var(--color-bg-surface-hover);
+	}
+
+	& option[data-cancel-option='true'] {
+		color: var(--color-text-error);
+	}
+}
+
+// ----------------------------------------
+// Custom Search Input Styles
+// ----------------------------------------
+.searchInput__control {
+	position: relative;
+	flex: 2 1 0;
+	min-width: 0;
+	width: 100%;
+	padding: var(--space-1) var(--space-2);
+	color: var(--color-text-primary);
+	background-color: var(--color-bg-surface-secondary);
+	border-radius: var(--radius-sm);
+	outline: transparent;
+	transition: background-color var(--transition-duration-fast);
+
+	&.empty {
+		color: var(--text-depressed);
+
+		& option {
+			color: var(--color-text-primary);
+		}
+	}
+
+	&:focus {
+		background-color: var(--color-bg-surface-hover);
+	}
+
+	& option[data-cancel-option='true'] {
+		color: var(--color-text-error);
+	}
+}
+
+// ----------------------------------------
+// Vuetify Overrides
+// ----------------------------------------
+.v-icon.v-icon {
+	transition-duration: var(--transition-duration-fast);
+}

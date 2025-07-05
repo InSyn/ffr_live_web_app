@@ -1,0 +1,142 @@
+@import './variables';
+
+$breakpoints: (
+	'sm': $breakpoint-sm,
+	'md': $breakpoint-md,
+	'lg': $breakpoint-lg,
+	'xl': $breakpoint-xl,
+	'2xl': $desktop-2k
+);
+
+@mixin respond-to($breakpoint) {
+	@if map-has-key($breakpoints, $breakpoint) {
+		@media (min-width: #{map-get($breakpoints, $breakpoint)}) {
+			@content;
+		}
+	} @else {
+		@warn "Warning: Breakpoint `#{$breakpoint}` not found. Available breakpoints: #{map-keys($breakpoints)}";
+	}
+}
+
+// ----------------------------------------
+// Fluid Typography
+// ----------------------------------------
+// This mixin generates a fluid font size using the CSS clamp() function.
+// It calculates the fluid value based on min/max font sizes and viewports.
+//
+// Usage:
+// .element {
+//   @include fluid-type(16px, 24px); // Scales from 16px to 24px
+// }
+//
+@mixin fluid-type($min-font-size, $max-font-size, $min-viewport: 480px, $max-viewport: 1280px) {
+	// Convert px values to rem for accessibility and scalability
+	$min-font-rem: $min-font-size / 16px * 1rem;
+	$max-font-rem: $max-font-size / 16px * 1rem;
+	$min-viewport-rem: $min-viewport / 16px * 1rem;
+	$max-viewport-rem: $max-viewport / 16px * 1rem;
+
+	// The 'preferred' value in the middle of clamp()
+	$preferred-value: ($max-font-rem - $min-font-rem) / ($max-viewport-rem - $min-viewport-rem);
+	$fluid-value: #{$min-font-rem} + #{100vw * $preferred-value} - #{$min-viewport-rem *
+		$preferred-value};
+
+	font-size: clamp(#{$min-font-rem}, #{$fluid-value}, #{$max-font-rem});
+}
+
+@mixin transparent-background($color: var(--color-bg-primary), $opacity: 0.92) {
+	background-color: color-mix(in srgb, $color, transparent $opacity);
+}
+
+// ----------------------------------------
+// Responsive Spacing System
+// ----------------------------------------
+// Generic helper mixin to apply a CSS property responsively.
+//r
+// @param {String} $property - The CSS property to apply (e.g., 'padding', 'margin-left').
+// @param {Map} $values - A map of breakpoint names ('sm', 'md', 'lg', 'xl') to space token suffixes (e.g., 4, 8, 12).
+//
+// Example:
+// .element {
+//   @include responsive-property('padding-top', ('sm': 4, 'lg': 8));
+// }
+// This will apply `padding-top: var(--space-4)` on small screens and `padding-top: var(--space-8)` on large screens.
+@mixin responsive-property($property, $values) {
+	@each $breakpoint, $token-suffix in $values {
+		@if map-has-key($breakpoints, $breakpoint) {
+			@include respond-to($breakpoint) {
+				#{$property}: var(--space-#{$token-suffix});
+			}
+		} @else {
+			@warn "Warning: Breakpoint `#{$breakpoint}` not found in responsive-property mixin. Available breakpoints: #{map-keys($breakpoints)}";
+		}
+	}
+}
+
+// Applies a set of responsive properties, perfect for complex spacing.
+//
+// @param {Map} $properties - A map where keys are CSS properties and values are maps of breakpoint-to-token-suffix values.
+//
+// Example:
+// .element {
+//   @include apply-spacing((
+//     'padding-top': ('sm': 4, 'lg': 8),
+//     'padding-bottom': ('sm': 4, 'lg': 8),
+//     'padding-left': ('sm': 2, 'lg': 4),
+//     'padding-right': ('sm': 2, 'lg': 4)
+//   ));
+// }
+@mixin apply-spacing($properties) {
+	@each $property, $values in $properties {
+		@include responsive-property($property, $values);
+	}
+}
+
+// ----------------------------------------
+// Semantic Spacing Mixins
+// ----------------------------------------
+// Applies standard padding for a main page container.
+@mixin apply-page-spacing() {
+	@include apply-spacing(
+		(
+			'padding-top': (
+				'sm': 8,
+				'md': 12
+			),
+			'padding-bottom': (
+				'sm': 0,
+				'md': 8
+			),
+			'padding-left': (
+				'sm': 0,
+				'md': 8,
+				'lg': 0
+			),
+			'padding-right': (
+				'sm': 0,
+				'md': 8,
+				'lg': 0
+			)
+		)
+	);
+}
+@mixin apply-container-md-spacing() {
+	@include apply-spacing(
+		(
+			'padding-top': (
+				'sm': 12
+			),
+			'padding-bottom': (
+				'sm': 8
+			),
+			'padding-left': (
+				'sm': 6,
+				'lg': 0
+			),
+			'padding-right': (
+				'sm': 6,
+				'lg': 0
+			)
+		)
+	);
+}

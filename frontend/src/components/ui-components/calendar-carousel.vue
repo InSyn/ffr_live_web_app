@@ -1,232 +1,250 @@
 <template>
-  <div class="calendar__wrapper">
-    <div class="calendar__head">
-      <div class="calendar__control">
-        <v-btn color="var(--text-default)" text small @click="previousMonth">
-          <v-icon small>{{ icons.controlLeftIcon }}</v-icon>
-        </v-btn>
-      </div>
-      <div class="date__input__wrapper">
-        <label for="calendar-date" @click="openDatePicker">
-          {{ formattedDate }}
-          <v-icon class="calendar__arrow"> {{ icons.arrowIcon }}</v-icon>
-        </label>
-        <input id="calendar-date" ref="dateInput" v-model="calendarDate" type="date" />
-      </div>
-      <div class="calendar__control">
-        <v-btn color="var(--text-default)" text small @click="nextMonth">
-          <v-icon small>{{ icons.controlRightIcon }}</v-icon>
-        </v-btn>
-      </div>
-    </div>
-    <div class="calendar__days__wrapper">
-      <button
-        :class="['calendar__day__item', selectedDay === day && 'selected', isCurrentDay(day) && 'isCurrentDay', hasEvents(day) && 'hasEvents']"
-        @click="selectDay(day)"
-        type="button"
-        v-for="day in days"
-        :key="day"
-      >
-        <span>{{ day }}</span>
-      </button>
-    </div>
-  </div>
+	<div class="calendar__wrapper">
+		<div class="calendar__head">
+			<div class="calendar__control">
+				<v-btn color="var(--color-text-primary)" text small @click="previousMonth">
+					<v-icon small>
+						{{ icons.controlLeftIcon }}
+					</v-icon>
+				</v-btn>
+			</div>
+			<div class="date__input__wrapper">
+				<label for="calendar-date" @click="openDatePicker">
+					{{ formattedDate }}
+					<v-icon class="calendar__arrow"> {{ icons.arrowIcon }}</v-icon>
+				</label>
+				<input id="calendar-date" ref="dateInput" v-model="calendarDate" type="date" />
+			</div>
+			<div class="calendar__control">
+				<v-btn color="var(--color-text-primary)" text small @click="nextMonth">
+					<v-icon small>
+						{{ icons.controlRightIcon }}
+					</v-icon>
+				</v-btn>
+			</div>
+		</div>
+		<div class="calendar__days__wrapper">
+			<button
+				v-for="day in days"
+				:key="day"
+				:class="[
+					'calendar__day__item',
+					selectedDay === day && 'selected',
+					isCurrentDay(day) && 'isCurrentDay',
+					hasEvents(day) && 'hasEvents'
+				]"
+				type="button"
+				@click="selectDay(day)"
+			>
+				<span>{{ day }}</span>
+			</button>
+		</div>
+	</div>
 </template>
 
 <script>
-import { getDaysOfMonth } from '@/utils/calendar-helpers';
-import { mdiChevronLeft, mdiChevronRight } from '@mdi/js';
-import { capitalizeString } from '@/utils/capitalizeString';
-import { mdiChevronDown } from '@mdi/js';
+import { getDaysOfMonth } from '../../utils/calendar-helpers'
+import {
+	toUTCDate,
+	isEventOnCalendarDay,
+	isCurrentDay,
+	formatDateForAPI
+} from '../../utils/date-utils'
+import { mdiChevronLeft, mdiChevronRight, mdiChevronDown } from '@mdi/js'
+import { capitalizeString } from '@/utils/capitalizeString'
 
 export default {
-  name: 'calendar-carousel',
-  props: ['calendarDateProp', 'events'],
-  methods: {
-    getDaysOfMonth,
-    selectDay(day) {
-      const date = new Date(this.calendarDate);
-      date.setDate(day);
-      this.$emit('set-calendar-date', date.toISOString().substring(0, 10));
-    },
-    openDatePicker() {
-      const input = this.$refs.dateInput;
-      input.showPicker();
-    },
-    previousMonth() {
-      const date = new Date(this.calendarDate);
-      date.setMonth(date.getMonth() - 1);
-      this.$emit('set-calendar-date', date.toISOString().substring(0, 10));
-    },
-    nextMonth() {
-      const date = new Date(this.calendarDate);
-      date.setMonth(date.getMonth() + 1);
-      this.$emit('set-calendar-date', date.toISOString().substring(0, 10));
-    },
-    isCurrentDay(day) {
-      const currentDay = new Date().getDate();
-      const currentMonth = new Date().getMonth() === new Date(this.calendarDate).getMonth();
-      const currentYear = new Date().getFullYear() === new Date(this.calendarDate).getFullYear();
+	name: 'CalendarCarousel',
+	props: ['calendarDateProp', 'events'],
+	data() {
+		return {
+			icons: {
+				controlLeftIcon: mdiChevronLeft,
+				controlRightIcon: mdiChevronRight,
+				arrowIcon: mdiChevronDown
+			}
+		}
+	},
+	computed: {
+		days() {
+			const date = new Date(this.calendarDate)
+			const year = date.getFullYear()
+			const month = date.getMonth() + 1
+			return getDaysOfMonth(year, month)
+		},
+		formattedDate() {
+			const date = new Date(this.calendarDate)
+			const month = date.toLocaleString('default', { month: 'long' })
 
-      return day === currentDay && currentMonth && currentYear;
-    },
-    hasEvents(day) {
-      if (!this.events) return;
+			return `${capitalizeString(month.toString())} ${date.getFullYear()}`
+		},
+		calendarDate: {
+			get() {
+				return this.calendarDateProp
+			},
+			set(val) {
+				this.$emit('set-calendar-date', val)
+			}
+		},
+		selectedDay() {
+			const date = new Date(this.calendarDate)
+			if (!date) return ''
 
-      return this.events.some((evt) => {
-        const evtDate = new Date(evt.start_at === undefined ? evt.date : evt.start_at);
-        if (!evtDate) return false;
+			return date.getDate()
+		}
+	},
+	methods: {
+		getDaysOfMonth,
+		selectDay(day) {
+			const date = toUTCDate(this.calendarDate)
+			date.setUTCDate(day)
+			this.$emit('set-calendar-date', formatDateForAPI(date))
+		},
+		openDatePicker() {
+			const input = this.$refs.dateInput
+			input.showPicker()
+		},
+		previousMonth() {
+			const date = toUTCDate(this.calendarDate)
+			date.setUTCMonth(date.getUTCMonth() - 1)
+			this.$emit('set-calendar-date', formatDateForAPI(date))
+		},
+		nextMonth() {
+			const date = toUTCDate(this.calendarDate)
+			date.setUTCMonth(date.getUTCMonth() + 1)
+			this.$emit('set-calendar-date', formatDateForAPI(date))
+		},
+		isCurrentDay(day) {
+			return isCurrentDay(day, this.calendarDate)
+		},
+		hasEvents(day) {
+			if (!this.events || !this.events.length) return false
 
-        const evtDay = evtDate.getDate();
-        if (evtDay.toString() !== day.toString()) return false;
-
-        const evtYear = evtDate.getFullYear(),
-          evtMonth = evtDate.getMonth();
-        if (evtYear === new Date(this.calendarDate).getFullYear() && evtMonth === new Date(this.calendarDate).getMonth()) return true;
-      });
-    },
-  },
-  data() {
-    return {
-      icons: {
-        controlLeftIcon: mdiChevronLeft,
-        controlRightIcon: mdiChevronRight,
-        arrowIcon: mdiChevronDown,
-      },
-    };
-  },
-  computed: {
-    days() {
-      const date = new Date(this.calendarDate);
-      const year = date.getFullYear();
-      const month = date.getMonth() + 1;
-      return getDaysOfMonth(year, month);
-    },
-    formattedDate() {
-      const date = new Date(this.calendarDate);
-      const month = date.toLocaleString('default', { month: 'long' });
-
-      return `${capitalizeString(month.toString())} ${date.getFullYear()}`;
-    },
-    calendarDate: {
-      get() {
-        return this.calendarDateProp;
-      },
-      set(val) {
-        this.$emit('set-calendar-date', val);
-      },
-    },
-    selectedDay() {
-      const date = new Date(this.calendarDate);
-      if (!date) return '';
-
-      return date.getDate();
-    },
-  },
-};
+			return this.events.some(evt => isEventOnCalendarDay(evt, day, this.calendarDate))
+		}
+	}
+}
 </script>
 
 <style scoped lang="scss">
 .calendar__wrapper {
-  display: flex;
-  flex-direction: column;
-  padding-bottom: 4px;
-  border-bottom: 1px solid var(--text-muted);
+	display: flex;
+	flex-direction: column;
+	padding-bottom: 4px;
+	background-color: var(--color-bg-surface);
+	border-bottom: 1px solid var(--color-text-secondary);
 
-  .calendar__head {
-    flex: 0 0 auto;
-    display: flex;
-    align-items: center;
+	.calendar__head {
+		flex: 0 0 auto;
+		display: flex;
+		align-items: stretch;
 
-    .calendar__control {
-      flex: 0 0 auto;
-      display: flex;
-      height: 100%;
+		.calendar__control {
+			flex: 0 0 auto;
+			display: flex;
 
-      button {
-        height: 100%;
-        border-radius: 0;
-      }
-    }
+			button {
+				height: 100%;
+				border-radius: 0;
+			}
+		}
 
-    .date__input__wrapper {
-      flex: 1 1 0;
-      display: flex;
-      justify-content: center;
-      position: relative;
+		.date__input__wrapper {
+			flex: 1 1 0;
+			display: flex;
+			justify-content: center;
+			position: relative;
 
-      label {
-        display: block;
-        cursor: pointer;
-        padding: 0.5rem;
-        border-radius: 4px;
-        font-weight: bold;
+			label {
+				display: block;
+				cursor: pointer;
+				padding: 0.5rem;
+				border-radius: 4px;
+				font-weight: bold;
 
-        .calendar__arrow {
-          display: inline-block;
-          color: var(--text-default);
-        }
-      }
+				.calendar__arrow {
+					display: inline-block;
+					color: var(--color-text-primary);
+				}
+			}
 
-      input {
-        position: absolute;
-        opacity: 0;
-        pointer-events: none;
-      }
-    }
-  }
+			input {
+				position: absolute;
+				opacity: 0;
+				pointer-events: none;
+			}
+		}
+	}
 
-  .calendar__days__wrapper {
-    flex: 0 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    padding: 8px 8px 0;
+	.calendar__days__wrapper {
+		flex: 0 0 auto;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-wrap: wrap;
+		padding: 8px 8px 0;
 
-    .calendar__day__item {
-      position: relative;
-      flex: 1 0 1.5rem;
-      max-width: 2rem;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 1.5rem;
+		.calendar__day__item {
+			position: relative;
+			flex: 1 0 1.5rem;
+			max-width: 2rem;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 1.5rem;
 
-      color: var(--text-muted);
-      //border-radius: 50%;
-      font-size: 1.1rem;
+			color: var(--color-text-secondary);
+			//border-radius: 50%;
+			font-size: 1.1rem;
 
-      &::before {
-        position: absolute;
-        top: 100%;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 0;
-        height: 2px;
-        background-color: var(--accent);
-        transition: width 64ms;
-        content: '';
-      }
-      &.hasEvents {
-        font-weight: bold;
-        color: var(--text-default);
-      }
-      &.selected {
-        flex-basis: 1.75rem;
-        font-weight: bold;
-        &::before {
-          width: 100%;
-        }
-      }
-      &.isCurrentDay {
-        color: var(--accent);
-      }
-      span {
-        display: inline-block;
-        margin: auto;
-      }
-    }
-  }
+			&::before {
+				position: absolute;
+				top: 100%;
+				left: 50%;
+				transform: translateX(-50%);
+				width: 0;
+				height: 2px;
+				background-color: var(--color-text-accent);
+				transition: width var(--transition-duration-instant);
+				content: '';
+			}
+
+			&.hasEvents {
+				font-weight: bold;
+				color: var(--color-text-primary);
+			}
+
+			&.selected {
+				flex-basis: 1.75rem;
+				font-weight: bold;
+
+				&::before {
+					width: 100%;
+				}
+
+				span {
+					transform: scale(1.25);
+					opacity: 0.9;
+				}
+			}
+
+			&.isCurrentDay {
+				color: var(--color-text-accent);
+			}
+
+			span {
+				display: inline-block;
+				margin: auto;
+				transition:
+					transform var(--transition-duration-instant),
+					opacity var(--transition-duration-instant);
+			}
+
+			&:hover span {
+				transform: scale(1.25);
+				opacity: 0.9;
+			}
+		}
+	}
 }
 </style>

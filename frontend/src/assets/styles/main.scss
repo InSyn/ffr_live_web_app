@@ -1,0 +1,23 @@
+// =============================================================================
+// MAIN.SCSS
+// -----------------------------------------------------------------------------
+// This is the single entry point for all global styles in the application.
+// It imports SCSS partials in the correct order of precedence:
+// 1. Abstracts: Variables, functions, mixins, and animations. No CSS output.
+// 2. Base: Base styles, resets, typography, and global element overrides.
+// =============================================================================
+
+// 1. Abstracts
+// ----------------------------------------
+// @import 'abstracts/variables';
+// @import 'abstracts/mixins';
+@import 'abstracts/animations';
+@import 'abstracts/utilities';
+
+// 2. Base
+// ----------------------------------------
+@import 'base/reset';
+@import 'base/typography';
+@import 'base/decorations';
+@import 'base/overrides';
+@import 'base/app';

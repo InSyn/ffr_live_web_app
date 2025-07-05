@@ -1,0 +1,38 @@
+// =============================================================================
+// BASE/_RESET.SCSS
+// -----------------------------------------------------------------------------
+// This file contains basic reset and normalization styles to ensure a
+// consistent baseline across all browsers.
+// =============================================================================
+
+:root {
+	--app-height: 100vh;
+	color-scheme: light dark;
+	font-synthesis: none;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	-webkit-text-size-adjust: 100%;
+}
+
+html,
+body {
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	box-sizing: border-box;
+}
+
+*,
+*:before,
+*:after {
+	box-sizing: inherit;
+}
+
+// Set app height for landscape orientation
+@media screen and (orientation: landscape) {
+	:root {
+		--app-height: auto;
+	}
+}

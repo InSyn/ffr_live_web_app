@@ -1,0 +1,547 @@
+---
+description: PROJECT STRUCTURE MAP AND FILE NAVIGATION REFERENCE - Must be referenced for ANY file path access, component imports, API endpoint verification, route definitions, model relationships, controller patterns, frontend page navigation, Vuex module structure, utility function locations, asset management, component hierarchy understanding, backend route mapping, database model schema verification, search functionality implementation, admin page structure, authentication flows, and BEFORE attempting to access, modify, or reference ANY file or endpoint to ensure it exists and follows project conventions.
+globs: 
+alwaysApply: false
+---
+# 🗺️ FFR Live Platform - Полная карта структуры проекта
+
+**Дата создания:** 2025-06-20  
+**Цель:** Избежание ошибок в путях файлов и роутах
+
+---
+
+## 🎯 **FRONTEND СТРУКТУРА**
+
+### **📁 Основные директории:**
+
+```
+frontend/src/
+├── components/
+├── pages/
+├── router/
+├── store/
+├── utils/
+├── assets/
+├── plugins/
+└── constants.js
+```
+
+---
+
+## 🧩 **КОМПОНЕНТЫ (frontend/src/components/)**
+
+### **🖼️ UI Components (ui-components/):**
+
+```
+ui-components/
+├── search/
+│   ├── index.vue                     # Основной компонент поиска
+│   ├── search-results.vue           # Унифицированный результаты (ОБНОВЛЕН)
+│   ├── mobile-search-trigger.vue    # Триггер мобильного поиска
+│   ├── search-advanced-filters.vue  # Расширенные фильтры
+│   └── search-inputs/               # Инпуты для поиска
+│       ├── athlete-category-input.vue
+│       ├── date-input.vue
+│       ├── date-range-input.vue
+│       ├── discipline-input.vue
+│       ├── gender-input.vue
+│       ├── jury-category-input.vue
+│       ├── region-input.vue
+│       ├── season-input.vue
+│       └── sport-input.vue
+├── calendar-carousel.vue
+├── country-flag.vue
+├── custom-checkbox.vue
+├── edit-button.vue
+├── LazyImage.vue
+├── loader-spinner.vue
+├── medals-select.vue
+├── message-container.vue
+├── person-photo.vue
+└── theme-switch.vue
+```
+
+### **🏗️ Layout Components (layout/):**
+
+```
+layout/
+├── app-header/
+│   ├── index.vue                    # Главный хедер
+│   └── header-logo.vue             # Логотип в хедере
+└── AppFooter.vue                   # Футер приложения
+```
+
+### **🧭 Navigation Components (navigation/):**
+
+```
+navigation/
+├── menu-desktop.vue                # Десктопное меню
+├── menu-mobile.vue                 # Мобильное меню
+└── mobile-menu-button.vue          # Кнопка мобильного меню
+```
+
+### **🎨 Icons (icons/):**
+
+```
+icons/
+├── athlete-ski.vue
+├── athlete-snowboard.vue
+├── cup-icon.vue
+├── download-icon.vue
+├── edit-icon.vue
+├── eventTranslation-icon.vue
+├── file-icon.vue
+├── files-icon.vue
+├── info-icon.vue
+├── medal-icon.vue
+├── socials-telegram-icon.vue
+├── socials-vk-icon.vue
+└── web-icon.vue
+```
+
+---
+
+## 📄 **СТРАНИЦЫ (frontend/src/pages/)**
+
+### **🏃‍♂️ Athletes:**
+
+```
+athletes/
+├── index.vue                       # Главная страница Athletes (УНИФИЦИРОВАНА)
+├── athlete-listItem.vue           # Элемент списка спортсмена
+└── athlete-page/
+    ├── index.vue                   # Детальная страница спортсмена
+    ├── athleteEventItem.vue        # События спортсмена
+    └── athleteMedals.vue           # Медали спортсмена
+```
+
+### **🎯 Events:**
+
+```
+events/
+├── calendar-page/
+│   └── index.vue                   # Календарь событий (ЭТАЛОН)
+├── competition-list-item.vue       # Элемент списка события
+└── event-page/
+    ├── index.vue                   # Детальная страница события
+    ├── eventPedestal.vue          # Пьедестал события
+    ├── resultsTable-DMO.vue       # Таблица результатов
+    ├── resultsTable-FIS.vue       # FIS таблица
+    ├── resultsTable-default.vue   # Обычная таблица
+    └── teamResults-table.vue      # Командные результаты
+```
+
+### **⚖️ Jury:**
+
+```
+jury/
+├── index.vue                       # Главная страница судей
+├── jury-list-item.vue             # Элемент списка судьи
+└── jury-page/
+    ├── index.vue                   # Детальная страница судьи
+    ├── jury-competition-list-item.vue
+    ├── juryCompetitions-list.vue
+    └── juryEventItem.vue
+```
+
+### **👨‍🏫 Trainers:**
+
+```
+trainers/
+├── index.vue                       # Главная страница тренеров
+├── trainer-list-item.vue          # Элемент списка тренера
+└── trainer-page/
+    ├── index.vue                   # Детальная страница тренера
+    └── trainerSeminars-list.vue    # Семинары тренера
+```
+
+### **🏢 Organizations:**
+
+```
+organizations/
+├── index.vue                       # Главная страница организаций
+├── organization-list-item.vue     # Элемент списка организации
+├── organization-page/
+│   ├── index.vue                   # Детальная страница организации
+│   ├── events-with-registration-list.vue
+│   ├── organization-team-list.vue
+│   └── organizationEventItem.vue
+└── report-page/
+    ├── index.vue                   # Страница отчета
+    └── images-list.vue             # Список изображений
+```
+
+### **📚 Seminars:**
+
+```
+seminars/
+├── index.vue                       # Главная страница семинаров
+├── seminar-list-item.vue          # Элемент списка семинара
+├── seminar-page/
+│   └── index.vue                   # Детальная страница семинара
+└── seminarParticipants-control/
+    ├── index.vue                   # Управление участниками
+    └── db-personal-list.vue        # Список персонала
+```
+
+### **🔐 Auth:**
+
+```
+auth/
+└── index.vue                       # Страница авторизации
+```
+
+### **👤 User:**
+
+```
+user/
+├── index.vue                       # Профиль пользователя
+├── admin-pages-nav.vue            # Навигация админ страниц
+└── statistics/
+    ├── index.vue                   # Статистика
+    └── stat-filters.vue            # Фильтры статистики
+```
+
+### **⚙️ Admin Pages:**
+
+```
+admin-pages/
+├── athletes/
+│   ├── createPage-athlete.vue     # Создание спортсмена
+│   ├── editPage-athlete.vue       # Редактирование спортсмена
+│   └── form-athlete.vue           # Форма спортсмена
+├── events/
+│   ├── createPage-cupEvent.vue    # Создание кубкового события
+│   ├── createPage-event.vue       # Создание события
+│   ├── cupStages-control.vue      # Управление этапами кубка
+│   ├── editPage-event.vue         # Редактирование события
+│   ├── eventResults-control.vue   # Управление результатами
+│   └── form-event.vue             # Форма события
+├── jury/
+│   ├── createPage-jury.vue        # Создание судьи
+│   ├── editPage-jury.vue          # Редактирование судьи
+│   └── form-jury.vue              # Форма судьи
+├── trainers/
+│   ├── createPage-trainer.vue     # Создание тренера
+│   ├── editPage-trainer.vue       # Редактирование тренера
+│   └── form-trainer.vue           # Форма тренера
+├── organizations/
+│   ├── createPage-organization.vue
+│   ├── editPage-organization.vue
+│   ├── form-organization.vue
+│   └── createOrganizationReport-page.vue
+├── seminars/
+│   ├── createPage-seminar.vue     # Создание семинара
+│   ├── editPage-seminar.vue       # Редактирование семинара
+│   └── form-seminar.vue           # Форма семинара
+├── online-registration/
+│   ├── event-online-registration.vue
+│   ├── event-online-registration-application.vue
+│   └── registration-list-page.vue
+└── user-registration.vue          # Регистрация пользователя
+```
+
+---
+
+## 🔄 **STORE/VUEX МОДУЛИ (frontend/src/store/)**
+
+### **🗂️ Modules (store/modules/):**
+
+```
+modules/
+├── index.js                       # Экспорт всех модулей
+├── athletes.js                    # Athletes модуль
+├── authorization.js               # Авторизация
+├── events.js                      # Events модуль  
+├── jury.js                        # Jury модуль
+├── menu.js                        # Меню приложения
+├── organizations.js               # Organizations модуль
+├── search.js                      # УНИФИЦИРОВАННЫЙ SEARCH МОДУЛЬ
+├── seminars.js                    # Seminars модуль
+└── trainers.js                    # Trainers модуль
+```
+
+### **📊 Data (store/data/):**
+
+```
+data/
+└── search-filters.js              # Конфигурация фильтров поиска
+```
+
+---
+
+## 🛣️ **РОУТИНГ (frontend/src/router/)**
+
+### **📍 Route Files:**
+
+```
+router/
+├── index.js                       # Главный роутер
+├── athlete-routes.js              # Роуты Athletes
+├── event-routes.js                # Роуты Events
+├── jury-routes.js                 # Роуты Jury
+├── organizations-routes.js        # Роуты Organizations
+├── seminars-routes.js             # Роуты Seminars
+└── trainers-routes.js             # Роуты Trainers
+```
+
+### **🔗 Frontend URL Routes:**
+
+```
+/                                  # Главная (Main.vue)
+/calendar                          # События календарь
+/athletes                          # Спортсмены
+/athlete-info/:athlete_code        # Детальная спортсмена
+/jury                             # Судьи  
+/jury-info/:jury_code             # Детальная судьи
+/trainers                         # Тренеры
+/trainer-info/:trainer_id         # Детальная тренера
+/organizations                    # Организации
+/organization-info/:organization_id # Детальная организации
+/seminars                         # Семинары
+/seminar-info/:seminar_id         # Детальная семинара
+/auth                             # Авторизация
+/user                             # Профиль пользователя
+/admin/*                          # Админ страницы
+```
+
+---
+
+## 🖥️ **BACKEND СТРУКТУРА**
+
+### **📁 Основные директории:**
+
+```
+backend/
+├── controllers/
+├── models/
+├── routes/
+├── middleware/
+├── utils/
+├── db/
+├── file-storage/
+├── app.js
+└── server.js
+```
+
+---
+
+## 🎮 **CONTROLLERS (backend/controllers/)**
+
+```
+controllers/
+├── athlete-controller.js          # Athletes API (ОБНОВЛЕН)
+├── auth-controller.js             # Авторизация API
+├── event-controller.js            # Events API
+├── event-registration-controller.js # Регистрация на события
+├── jury-controller.js             # Jury API
+├── organizations-controller.js    # Organizations API
+├── seminar-controller.js          # Seminars API
+├── statistics-controller.js       # Статистика API
+└── trainers-controller.js         # Trainers API
+```
+
+---
+
+## 📊 **MODELS (backend/models/)**
+
+```
+models/
+├── athlete-model.js               # Модель Athletes (+ mongoose-paginate-v2)
+├── competition-model.js           # Модель соревнований
+├── document-model.js              # Модель документов
+├── event-model.js                 # Модель событий
+├── jury-model.js                  # Модель судей
+├── onlineRegistration-model.js    # Модель онлайн регистрации
+├── organization-model.js          # Модель организаций
+├── race-model.js                  # Модель гонок
+├── result-model.js                # Модель результатов
+├── seminar-model.js               # Модель семинаров
+├── totalResult-model.js           # Модель общих результатов
+├── trainer-model.js               # Модель тренеров
+└── user-model.js                  # Модель пользователей
+```
+
+---
+
+## 🛤️ **ROUTES (backend/routes/)**
+
+```
+routes/
+├── athleteRoutes.js               # /api/v1/athletes/*
+├── authRoutes.js                  # /api/v1/auth/*
+├── eventRoutes.js                 # /api/v1/events/*
+├── eventRegistrationRoutes.js     # /api/v1/event-registration/*
+├── juryRoutes.js                  # /api/v1/jury/*
+├── organizationRoutes.js          # /api/v1/organizations/*
+├── seminarRoutes.js               # /api/v1/seminars/*
+├── statisticsRoutes.js            # /api/v1/statistics/*
+└── trainerRoutes.js               # /api/v1/trainers/*
+```
+
+---
+
+## 📡 **BACKEND API ENDPOINTS**
+
+### **🏃‍♂️ Athletes API:**
+
+```
+GET  /api/v1/athletes              # Все спортсмены
+GET  /api/v1/athletes/find         # Поиск спортсменов (УНИФИЦИРОВАН)
+GET  /api/v1/athletes/:code        # Спортсмен по коду
+POST /api/v1/athletes              # Создание спортсмена
+PUT  /api/v1/athletes/:code        # Обновление спортсмена
+DELETE /api/v1/athletes/:code      # Удаление спортсмена
+GET  /api/v1/athletes/:code/tv-photo # TV фото спортсмена
+GET  /api/v1/athletes/:code/competitions # Соревнования спортсмена
+```
+
+### **🎯 Events API:**
+
+```
+GET  /api/v1/events                # Все события
+GET  /api/v1/events/find           # Поиск событий (ЭТАЛОН)
+GET  /api/v1/events/:id            # Событие по ID
+POST /api/v1/events                # Создание события
+PUT  /api/v1/events/:id            # Обновление события
+DELETE /api/v1/events/:id          # Удаление события
+```
+
+### **⚖️ Jury API:**
+
+```
+GET  /api/v1/jury                  # Все судьи
+GET  /api/v1/jury/find             # Поиск судей
+GET  /api/v1/jury/:code            # Судья по коду
+POST /api/v1/jury                  # Создание судьи
+PUT  /api/v1/jury/:code            # Обновление судьи
+DELETE /api/v1/jury/:code          # Удаление судьи
+```
+
+### **👨‍🏫 Trainers API:**
+
+```
+GET  /api/v1/trainers              # Все тренеры
+GET  /api/v1/trainers/find         # Поиск тренеров
+GET  /api/v1/trainers/:id          # Тренер по ID
+POST /api/v1/trainers              # Создание тренера
+PUT  /api/v1/trainers/:id          # Обновление тренера
+DELETE /api/v1/trainers/:id        # Удаление тренера
+```
+
+### **🏢 Organizations API:**
+
+```
+GET  /api/v1/organizations         # Все организации
+GET  /api/v1/organizations/find    # Поиск организаций
+GET  /api/v1/organizations/:id     # Организация по ID
+POST /api/v1/organizations         # Создание организации
+PUT  /api/v1/organizations/:id     # Обновление организации
+DELETE /api/v1/organizations/:id   # Удаление организации
+```
+
+### **📚 Seminars API:**
+
+```
+GET  /api/v1/seminars              # Все семинары
+GET  /api/v1/seminars/find         # Поиск семинаров
+GET  /api/v1/seminars/:id          # Семинар по ID
+POST /api/v1/seminars              # Создание семинара
+PUT  /api/v1/seminars/:id          # Обновление семинара
+DELETE /api/v1/seminars/:id        # Удаление семинара
+```
+
+### **🔐 Auth API:**
+
+```
+POST /api/v1/auth/login            # Вход в систему
+POST /api/v1/auth/register         # Регистрация
+GET  /api/v1/auth/user             # Текущий пользователь
+POST /api/v1/auth/logout           # Выход из системы
+```
+
+---
+
+## 🎨 **ДИЗАЙН СИСТЕМЫ**
+
+### **📐 Стили (frontend/src/assets/styles/):**
+
+```
+styles/
+├── main.scss                      # Главный файл стилей
+├── global.scss                    # Глобальные стили
+├── abstracts/
+│   ├── _animations.scss           # Анимации
+│   ├── _mixins.scss               # Миксины
+│   ├── _utilities.scss            # Утилиты
+│   └── _variables.scss            # Переменные
+└── base/
+    ├── _app.scss                  # Базовые стили приложения
+    ├── _decorations.scss          # Декоративные элементы
+    ├── _overrides.scss            # Переопределения Vuetify
+    ├── _reset.scss                # Reset стилей
+    └── _typography.scss           # Типографика
+```
+
+### **🎨 Design Tokens:**
+
+```scss
+// Цвета
+--color-text-primary
+--color-text-secondary
+--color-bg-surface
+--color-bg-surface-hover
+--color-border-primary
+
+// Отступы
+--space-1, --space-2, --space-4, --space-6, --space-8
+
+// Радиусы
+--radius-sm, --radius-md, --radius-lg
+
+// Тени
+--surface-shadow-s, --surface-shadow-m, --surface-shadow-l
+```
+
+---
+
+## 🔧 **УТИЛИТЫ (frontend/src/utils/)**
+
+```
+utils/
+├── alphabet-generator.js          # Алфавитная группировка (ИСПОЛЬЗУЕТСЯ)
+├── auth-helpers.js                # Хелперы авторизации
+├── calendar-helpers.js            # Хелперы календаря
+├── capitalizeString.js            # Капитализация строк
+├── check-theme.js                 # Проверка темы
+├── competition-utils.js           # Утилиты соревнований
+├── data-formaters.js              # Форматтеры данных
+├── debounce.js                    # Debounce функция
+├── excelData-saver.js             # Сохранение Excel
+├── formData-helpers.js            # Хелперы форм
+├── formFields-translator.js       # Переводчик полей форм
+├── inputType-util.js              # Утилиты типов input
+├── mobileHeightResize-util.js     # Ресайз мобильных
+└── url-helpers.js                 # Хелперы URL
+```
+
+---
+
+## 📋 **КРИТИЧЕСКИ ВАЖНЫЕ ФАЙЛЫ**
+
+### **✅ Обновленные файлы:**
+
+- `frontend/src/components/ui-components/search/search-results.vue` - Унифицированный компонент
+- `frontend/src/pages/athletes/index.vue` - Унифицированная Athletes страница
+- `backend/controllers/athlete-controller.js` - Стандартизированный API
+- `backend/models/athlete-model.js` - Добавлен mongoose-paginate-v2
+
+### **🎯 Эталонные файлы:**
+
+- `frontend/src/pages/events/calendar-page/index.vue` - ЭТАЛОН для сравнения
+- `backend/controllers/event-controller.js` - ЭТАЛОН API
+- `frontend/src/store/modules/search.js` - Унифицированный поиск
+
+---
+
+Теперь с этой картой структуры давайте сравним Events и Athletes страницы для унификации стилей!

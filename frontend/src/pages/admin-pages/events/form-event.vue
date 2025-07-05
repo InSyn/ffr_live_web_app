@@ -1,438 +1,494 @@
 <script>
-import DocumentsSelectControl from '@/components/ui-components/custom-controls/documents-select-control.vue';
-import { backendRootUrl } from '@/constants';
-import { getInputType } from '@/utils/inputType-util';
-import { getDisciplines, sports } from '@/store/data/sports';
-import { setFieldValue } from '@/utils/formData-helpers';
-import { translateField } from '@/utils/formFields-translator';
-import { countries, getCountryCode } from '@/store/data/countries';
-import { getSortedRegions } from '@/store/data/russia-regions';
-import CompetitionImageFillerIcon from '@/assets/svg/competitionImageFiller-icon.vue';
-import { capitalizeString } from '@/utils/capitalizeString';
-import { mdiArrowRight } from '@mdi/js';
-import CustomCheckbox from '@/components/ui-components/custom-checkbox.vue';
-import CountrySelectControl from '@/components/ui-components/custom-controls/country-select-control.vue';
-import RegionSelectControl from '@/components/ui-components/custom-controls/region-select-control.vue';
+import DocumentsSelectControl from '@/components/ui-components/custom-controls/documents-select-control.vue'
+import { backendRootUrl } from '@/constants'
+import { getInputType } from '@/utils/inputType-util'
+import { getDisciplines, sports } from '@/store/data/sports'
+import { setFieldValue } from '@/utils/formData-helpers'
+import { translateField } from '@/utils/formFields-translator'
+import { countries, getCountryCode } from '@/store/data/countries'
+import { getSortedRegions } from '@/store/data/russia-regions'
+import CompetitionImageFillerIcon from '@/assets/svg/competitionImageFiller-icon.vue'
+import { capitalizeString } from '@/utils/capitalizeString'
+import { mdiArrowRight } from '@mdi/js'
+import CustomCheckbox from '@/components/ui-components/custom-checkbox.vue'
+import CountrySelectControl from '@/components/ui-components/custom-controls/country-select-control.vue'
+import RegionSelectControl from '@/components/ui-components/custom-controls/region-select-control.vue'
 
 export default {
-  name: 'event-form',
-  components: { RegionSelectControl, CountrySelectControl, CustomCheckbox, CompetitionImageFillerIcon, DocumentsSelectControl },
-  props: {
-    event: Object,
-    eventImages: Object,
-    action: String,
-  },
-  data() {
-    return {
-      selectedFile: {},
-      imagePreview: {},
-      arrowRightIcon: mdiArrowRight,
-    };
-  },
-  computed: {
-    countries() {
-      return countries;
-    },
-    sports() {
-      return sports;
-    },
-  },
-  methods: {
-    capitalizeString,
-    getSortedRegions,
-    getCountryCode,
-    translateField,
-    setFieldValue,
-    getDisciplines,
-    getInputType,
+	name: 'EventForm',
+	components: {
+		RegionSelectControl,
+		CountrySelectControl,
+		CustomCheckbox,
+		CompetitionImageFillerIcon,
+		DocumentsSelectControl
+	},
+	props: {
+		event: Object,
+		eventImages: Object,
+		action: String
+	},
+	data() {
+		return {
+			selectedFile: {},
+			imagePreview: {},
+			arrowRightIcon: mdiArrowRight
+		}
+	},
+	computed: {
+		countries() {
+			return countries
+		},
+		sports() {
+			return sports
+		}
+	},
 
-    onFileChange(e, imageType) {
-      if (!e.target.files[0]) {
-        this.$set(this.imagePreview, imageType, null);
-        return;
-      }
+	watch: {
+		eventImages: {
+			immediate: true,
+			handler(newImages) {
+				if (!newImages) return
 
-      this.$set(this.selectedFile, imageType, e.target.files[0]);
-      this.previewImage(imageType, 'file');
-    },
-    previewImage(imageType, sourceType) {
-      if (sourceType === 'file' && this.selectedFile[imageType]) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          this.$set(this.imagePreview, imageType, e.target.result);
-        };
-        reader.readAsDataURL(this.selectedFile[imageType]);
-      } else if (sourceType === 'url') {
-        this.$set(this.imagePreview, imageType, backendRootUrl + this.eventImages[imageType]);
-      }
-    },
-    updateDocuments(documents) {
-      this.event.documents = [...documents];
-    },
+				for (const imgKey in newImages) {
+					if (newImages[imgKey]) this.previewImage(imgKey, 'url')
+				}
+			}
+		}
+	},
+	methods: {
+		capitalizeString,
+		getSortedRegions,
+		getCountryCode,
+		translateField,
+		setFieldValue,
+		getDisciplines,
+		getInputType,
 
-    submitForm() {
-      switch (this.action) {
-        case 'create': {
-          this.$emit('create-event', this.selectedFile);
-          return;
-        }
-        case 'update': {
-          this.$emit('update-event', this.selectedFile);
-          return;
-        }
-      }
-    },
-    deleteEvent() {
-      if (confirm('Вы уверены, что хотите удалить событие?')) {
-        this.$emit('delete-event', this.event.event_id);
-      }
-    },
-    openOnlineRegistration() {
-      this.$emit('open-online-registration');
-    },
-  },
+		onFileChange(e, imageType) {
+			if (!e.target.files[0]) {
+				this.$set(this.imagePreview, imageType, null)
+				return
+			}
 
-  watch: {
-    eventImages: {
-      immediate: true,
-      handler(newImages) {
-        if (!newImages) return;
+			this.$set(this.selectedFile, imageType, e.target.files[0])
+			this.previewImage(imageType, 'file')
+		},
+		previewImage(imageType, sourceType) {
+			if (sourceType === 'file' && this.selectedFile[imageType]) {
+				const reader = new FileReader()
+				reader.onload = e => {
+					this.$set(this.imagePreview, imageType, e.target.result)
+				}
+				reader.readAsDataURL(this.selectedFile[imageType])
+			} else if (sourceType === 'url') {
+				this.$set(this.imagePreview, imageType, backendRootUrl + this.eventImages[imageType])
+			}
+		},
+		updateDocuments(documents) {
+			this.event.documents = [...documents]
+		},
 
-        for (const imgKey in newImages) {
-          if (newImages[imgKey]) this.previewImage(imgKey, 'url');
-        }
-      },
-    },
-  },
-};
+		submitForm() {
+			switch (this.action) {
+				case 'create': {
+					this.$emit('create-event', this.selectedFile)
+					return
+				}
+				case 'update': {
+					this.$emit('update-event', this.selectedFile)
+				}
+			}
+		},
+		deleteEvent() {
+			if (confirm('Вы уверены, что хотите удалить событие?')) {
+				this.$emit('delete-event', this.event.event_id)
+			}
+		},
+		openOnlineRegistration() {
+			this.$emit('open-online-registration')
+		}
+	}
+}
 </script>
 
 <template>
-  <form enctype="multipart/form-data" @submit.prevent="submitForm">
-    <div class="formHeader">
-      <span v-if="action === 'create'">Новое соревнование</span>
-      <span v-else>Обновление данных соревнования</span>
+	<form enctype="multipart/form-data" @submit.prevent="submitForm">
+		<div class="formHeader">
+			<span v-if="action === 'create'">Новое соревнование</span>
+			<span v-else>Обновление данных соревнования</span>
 
-      <div @click="openOnlineRegistration" v-if="action === 'update'" class="onlineRegistration__link">
-        Дополнительные настройки
-        <v-icon class="onlineRegistration__icon" color="currentColor" size="18">
-          {{ arrowRightIcon }}
-        </v-icon>
-      </div>
-    </div>
+			<div
+				v-if="action === 'update'"
+				class="onlineRegistration__link"
+				@click="openOnlineRegistration"
+			>
+				Дополнительные настройки
+				<v-icon class="onlineRegistration__icon" color="currentColor" size="18">
+					{{ arrowRightIcon }}
+				</v-icon>
+			</div>
+		</div>
 
-    <div class="formBody">
-      <div class="imageUpload__wrapper">
-        <div class="imagePreview__wrapper">
-          <img v-if="imagePreview['logo_image_url']" :src="imagePreview['logo_image_url']" alt="Selected Image" />
-          <div v-else class="imageFiller">
-            <competition-image-filler-icon class="imageFiller__icon"></competition-image-filler-icon>
-          </div>
-        </div>
+		<div class="formBody">
+			<div class="imageUpload__wrapper">
+				<div class="imagePreview__wrapper">
+					<img
+						v-if="imagePreview['logo_image_url']"
+						:src="imagePreview['logo_image_url']"
+						alt="Selected Image"
+					/>
+					<div v-else class="imageFiller">
+						<competition-image-filler-icon class="imageFiller__icon" />
+					</div>
+				</div>
 
-        <div class="imageInput__wrapper">
-          <div class="imageInput__title">Логотип события</div>
-          <input @change="onFileChange($event, 'logo_image_url')" id="image_url" class="formControl-image" name="image_url" type="file" />
-        </div>
-      </div>
+				<div class="imageInput__wrapper">
+					<div class="imageInput__title">Логотип события</div>
+					<input
+						id="image_url"
+						class="formControl-image"
+						name="image_url"
+						type="file"
+						@change="onFileChange($event, 'logo_image_url')"
+					/>
+				</div>
+			</div>
 
-      <div class="imageUpload__wrapper">
-        <div class="imagePreview__wrapper">
-          <img v-if="imagePreview['track_image_url']" :src="imagePreview['track_image_url']" alt="Selected Image" />
-          <div v-else class="imageFiller">
-            <competition-image-filler-icon class="imageFiller__icon"></competition-image-filler-icon>
-          </div>
-        </div>
+			<div class="imageUpload__wrapper">
+				<div class="imagePreview__wrapper">
+					<img
+						v-if="imagePreview['track_image_url']"
+						:src="imagePreview['track_image_url']"
+						alt="Selected Image"
+					/>
+					<div v-else class="imageFiller">
+						<competition-image-filler-icon class="imageFiller__icon" />
+					</div>
+				</div>
 
-        <div class="imageInput__wrapper">
-          <div class="imageInput__title">Изображение трассы</div>
-          <input @change="onFileChange($event, 'track_image_url')" id="image_url" class="formControl-image" name="image_url" type="file" />
-        </div>
-      </div>
+				<div class="imageInput__wrapper">
+					<div class="imageInput__title">Изображение трассы</div>
+					<input
+						id="image_url"
+						class="formControl-image"
+						name="image_url"
+						type="file"
+						@change="onFileChange($event, 'track_image_url')"
+					/>
+				</div>
+			</div>
 
-      <div v-for="(_, field_key) in event" v-show="field_key !== 'country_code' && field_key !== 'region_code'" :key="field_key" class="formGroup">
-        <label :for="field_key" class="formLabel">
-          {{ translateField(field_key) }}
-        </label>
+			<div
+				v-for="(_, field_key) in event"
+				v-show="field_key !== 'country_code' && field_key !== 'region_code'"
+				:key="field_key"
+				class="formGroup"
+			>
+				<label :for="field_key" class="formLabel">
+					{{ translateField(field_key) }}
+				</label>
 
-        <select v-if="field_key === 'sport'" :id="field_key" class="formControl" v-model="event[field_key]">
-          <option selected disabled value="">Выберите вид спорта</option>
-          <option v-for="sport in sports" :key="sport.code" class="formControl-option">
-            {{ capitalizeString(sport.name_rus) }}
-          </option>
-        </select>
-        <div class="select__wrapper" v-else-if="field_key === 'discipline'">
-          <select
-            @change="setFieldValue(event, 'discipline', $event.target.value)"
-            :value="event[field_key]"
-            :key="event[field_key] || 'dsc'"
-            :id="field_key"
-            class="formControl"
-            :disabled="!event['sport']"
-          >
-            <option selected disabled value="">Выберите дисциплину</option>
-            <option v-for="discipline in getDisciplines(event['sport'])" :key="discipline.code">
-              {{ discipline.name_rus }}
-            </option>
-          </select>
-        </div>
+				<select
+					v-if="field_key === 'sport'"
+					:id="field_key"
+					v-model="event[field_key]"
+					class="formControl"
+				>
+					<option selected disabled value="">Выберите вид спорта</option>
+					<option v-for="sport in sports" :key="sport.code" class="formControl-option">
+						{{ capitalizeString(sport.name_rus) }}
+					</option>
+				</select>
+				<div v-else-if="field_key === 'discipline'" class="select__wrapper">
+					<select
+						:id="field_key"
+						:key="event[field_key] || 'dsc'"
+						:value="event[field_key]"
+						class="formControl"
+						:disabled="!event['sport']"
+						@change="setFieldValue(event, 'discipline', $event.target.value)"
+					>
+						<option selected disabled value="">Выберите дисциплину</option>
+						<option v-for="discipline in getDisciplines(event['sport'])" :key="discipline.code">
+							{{ discipline.name_rus }}
+						</option>
+					</select>
+				</div>
 
-        <country-select-control
-          v-else-if="field_key === 'country'"
-          :value="event[field_key]"
-          @input="setFieldValue(event, 'country', $event)"
-        ></country-select-control>
-        <region-select-control
-          v-else-if="field_key === 'region'"
-          :value="event[field_key]"
-          :country="event['country']"
-          @input="setFieldValue(event, 'region', $event)"
-        ></region-select-control>
+				<country-select-control
+					v-else-if="field_key === 'country'"
+					:value="event[field_key]"
+					@input="setFieldValue(event, 'country', $event)"
+				/>
+				<region-select-control
+					v-else-if="field_key === 'region'"
+					:value="event[field_key]"
+					:country="event['country']"
+					@input="setFieldValue(event, 'region', $event)"
+				/>
 
-        <documents-select-control
-          v-else-if="field_key === 'documents'"
-          @update:documents="updateDocuments"
-          :initial-documents="event.documents"
-        ></documents-select-control>
-        <custom-checkbox
-          v-else-if="field_key === 'international' || field_key === 'is_public'"
-          :value="event[field_key]"
-          @input="setFieldValue(event, field_key, $event)"
-        ></custom-checkbox>
-        <input v-else v-model="event[field_key]" :id="field_key" class="formControl" :type="getInputType(field_key)" :name="field_key" />
-      </div>
-    </div>
+				<documents-select-control
+					v-else-if="field_key === 'documents'"
+					:initial-documents="event.documents"
+					@update:documents="updateDocuments"
+				/>
+				<custom-checkbox
+					v-else-if="field_key === 'international' || field_key === 'is_public'"
+					:value="event[field_key]"
+					@input="setFieldValue(event, field_key, $event)"
+				/>
+				<input
+					v-else
+					:id="field_key"
+					v-model="event[field_key]"
+					class="formControl"
+					:type="getInputType(field_key)"
+					:name="field_key"
+				/>
+			</div>
+		</div>
 
-    <div class="formActions">
-      <v-btn class="actionButton" type="submit" color="var(--text-contrast)" small>
-        {{ action === 'create' ? 'Создать' : 'Обновить' }}
-      </v-btn>
-      <v-btn v-show="action === 'update'" class="actionButton" type="button" color="var(--message-error)" @click="deleteEvent" text small> Удалить </v-btn>
-    </div>
-  </form>
+		<div class="formActions">
+			<v-btn class="actionButton" type="submit" color="var(--color-text-secondary)" small>
+				{{ action === 'create' ? 'Создать' : 'Обновить' }}
+			</v-btn>
+			<v-btn
+				v-show="action === 'update'"
+				class="actionButton"
+				type="button"
+				color="var(--color-text-error)"
+				text
+				small
+				@click="deleteEvent"
+			>
+				Удалить
+			</v-btn>
+		</div>
+	</form>
 </template>
 
 <style scoped lang="scss">
 form {
-  flex: 0 1 0;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  max-width: var(--tablet-default);
-  width: 100%;
+	flex: 0 1 0;
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	max-width: var(--tablet-default);
+	width: 100%;
 
-  margin: auto;
-  padding: 1rem 1.6rem;
+	margin: auto;
+	padding: 1rem 1.6rem;
 
-  background-color: var(--background--card);
-  box-shadow: var(--container-shadow-m);
-  border: 1px solid var(--border-container);
-  border-radius: 4px;
+	background-color: var(--color-bg-surface);
+	box-shadow: var(--surface-shadow-m);
+	border: 1px solid var(--color-border-primary);
+	border-radius: 4px;
 
-  .formHeader {
-    flex: 0 0 auto;
-    display: flex;
-    align-items: flex-end;
-    gap: 8px;
-    padding: 0 0.5rem 1.25rem;
-    font-size: 1.4rem;
-    font-weight: bold;
+	.formHeader {
+		flex: 0 0 auto;
+		display: flex;
+		align-items: flex-end;
+		gap: 8px;
+		padding: 0 0.5rem 1.25rem;
+		font-size: 1.4rem;
+		font-weight: bold;
 
-    .onlineRegistration__link {
-      display: flex;
-      align-items: center;
-      margin-left: auto;
-      font-size: 1rem;
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: color 92ms;
-      &:hover {
-        color: var(--ffr-brand);
-      }
-      .onlineRegistration__icon {
-        margin-left: 0.25rem;
-        color: inherit;
-        transition: fill 92ms;
-      }
-    }
-  }
+		.onlineRegistration__link {
+			display: flex;
+			align-items: center;
+			margin-left: auto;
+			font-size: 1rem;
+			color: var(--color-text-secondary);
+			cursor: pointer;
+			transition: color var(--transition-duration-fast);
+			&:hover {
+				color: var(--color-interactive-brand-default);
+			}
+			.onlineRegistration__icon {
+				margin-left: 0.25rem;
+				color: inherit;
+				transition: fill var(--transition-duration-fast);
+			}
+		}
+	}
 
-  .formBody {
-    flex: 0 1 auto;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    align-items: flex-start;
-    grid-auto-rows: min-content;
-    grid-gap: 0.75rem 1.25rem;
-    overflow-y: auto;
+	.formBody {
+		flex: 0 1 auto;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+		align-items: flex-start;
+		grid-auto-rows: min-content;
+		grid-gap: 0.75rem 1.25rem;
+		overflow-y: auto;
 
-    @media screen and (max-width: 900px) {
-      max-height: none;
-    }
+		@media screen and (max-width: 900px) {
+			max-height: none;
+		}
 
-    .imageUpload__wrapper {
-      flex: 0 0 auto;
-      display: flex;
-      flex-wrap: nowrap;
-      margin-bottom: 4px;
+		.imageUpload__wrapper {
+			flex: 0 0 auto;
+			display: flex;
+			flex-wrap: nowrap;
+			margin-bottom: 4px;
 
-      .imagePreview__wrapper {
-        flex: 0 0 auto;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 80px;
-        aspect-ratio: 1;
-        padding: 8px;
+			.imagePreview__wrapper {
+				flex: 0 0 auto;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				height: 80px;
+				aspect-ratio: 1;
+				padding: 8px;
 
-        img {
-          display: block;
-          max-height: 100%;
-          max-width: 100%;
-        }
+				img {
+					display: block;
+					max-height: 100%;
+					max-width: 100%;
+				}
 
-        .imageFiller {
-          flex: 0 0 auto;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          height: 80px;
-          aspect-ratio: 1;
-          padding: 0.5rem;
+				.imageFiller {
+					flex: 0 0 auto;
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					height: 80px;
+					aspect-ratio: 1;
+					padding: 0.5rem;
 
-          .imageFiller__icon {
-            width: 100%;
-            height: 100%;
-          }
-        }
-      }
+					.imageFiller__icon {
+						width: 100%;
+						height: 100%;
+					}
+				}
+			}
 
-      .imageInput__wrapper {
-        flex: 1 1 0;
-        display: flex;
-        flex-direction: column;
-        margin-left: 8px;
+			.imageInput__wrapper {
+				flex: 1 1 0;
+				display: flex;
+				flex-direction: column;
+				margin-left: 8px;
 
-        .imageInput__title {
-          flex: 0 0 auto;
-        }
+				.imageInput__title {
+					flex: 0 0 auto;
+				}
 
-        .formControl-image {
-          flex: 0 0 auto;
-          min-width: 0;
-          width: 100%;
-          margin-top: auto;
+				.formControl-image {
+					flex: 0 0 auto;
+					min-width: 0;
+					width: 100%;
+					margin-top: auto;
 
-          &::file-selector-button {
-            padding: 3px 6px;
-            margin-right: 0.8rem;
+					&::file-selector-button {
+						padding: 3px 6px;
+						margin-right: 0.8rem;
 
-            color: var(--text-default);
-            background-color: var(--background--card-secondary);
-            border-radius: 4px;
-            border-width: 1px;
+						color: var(--color-text-primary);
+						background-color: var(--color-bg-surface-secondary);
+						border-radius: 4px;
+						border-width: 1px;
 
-            cursor: pointer;
-          }
+						cursor: pointer;
+					}
 
-          &::file-selector-button:hover {
-            background-color: var(--background--card-hover);
-          }
-        }
-      }
-    }
+					&::file-selector-button:hover {
+						background-color: var(--color-bg-surface-hover);
+					}
+				}
+			}
+		}
 
-    .formGroup {
-      flex: 0 0 auto;
-      display: flex;
-      align-items: flex-start;
-      padding: 0 0 0.25rem;
-      border-bottom: 1px solid var(--background--card-hover);
-      transition: border-bottom 92ms;
+		.formGroup {
+			flex: 0 0 auto;
+			display: flex;
+			align-items: flex-start;
+			padding: 0 0 0.25rem;
+			border-bottom: 1px solid var(--color-bg-surface-hover);
+			transition: border-bottom var(--transition-duration-fast);
 
-      &:focus-within {
-        border-bottom: 1px solid var(--text-muted);
-      }
+			&:focus-within {
+				border-bottom: 1px solid var(--color-text-secondary);
+			}
 
-      .formLabel {
-        flex: 0 0 12ch;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        margin-right: 1rem;
+			.formLabel {
+				flex: 0 0 12ch;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				margin-right: 1rem;
 
-        &:hover {
-          overflow: visible;
-        }
-      }
+				&:hover {
+					overflow: visible;
+				}
+			}
 
-      .select__wrapper {
-        flex: 1 1 0;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
+			.select__wrapper {
+				flex: 1 1 0;
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
 
-        .formControl__wrapper {
-          position: relative;
-          display: flex;
-          align-items: center;
+				.formControl__wrapper {
+					position: relative;
+					display: flex;
+					align-items: center;
 
-          span {
-            width: 4rem;
-            margin-right: 8px;
-          }
-        }
-      }
+					span {
+						width: 4rem;
+						margin-right: 8px;
+					}
+				}
+			}
 
-      .formControl {
-        flex: 1 1 0;
-        min-width: 0;
-        width: 100%;
-        padding: 3px 6px;
-        color: var(--text-default);
-        background-color: var(--background--card-secondary);
-        border-radius: 2px;
-        outline: transparent;
-        transition: background-color 92ms;
+			.formControl {
+				flex: 1 1 0;
+				min-width: 0;
+				width: 100%;
+				padding: 3px 6px;
+				color: var(--color-text-primary);
+				background-color: var(--color-bg-surface-secondary);
+				border-radius: 2px;
+				outline: transparent;
+				transition: background-color var(--transition-duration-fast);
 
-        &[type='checkbox'] {
-          flex: 0 0 auto;
-        }
+				&[type='checkbox'] {
+					flex: 0 0 auto;
+				}
 
-        &:focus-visible {
-          background-color: var(--background--card-hover);
-        }
+				&:focus-visible {
+					background-color: var(--color-bg-surface-hover);
+				}
 
-        &[name='international'] {
-          align-self: center;
-          width: auto;
-        }
-      }
-    }
+				&[name='international'] {
+					align-self: center;
+					width: auto;
+				}
+			}
+		}
 
-    .select__wrapper {
-      flex: 1 1 0;
-      display: flex;
+		.select__wrapper {
+			flex: 1 1 0;
+			display: flex;
 
-      .formControl {
-        flex: 1 1 0;
-        min-width: 0;
-      }
-    }
-  }
+			.formControl {
+				flex: 1 1 0;
+				min-width: 0;
+			}
+		}
+	}
 
-  .formActions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1.25rem;
-    margin-top: 1.75rem;
+	.formActions {
+		display: flex;
+		justify-content: flex-end;
+		gap: 1.25rem;
+		margin-top: 1.75rem;
 
-    .actionButton {
-      color: #2c3e50;
-      font-weight: bold;
-      letter-spacing: 1px;
-      font-size: 0.75rem;
-    }
-  }
+		.actionButton {
+			color: #2c3e50;
+			font-weight: bold;
+			letter-spacing: 1px;
+			font-size: 0.75rem;
+		}
+	}
 }
 </style>

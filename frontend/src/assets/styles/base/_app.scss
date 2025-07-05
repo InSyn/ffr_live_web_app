@@ -1,0 +1,52 @@
+// =============================================================================
+// BASE/_APP.SCSS
+// -----------------------------------------------------------------------------
+// This file contains the base styles for the main Vue application container
+// (`#app .v-application`), including layout, fonts, and scrollbars.
+// =============================================================================
+#app .v-application {
+	font-family: 'Petrov Sans-Trial', Avenir, Helvetica, Arial, sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	letter-spacing: 0.01em;
+
+	display: flex;
+	flex-direction: column;
+	height: inherit;
+	max-height: var(--app-height);
+
+	color: var(--color-text-primary);
+
+	* {
+		box-sizing: border-box;
+		scroll-behavior: smooth;
+
+		&::-webkit-scrollbar {
+			height: 6px;
+			width: 6px;
+		}
+
+		&::-webkit-scrollbar-track {
+			background: transparent;
+		}
+
+		&::-webkit-scrollbar-thumb {
+			background-color: var(--color-text-primary);
+			border-radius: 4px;
+			cursor: pointer;
+
+			&:hover {
+				background-color: color-mix(in srgb, var(--color-text-primary), transparent 18%);
+			}
+		}
+	}
+
+	&.theme-dark * {
+		color-scheme: dark;
+	}
+
+	& input:checked {
+		outline: none;
+		accent-color: var(--color-text-primary);
+	}
+}

@@ -1,0 +1,75 @@
+# FFR Live Platform - Cursor AI Rules & Architectural Guide
+
+## 🎯 CORE DEVELOPMENT PRINCIPLES
+
+**MANDATORY**: Every chat session must follow these rules for FFR Live Platform development.
+
+### 1. MCP Tools Integration (HIGHEST PRIORITY)
+
+```
+🚀 Browser MCP: REQUIRED for ALL UI testing, debugging, validation
+🐳 Docker MCP: REQUIRED for ALL backend diagnostics, log analysis  
+📚 Context7 MCP: REQUIRED for ALL technical research, documentation
+
+❌ FORBIDDEN: Manual testing/debugging without MCP validation
+✅ SUCCESS PATTERN: MCP-first approach for instant problem detection
+```
+
+### 2. Architecture Standards (ZERO TOLERANCE)
+
+```
+🔧 snake_case Database Fields: ALL backend DB fields MUST use snake_case
+🏗️ ADR-001 Centralized State: ALL complex features MUST use Vuex centralization
+📡 API Response Format: ALL /find endpoints MUST return mongoose-paginate-v2 format
+🎨 Semantic Design Tokens: ALL styling MUST use --color-* and --space-* tokens
+```
+
+### 3. Technology Stack
+
+```
+Frontend: Vue.js 2.7 → Vue 3 migration priority
+Backend: Node.js 18+ ES Modules, Express.js, MongoDB 7.0
+Security: JWT + bcryptjs, helmet, rate limiting
+Testing: Jest, regression testing required
+```
+
+### 4. Quality Gates
+
+```bash
+# Before ANY code changes:
+✅ MCP validation completed
+✅ Pattern compliance verified  
+✅ No breaking changes introduced
+✅ Tests pass, security validated
+```
+
+### 5. Anti-Patterns (FORBIDDEN)
+
+```
+❌ Manual UI testing without Browser MCP
+❌ Backend changes without Docker MCP logs
+❌ Technical research without Context7 MCP
+❌ camelCase in database fields (CRITICAL ERROR)
+❌ Local component state instead of Vuex centralization
+❌ Hardcoded colors/spacing instead of design tokens
+```
+
+## 📚 REFERENCE GUIDES
+
+**Always reference these architectural guides:**
+
+- `.cursor/rules/architectural-guide.mdc` - Core patterns, ADR-001
+- `.cursor/rules/design-system-guide.mdc` - UI/UX standards
+- `.cursor/rules/general-rules.mdc` - Development workflows
+- `.cursor/rules/multi-agent-workflow.mdc` - Collaboration patterns
+- `.cursor/rules/mcp-tools-guide.mdc` - MCP usage mandates
+
+## 🚀 SUCCESS METRICS
+
+**Primary KPI:** Regression-Free Implementation Rate >90%
+**Quality Gate:** 100% MCP usage for UI/Backend/Research tasks
+**Performance:** <200ms API response, >90 Lighthouse score
+
+---
+
+**BOTTOM LINE: Follow architectural patterns, use MCP tools, maintain quality standards.**

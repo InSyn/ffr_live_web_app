@@ -10,12 +10,12 @@ const medalEvents = new Map([
   ['Русско-китайские игры', 'РКИ'],
   ['Кубок Европы', 'КЕ'],
   ['Чемпионат Европы', 'ЧЕ'],
-  ['Чемпионат Европы среди юниоров', 'ЧЕЮ'],
-]);
+  ['Чемпионат Европы среди юниоров', 'ЧЕЮ']
+])
 
 export const getMedalEvents = () => {
-  return Array.from(medalEvents.keys()).sort((a, b) => a.localeCompare(b));
-};
-export const getMedalEventAbbr = (evtName) => {
-  return medalEvents.get(evtName) || evtName;
-};
+  return Array.from(medalEvents.keys()).sort((a, b) => a.localeCompare(b))
+}
+export const getMedalEventAbbr = evtName => {
+  return medalEvents.get(evtName) || evtName
+}

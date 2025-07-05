@@ -1,0 +1,398 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# General Development Rules & Claude 4 Sonnet Workflow
+
+**Version:** 3.0
+**Status:** Active Reference - AI-Optimized
+**Purpose:** High-level rules, problem-solving algorithms, and success metrics for FFR Live Platform
+
+---
+
+## 1. Primary Success Metric
+
+**Regression-Free Implementation Rate** = 
+(Successful implementations without fixes) / (Total implementations) × 100%
+
+### Success Criteria
+- 🎯 **Target:** >90% regression-free rate
+- 🔶 **Acceptable:** 80-90% 
+- 🚨 **Review needed:** <80%
+
+**Translation:** "Эффективность тем выше, чем меньше вносимые ИИ изменения ломают существующий функционал и требуют исправлений и доработок."
+
+---
+
+## 2. Core Development Principles
+
+### Mandatory Standards (Zero Tolerance)
+1. **snake_case Database Fields**: All backend DB fields MUST use snake_case (critical production requirement)
+2. **Centralized State Logic**: All complex features MUST follow ADR-001 pattern (Vuex centralization)
+3. **API Response Standards**: All `/find` endpoints MUST return mongoose-paginate-v2 format
+4. **Semantic Design Tokens**: All styling MUST use `--color-*` and `--space-*` tokens
+5. **MCP Tools Usage**: MANDATORY use of Browser/Docker/Context7 MCP for ANY development task
+
+### MCP Tools Integration (CRITICAL)
+```markdown
+🚀 **Browser MCP**: REQUIRED for ALL UI changes, testing, debugging
+🐳 **Docker MCP**: REQUIRED for ALL backend diagnostics, container management  
+📚 **Context7 MCP**: REQUIRED for ALL technical research, documentation
+❌ **Anti-pattern**: Manual testing/debugging instead of MCP tools
+✅ **Success Pattern**: MCP-first approach for instant problem detection
+```
+
+### Quality Gates (Automated)
+```bash
+# Pre-commit validation
+npm run lint          # ESLint enforcement  
+npm run test:unit     # Coverage validation
+npm run build         # Build integrity
+
+# Pre-merge validation
+npm run test:integration
+npm run audit:security
+npm run performance:check
+```
+
+---
+
+## 3. Problem-Solving Algorithm Selection
+
+### Classification Decision Tree
+```mermaid
+graph TD
+    A[Problem Identified] --> B{Similar Pattern Exists?}
+    B -->|Yes| C[Supervised Learning: Copy & Adapt]
+    B -->|No| D{Clear Requirements?}
+    
+    D -->|Yes| E[Step-by-Step Classification]
+    D -->|No| F[Unsupervised Exploration]
+    
+    C --> G[Template → Modify → Validate]
+    E --> H[Analyze → Plan → Implement → Test]
+    F --> I[Explore → Discover → Hypothesize → Experiment]
+```
+
+### Algorithm Application Matrix
+
+| Problem Type | Algorithm | Pattern Example | Success Validation |
+|:-------------|:----------|:----------------|:-------------------|
+| **Search Unification** | Supervised Learning | Events page → Athletes page | Functional parity test |
+| **New Feature** | Classification | Break into components → Implement → Integrate | Feature acceptance criteria |
+| **Bug Investigation** | Unsupervised Analysis | Gather data → Find patterns → Root cause | Bug reproduction eliminated |
+| **Performance Issue** | Regression Analysis | Baseline → Identify degradation → Optimize | Performance metrics improved |
+| **Architecture Decision** | Multi-Agent Consensus | Research → Debate → Consensus → Document | Team approval + ADR |
+
+---
+
+## 4. Problem-Solving Techniques (AI-Enhanced)
+
+### Supervised Learning Approach
+**When:** Similar problem/pattern exists in codebase
+**Process:**
+1. **Pattern Identification**: Find successful implementation
+2. **Template Extraction**: Abstract reusable pattern  
+3. **Adaptation**: Modify for new context
+4. **Validation**: Ensure same quality/behavior
+
+**Example:**
+```javascript
+// Found pattern: Events search (successful)
+const eventsTemplate = {
+  controller: 'searchEvents with mongoose-paginate-v2',
+  frontend: 'Vuex centralized state management',
+  components: 'search + search-results + mobile-trigger'
+}
+
+// Apply to: Athletes search (target)
+const athletesImplementation = {
+  controller: 'searchAthletes with same pagination format',
+  frontend: 'Same Vuex pattern, different entity',
+  components: 'Reuse same components, athlete-specific data'
+}
+```
+
+### Unsupervised Exploration Approach  
+**When:** No clear pattern exists, requirements unclear
+**Process:**
+1. **Data Gathering**: Collect all relevant information
+2. **Cluster Analysis**: Group related issues/requirements
+3. **Pattern Discovery**: Identify hidden relationships
+4. **Hypothesis Formation**: Create testable solutions
+
+**Example:**
+```javascript
+// Exploring: Why search is inconsistent across pages?
+const analysisData = {
+  pages: ['events', 'athletes', 'jury', 'trainers'],
+  patterns: {
+    events: 'Vuex centralized + search-results component',
+    athletes: 'Mixed: Vuex + local state + custom rendering',
+    jury: 'Unknown - needs investigation',
+    trainers: 'Unknown - needs investigation'
+  },
+  discovery: 'Inconsistent state management causes UX fragmentation'
+}
+```
+
+### Reinforcement Learning Approach
+**When:** Iterative optimization with feedback
+**Process:**
+1. **Baseline Measurement**: Current performance metrics
+2. **Incremental Changes**: Small, measurable improvements  
+3. **Feedback Analysis**: Success/failure evaluation
+4. **Policy Adjustment**: Refine approach based on results
+
+**Example:**
+```javascript
+// Optimizing: Component reusability
+const iterationCycle = {
+  action: 'Extract surface-card utility class',
+  environment: '8 components with similar card styling',
+  reward: 'Positive: 200 lines CSS removed, consistent styling',
+  nextAction: 'Apply pattern to remaining components'
+}
+```
+
+---
+
+## 5. Enhanced Debugging Techniques
+
+### Rubber Duck Debugging (AI-Enhanced)
+**Frontend Application:**
+```markdown
+**Problem:** "Search component not updating results"
+**Verbalization Process:**
+1. "Component dispatches search action to Vuex"
+2. "Action makes API call to backend"  
+3. "Response should commit to searchResults state"
+4. "Component should reactively update via getter"
+**Discovery:** "Getter not mapped in component - that's the bug!"
+```
+
+**Backend Application:**
+```markdown
+**Problem:** "API endpoint returning 500 error"
+**Verbalization Process:**
+1. "Request hits route handler"
+2. "Handler calls controller method"
+3. "Controller builds query and calls database"
+4. "Database query fails - need to check query structure"
+**Discovery:** "Query uses camelCase but DB fields are snake_case!"
+```
+
+### 5 Whys Analysis (Systematic)
+**Frontend Example:**
+```
+1. Why is the page loading slowly?
+   → Large bundle size
+2. Why is the bundle large?
+   → Importing entire libraries instead of specific modules
+3. Why are we importing entire libraries?
+   → No tree-shaking configuration
+4. Why no tree-shaking?
+   → Webpack config not optimized for production
+5. Why config not optimized?
+   → Default Vue CLI config never customized for our needs
+
+Root Solution: Optimize webpack config + implement tree-shaking
+```
+
+**Backend Example:**
+```
+1. Why is the server crashing?
+   → Unhandled promise rejection
+2. Why unhandled rejection?
+   → Missing try-catch in async controller
+3. Why missing try-catch?
+   → No standardized error handling pattern
+4. Why no standard pattern?
+   → No global error middleware implemented
+5. Why no global middleware?
+   → Team never prioritized infrastructure hardening
+
+Root Solution: Implement global error handling middleware
+```
+
+### Mind Mapping (AI-Structured)
+**Frontend User Flow Mapping:**
+```mermaid
+graph LR
+    A[User Opens Page] --> B[Component Created]
+    B --> C[Dispatch setSearchMode]
+    C --> D[Dispatch performSearch]
+    D --> E[API Call]
+    E --> F[Update searchResults]
+    F --> G[Component Rerenders]
+    G --> H[User Sees Results]
+    
+    I[User Filters] --> J[Update searchFilters]
+    J --> D
+```
+
+**Backend API Dependency Mapping:**
+```mermaid
+graph TD
+    A[Client Request] --> B[Express Router]
+    B --> C[Auth Middleware]
+    C --> D[Controller Method]
+    D --> E[Build Query Function]
+    E --> F[Mongoose Model]
+    F --> G[MongoDB Database]
+    G --> H[Paginated Response]
+    H --> I[JSON Response]
+```
+
+---
+
+## 6. Code Review & Quality Assurance
+
+### Multi-Agent Review Process
+```mermaid
+graph TD
+    A[Code Change] --> B{Complexity Level?}
+    B -->|Low| C[Single Agent Review]
+    B -->|Medium| D[Dual Agent Review]
+    B -->|High| E[Multi-Agent + QA]
+    
+    C --> F[Automated Tests + Merge]
+    D --> G[Cross-validation + Tests]
+    E --> H[Full Team Consensus]
+```
+
+### Review Checklist Template
+```markdown
+**Functional Review:**
+- [ ] Follows established patterns (ADR-001, etc.)
+- [ ] Uses semantic design tokens
+- [ ] snake_case for all DB fields
+- [ ] Standard API response format
+- [ ] Error handling implemented
+
+**Quality Review:**
+- [ ] Unit tests added/updated
+- [ ] No hardcoded values
+- [ ] Responsive design verified
+- [ ] Accessibility standards met
+- [ ] Performance impact assessed
+
+**Integration Review:**
+- [ ] No breaking changes
+- [ ] Backward compatibility maintained
+- [ ] Documentation updated
+- [ ] Migration path documented (if needed)
+```
+
+### Data-Driven Decision Making
+```javascript
+// Quality Metrics Dashboard
+const qualityMetrics = {
+  regressionRate: calculateRegressionRate(),      // Primary metric
+  testCoverage: getTestCoverage(),               // 50% → 80% goal
+  buildTime: getBuildTime(),                     // Performance impact
+  bundleSize: getBundleSize(),                   // Frontend optimization
+  apiResponseTime: getAverageResponseTime(),     // Backend performance
+  userSatisfaction: getUserFeedback()            // UX validation
+}
+
+// Decision making based on metrics
+if (qualityMetrics.regressionRate > 0.1) {
+  triggerQualityReview()
+  implementAdditionalTesting()
+}
+```
+
+---
+
+## 7. Context Management for Claude 4 Sonnet
+
+### Context Loading Strategy
+```markdown
+**Always Load (Core Context):**
+- This general rules guide
+- Architectural patterns (ADR-001, etc.)
+- Mandatory standards (snake_case, API formats)
+- Current project status
+
+**Task-Dependent Context:**
+- Search tasks → Search unification roadmap
+- UI tasks → Design system guide + utility patterns
+- Backend tasks → Controller templates + validation patterns
+- Testing tasks → QA workflows + test templates
+
+**Progressive Context Expansion:**
+1. Start with high-level pattern/approach
+2. Load specific implementation details as needed
+3. Add edge cases and validation criteria
+4. Include error handling and recovery patterns
+```
+
+### Prompt Engineering Best Practices
+```markdown
+**Effective Prompt Structure:**
+1. **Context:** "Working on [specific feature] following [specific pattern]"
+2. **Scope:** "Need to [specific action] affecting [specific files/components]"
+3. **Constraints:** "Must follow [specific standards], avoid [specific anti-patterns]"
+4. **Success Criteria:** "Implementation successful when [specific validation]"
+5. **Quality Gates:** "Must pass [specific tests/checks]"
+
+**Example:**
+"Working on Athletes search unification following ADR-001 pattern. Need to refactor pages/athletes/index.vue to use centralized Vuex search module. Must follow searchAthletes controller standard format, avoid local state management anti-patterns. Implementation successful when Athletes page has same functionality as Events page. Must pass regression tests for search filtering and pagination."
+```
+
+---
+
+## 8. Continuous Learning & Adaptation
+
+### Feedback Loop Integration
+```javascript
+// Implementation Success Tracking
+const implementationMetrics = {
+  taskType: 'search-unification',
+  approach: 'supervised-learning',
+  timeToComplete: 4.5, // hours
+  regressionIssues: 0,
+  patternReuse: 95, // percentage
+  teamSatisfaction: 9, // 1-10 scale
+  
+  // Learning insights
+  successFactors: [
+    'Clear pattern template available',
+    'Concrete code examples provided',
+    'Step-by-step validation checkpoints'
+  ],
+  improvementAreas: [
+    'Need better test automation for regression detection'
+  ]
+}
+```
+
+### Rule Evolution Process
+```markdown
+**Weekly Retrospective:**
+- Review regression-free implementation rate
+- Analyze successful vs problematic implementations  
+- Identify patterns in successful approaches
+- Update rules based on evidence
+
+**Monthly Rule Audit:**
+- Remove rules that create friction without value
+- Add rules for newly discovered patterns
+- Simplify complex rules with concrete examples
+- Validate rule effectiveness with team feedback
+
+**Quarterly Strategy Review:**
+- Assess overall development velocity
+- Evaluate Claude optimization effectiveness
+- Plan technology stack evolution (Vue 3, etc.)
+- Update success metrics and targets
+```
+
+---
+
+This guide provides evidence-based, AI-optimized development practices with concrete success metrics and continuous improvement processes for the FFR Live Platform.
+
+Rule Name: general-rules
+Description: CORE DEVELOPMENT PRINCIPLES AND SUCCESS METRICS - Must be referenced for development workflow optimization, problem-solving algorithms, debugging techniques, code quality assurance, regression-free implementation tracking, technical debt management, Vue 2→3 migration strategy, snake_case database standards, API response formats, centralized state management principles, MCP tools integration, quality gates validation, testing strategies, performance optimization, security implementation, error handling patterns, continuous improvement processes, team collaboration, and ANY high-level development decisions. Essential for maintaining development quality and efficiency standards.

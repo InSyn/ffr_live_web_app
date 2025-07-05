@@ -1,15 +1,15 @@
-import mongoose from 'mongoose';
+import mongoose from 'mongoose'
 
 export const resultSchema = new mongoose.Schema({
-  race_id: String,
-  competitor_id: String,
-  marks: [
-    {
-      judge_id: String,
-      value: String | Number,
-    },
-  ],
-  value: String | Number,
-  gap: String | Number | null,
-  trick_name: String,
-});
+	race_id: String,
+	competitor_id: String,
+	marks: [
+		{
+			judge_id: String,
+			value: mongoose.Schema.Types.Mixed
+		}
+	],
+	value: mongoose.Schema.Types.Mixed,
+	gap: mongoose.Schema.Types.Mixed,
+	trick_name: String
+})
