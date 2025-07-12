@@ -9,13 +9,12 @@
 	>
 		<div class="athleteCompetition__item__image__container">
 			<lazy-image
-				v-if="event['logo_image_url']"
-				:src="uploadsFolderUrl() + event['logo_image_url']"
+				:src="event['logo_image_url'] ? uploadsFolderUrl() + event['logo_image_url'] : ''"
 				:alt="event.title || 'Event logo'"
-				img-class="competitionImage__image"
 				variant="list"
+				entity-type="event"
+				:entity-data="event"
 			/>
-			<competition-image-filler-icon v-else class="competitionImage__imageFiller__icon" />
 		</div>
 
 		<div class="athleteCompetition__item__competitionInfo">
@@ -72,7 +71,6 @@
 </template>
 
 <script>
-import CompetitionImageFillerIcon from '@/assets/svg/competitionImageFiller-icon.vue'
 import { formatDate } from '@/utils/data-formaters'
 import { backendRootUrl } from '@/constants'
 import CountryFlag from '@/components/ui-components/country-flag.vue'
@@ -81,7 +79,7 @@ import LazyImage from '@/components/ui-components/LazyImage.vue'
 
 export default {
 	name: 'AthleteEventItem',
-	components: { CountryFlag, CompetitionImageFillerIcon, LazyImage },
+	components: { CountryFlag, LazyImage },
 	props: ['athlete_code', 'event', 'competitions', 'index'],
 	methods: {
 		getCountryCode,
@@ -138,22 +136,9 @@ export default {
 		flex: 0 0 auto;
 		display: flex;
 		justify-content: center;
-
 		height: 80px;
 		aspect-ratio: 1;
 		padding: 8px;
-
-		.competitionImage__image {
-			flex: 1 1 0;
-			max-width: 100%;
-			max-height: 100%;
-		}
-
-		.competitionImage__imageFiller__icon {
-			height: 100%;
-			width: 100%;
-			color: #7c7f87;
-		}
 
 		@media screen and (max-width: 720px) {
 			height: 60px;

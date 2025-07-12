@@ -8,21 +8,18 @@
 	<div v-else-if="trainer" class="trainerPage__wrapper">
 		<div class="trainerCard__top__wrapper">
 			<bg-mountains class="mountains_bg" />
+
 			<div class="trainerCard__top__content">
-				<div class="trainerInfo__wrapper">
+				<div class="trainerInfo__wrapper bg-frozen-glass">
 					<div class="trainerCard__mainInfo">
 						<div class="trainerPhoto__wrapper bg-blur">
 							<lazy-image
-								v-if="trainer['photo_url']"
-								:src="getImageUrl(trainer['photo_url'])"
+								:src="getImageUrl(trainer['photo_url']) || ''"
 								:alt="trainer.fullname || 'Trainer photo'"
-								img-class="trainerPhoto"
+								rounding="50%"
 								variant="page"
-							/>
-							<athlete-photo-filler-icon
-								v-else
-								class="trainerPhotoFiller__icon"
-								:gender="trainer.gender"
+								entity-type="trainer"
+								:entity-data="trainer"
 							/>
 
 							<edit-button class="edit__button" type="trainer" :code="trainer_id" />
@@ -180,7 +177,6 @@
 
 <script>
 import SocialsVkIcon from '@/components/icons/socials-vk-icon.vue'
-import AthletePhotoFillerIcon from '@/assets/svg/athletePhotoFiller-icon.vue'
 import CountryFlag from '@/components/ui-components/country-flag.vue'
 import SocialsTelegramIcon from '@/components/icons/socials-telegram-icon.vue'
 import EditButton from '@/components/ui-components/edit-button.vue'
@@ -216,7 +212,6 @@ export default {
 		EditButton,
 		SocialsTelegramIcon,
 		CountryFlag,
-		AthletePhotoFillerIcon,
 		SocialsVkIcon,
 		LazyImage,
 		LoaderSpinner
@@ -341,27 +336,14 @@ export default {
 			width: 100%;
 			margin: 16px 16px;
 			color: var(--color-text-secondary);
-			&::before {
-				position: absolute;
-				top: 0;
-				width: 100%;
-				height: 100%;
-				background-color: rgba(2, 2, 6, 0.6);
-				backdrop-filter: blur(5px);
-				border: 1px solid rgb(255, 255, 255);
-				box-shadow:
-					0 0 6px -2px rgb(255, 255, 255) inset,
-					0 16px 32px 0 rgba(12, 14, 46, 0.48),
-					-4px -8px 24px 0 rgba(255, 255, 255, 0.14) inset;
-				border-radius: 12px;
-				content: '';
-			}
+
 			.trainerInfo__wrapper {
 				position: relative;
 				flex: 1 1 0;
 				display: flex;
 				flex-direction: column;
 				padding: var(--padd-entityPage-card);
+
 				.trainerCard__mainInfo {
 					display: flex;
 					justify-content: space-between;
@@ -373,26 +355,24 @@ export default {
 					}
 
 					.trainerPhoto__wrapper {
+						--bg-radius: 50%;
 						position: relative;
 						flex: 0 0 auto;
+						align-self: flex-start;
 						display: flex;
-						flex-wrap: wrap;
 						align-items: center;
 						justify-content: center;
+
 						aspect-ratio: 1;
 						background-color: var(--color-bg-image);
 						border: 2px solid var(--color-text-secondary);
 						border-radius: 50%;
+
 						.trainerPhoto {
 							flex: 1 1 0;
 							max-width: 100%;
 							max-height: 100%;
 							border-radius: 50%;
-						}
-						.trainerPhotoFiller__icon {
-							height: 100%;
-							aspect-ratio: 1;
-							color: var(--color-text-primary);
 						}
 						.edit__button {
 							position: absolute;

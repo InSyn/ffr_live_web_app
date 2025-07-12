@@ -14,17 +14,12 @@
 					<div class="juryCard__mainInfo">
 						<div class="juryPhoto__wrapper bg-blur">
 							<lazy-image
-								v-if="jury['photo_url']"
-								:src="getImageUrl(jury['photo_url'])"
+								:src="getImageUrl(jury['photo_url']) || ''"
 								:alt="jury.lastname + ' ' + jury.name || 'Jury photo'"
-								img-class="juryPhoto"
 								rounding="50%"
 								variant="page"
-							/>
-							<athlete-photo-filler-icon
-								v-else
-								class="juryPhotoFiller__icon"
-								:gender="jury.gender"
+								entity-type="jury"
+								:entity-data="jury"
 							/>
 
 							<edit-button class="edit__button" type="jury" :code="jury_code" />
@@ -143,7 +138,6 @@
 </template>
 
 <script>
-import AthletePhotoFillerIcon from '@/assets/svg/athletePhotoFiller-icon.vue'
 import EditButton from '@/components/ui-components/edit-button.vue'
 import CountryFlag from '@/components/ui-components/country-flag.vue'
 import axios from 'axios'
@@ -172,7 +166,6 @@ export default {
 		SocialsVkIcon,
 		CountryFlag,
 		EditButton,
-		AthletePhotoFillerIcon,
 		LazyImage,
 		LoaderSpinner
 	},
@@ -257,7 +250,6 @@ export default {
 			max-width: var(--desktop-small);
 			width: 100%;
 			margin: 16px 16px;
-
 			color: var(--color-text-secondary);
 
 			.juryCard__content {
@@ -281,7 +273,6 @@ export default {
 						position: relative;
 						flex: 0 0 auto;
 						display: flex;
-						flex-wrap: wrap;
 						align-items: center;
 						justify-content: center;
 
@@ -295,12 +286,6 @@ export default {
 							max-width: 100%;
 							max-height: 100%;
 							border-radius: 50%;
-						}
-
-						.juryPhotoFiller__icon {
-							height: 100%;
-							aspect-ratio: 1;
-							color: var(--color-text-primary);
 						}
 
 						.edit__button {

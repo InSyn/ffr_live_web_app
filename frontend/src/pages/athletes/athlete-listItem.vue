@@ -2,15 +2,15 @@
 	<router-link :to="{ name: 'athletePage', params: { athlete_code: item.ffr_id } }">
 		<div class="athlete__listItem__wrapper">
 			<lazy-image
-				v-if="item['photo_url']"
 				id="athletePhoto"
 				wrapper-class="md:m-1 xl:m-2"
-				:src="getImageUrl(item['photo_url'])"
+				:src="getImageUrl(item['photo_url']) || ''"
 				:alt="getAthleteName(item) || 'Athlete photo'"
 				rounding="50%"
 				variant="list"
+				entity-type="athlete"
+				:entity-data="item"
 			/>
-			<person-photo v-else :person="item" />
 
 			<div class="athleteInfo__top">
 				<span class="athleteInfo__name">
@@ -73,14 +73,13 @@ import { getDisciplineCode } from '@/store/data/sports'
 import { concatStringsWithComma, formatBirthDate, getAthleteName } from '@/utils/data-formaters'
 import { getRegionCode } from '@/store/data/russia-regions'
 import { getShortAthleteRank } from '@/store/data/sport-data-sets'
-import PersonPhoto from '@/components/ui-components/person-photo.vue'
 import { getCountryCode } from '@/store/data/countries'
 import LazyImage from '@/components/ui-components/LazyImage.vue'
 import { getImageUrl } from '@/utils/url-helpers'
 
 export default {
 	name: 'AthleteListItem',
-	components: { PersonPhoto, CountryFlag, LazyImage },
+	components: { CountryFlag, LazyImage },
 	props: {
 		item: Object
 	},

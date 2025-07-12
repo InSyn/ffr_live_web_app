@@ -1,0 +1,82 @@
+services:
+  ffr_live_backend:
+    build:
+      target: development
+    environment:
+      - NODE_ENV=development
+      - DEBUG=ffr:*
+      - DB_HOSTNAME=ffr_live_db
+      - DB_PORT=27017
+      - DB_USER=${DB_USER:-admin}
+      - DB_PWD=${DB_PWD:-password}
+      - DB=${DB:-ffr_live_dev}
+      - JWT_SECRET=${JWT_SECRET:-dev-jwt-secret-key}
+    volumes:
+      - ./backend:/app:rw
+      - backend_node_modules:/app/node_modules
+    command: ['npm', 'run', 'dev']
+    ports:
+      - '8081:8080' # Backend API
+      - '9229:9229' # Node.js debug port
+    depends_on:
+      - ffr_live_db
+      - redis
+
+  ffr_live_db:
+    ports:
+      - '27017:27017' # Expose MongoDB for development tools
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${DB_USER:-admin}
+      - MONGO_INITDB_ROOT_PASSWORD=${DB_PWD:-password}
+
+  # Comment out frontend for development (use npm run serve locally)
+  # ffr_live_frontend:
+  #   build:
+  #     args:
+  #       - NODE_ENV=development
+  #   volumes:
+  #     - ./frontend:/app:rw
+  #     - /app/node_modules
+  #   environment:
+  #     - CHOKIDAR_USEPOLLING=true
+
+  # Comment out production services for development
+  # nginx:
+  #   image: nginx:alpine
+
+  redis:
+    ports:
+      - '6379:6379' # Expose Redis for development tools
+    command: ['redis-server', '--requirepass', '${REDIS_PASSWORD:-devpassword}']
+
+  # Development tools
+  mongo-express:
+    image: mongo-express:latest
+    container_name: ffr_live_mongo_express
+    restart: unless-stopped
+    ports:
+      - '8082:8081'
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=${DB_USER:-admin}
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=${DB_PWD:-password}
+      - ME_CONFIG_MONGODB_URL=mongodb://${DB_USER:-admin}:${DB_PWD:-password}@ffr_live_db:27017/
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=pass
+    depends_on:
+      - ffr_live_db
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: ffr_live_redis_commander
+    restart: unless-stopped
+    ports:
+      - '8083:8081'
+    environment:
+      - REDIS_HOSTS=local:ffr_live_redis:6379:0:${REDIS_PASSWORD:-devpassword}
+    networks:
+      - app-network
+    depends_on:
+      - redis
+
+volumes:
+  backend_node_modules:

@@ -31,12 +31,12 @@
 		}
 
 		&::-webkit-scrollbar-thumb {
-			background-color: var(--color-text-primary);
+			background-color: var(--color-thumb-primary);
 			border-radius: 4px;
 			cursor: pointer;
 
 			&:hover {
-				background-color: color-mix(in srgb, var(--color-text-primary), transparent 18%);
+				background-color: var(--color-thumb-secondary);
 			}
 		}
 	}

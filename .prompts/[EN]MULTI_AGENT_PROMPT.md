@@ -44,12 +44,12 @@
 
 #### Memory MCP (Context Persistence)
 
-- **ИНТЕНСИВНОЕ ИСПОЛЬЗОВАНИЕ** для всех агентов
+- **INTENSIVE USE** for each agent
 - Store architectural decisions, pattern validations
 - Track technical debt, improvement opportunities  
 - Persist debugging insights, solution patterns
-- **Перед каждой задачей**: Search memory for relevant context
-- **После каждого решения**: Store key learnings и patterns
+- **Before each task**: Search memory for relevant context
+- **After each solution**: Store key learnings and patterns
 
 ## MANDATORY Multi-Agent Approach For Task Resolution
 

@@ -1,17 +1,15 @@
 <template>
 	<router-link :to="{ name: 'trainerPage', params: { trainer_id: item.trainer_id } }">
 		<div class="trainersList__item__wrapper">
-			<div class="trainerPhoto">
-				<lazy-image
-					v-if="item['photo_url']"
-					:src="getImageUrl(item['photo_url'])"
-					:alt="item.fullname || 'Trainer photo'"
-					img-class="trainerPhoto"
-					rounding="50%"
-					variant="list"
-				/>
-				<person-photo v-else :person="item" />
-			</div>
+			<lazy-image
+				class="trainerPhoto"
+				:src="getImageUrl(item['photo_url']) || ''"
+				:alt="item.fullname || 'Trainer photo'"
+				rounding="50%"
+				variant="list"
+				entity-type="trainer"
+				:entity-data="item"
+			/>
 
 			<div class="trainerInfo__top">
 				<span class="trainerInfo__name">
@@ -60,7 +58,6 @@
 <script>
 import CountryFlag from '@/components/ui-components/country-flag.vue'
 import { getDisciplineCode } from '@/store/data/sports'
-import PersonPhoto from '@/components/ui-components/person-photo.vue'
 import { getCountryCode } from '@/store/data/countries'
 import LazyImage from '@/components/ui-components/LazyImage.vue'
 import { getImageUrl } from '@/utils/url-helpers'
@@ -68,7 +65,6 @@ import { getImageUrl } from '@/utils/url-helpers'
 export default {
 	name: 'TrainerListItem',
 	components: {
-		PersonPhoto,
 		CountryFlag,
 		LazyImage
 	},

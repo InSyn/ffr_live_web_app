@@ -1,17 +1,15 @@
 <template>
 	<router-link :to="{ name: 'juryPage', params: { jury_code: item.jury_code } }">
 		<div class="juryList__item__wrapper">
-			<div class="juryPhoto">
-				<lazy-image
-					v-if="item['photo_url']"
-					:src="getImageUrl(item['photo_url'])"
-					:alt="getAthleteName(item) || 'Jury photo'"
-					img-class="juryPhoto"
-					rounding="50%"
-					variant="list"
-				/>
-				<person-photo v-else :person="item" />
-			</div>
+			<lazy-image
+				class="juryPhoto"
+				:src="getImageUrl(item['photo_url']) || ''"
+				:alt="getAthleteName(item) || 'Jury photo'"
+				rounding="50%"
+				variant="list"
+				entity-type="jury"
+				:entity-data="item"
+			/>
 
 			<div class="juryInfo__top">
 				<span class="juryInfo__name">
@@ -58,7 +56,6 @@
 import CountryFlag from '@/components/ui-components/country-flag.vue'
 import { getDisciplineCode } from '@/store/data/sports'
 import { getAthleteName } from '@/utils/data-formaters'
-import PersonPhoto from '@/components/ui-components/person-photo.vue'
 import { getCountryCode } from '@/store/data/countries'
 import LazyImage from '@/components/ui-components/LazyImage.vue'
 import { getImageUrl } from '@/utils/url-helpers'
@@ -66,7 +63,6 @@ import { getImageUrl } from '@/utils/url-helpers'
 export default {
 	name: 'JuryListItem',
 	components: {
-		PersonPhoto,
 		CountryFlag,
 		LazyImage
 	},

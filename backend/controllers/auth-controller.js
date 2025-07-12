@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { User } from '../models/user-model.js'
 
-const { JWT_SECRET } = process.env
+const JWT_SECRET = process.env.JWTS
 const dbRoles = ['secretary', 'jury', 'athlete', 'trainer']
 
 export const register = async (req, res) => {

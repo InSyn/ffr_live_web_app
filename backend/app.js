@@ -23,7 +23,20 @@ const app = express()
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-app.use(cors())
+
+// CORS configuration for production domain
+const corsOptions = {
+	origin: [
+		'http://localhost:8080',
+		'http://localhost:3000',
+		'https://live-result.ffr-ski.ru',
+		'https://api-live-result.ffr-ski.ru'
+	],
+	credentials: true,
+	optionsSuccessStatus: 200
+}
+
+app.use(cors(corsOptions))
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 

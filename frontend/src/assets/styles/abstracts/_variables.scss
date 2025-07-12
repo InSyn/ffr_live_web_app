@@ -47,12 +47,13 @@ $desktop-2k: 2560px; // Legacy
 	--raw-neutral-850: #0a0a13;
 	--raw-neutral-800: #111118;
 	--raw-neutral-700: #212125;
-	--raw-neutral-650: #2c2c31;
+	--raw-neutral-650: #2d2d32;
 	--raw-neutral-600: #2f2f34;
 	--raw-neutral-500: #757589;
 	--raw-neutral-400: #9898ab;
 	--raw-neutral-300: #c2c2c7;
 	--raw-neutral-200: #cfcfd6;
+	--raw-neutral-150: #d9d9dd;
 	--raw-neutral-100: #dadadf;
 	--raw-neutral-50: #f2f2f7;
 
@@ -68,7 +69,7 @@ $desktop-2k: 2560px; // Legacy
 :root {
 	// Text Colors
 	--color-text-primary: var(--raw-neutral-900);
-	--color-text-secondary: var(--raw-neutral-300);
+	--color-text-secondary: var(--raw-neutral-500);
 	--color-text-contrast: var(--raw-neutral-100);
 	--color-text-on-brand: var(--raw-neutral-50);
 	--color-text-accent: var(--raw-brand-blue-600);
@@ -78,7 +79,7 @@ $desktop-2k: 2560px; // Legacy
 	// Background Colors
 	--color-bg-primary: var(--raw-neutral-100);
 	--color-bg-secondary: var(--raw-neutral-700);
-	--color-bg-tertiary: var(--raw-neutral-650);
+	--color-bg-tertiary: var(--raw-neutral-150);
 	--color-bg-surface: #f2f2f7;
 	--color-bg-surface-hover: color-mix(
 		in srgb,
@@ -92,6 +93,9 @@ $desktop-2k: 2560px; // Legacy
 	// Border Colors
 	--color-border-primary: #acafb6;
 	--color-border-photo: #e0e0e4;
+
+	--color-thumb-primary: var(--raw-neutral-400);
+	--color-thumb-secondary: var(--raw-neutral-300);
 
 	// Shadow
 	--shadow-brand: 6px 4px 20px rgba(116, 141, 186, 0.6);
@@ -114,7 +118,7 @@ $desktop-2k: 2560px; // Legacy
 	// Background Colors
 	--color-bg-primary: var(--raw-neutral-600);
 	--color-bg-secondary: var(--raw-neutral-800);
-	--color-bg-tertiary: var(--raw-neutral-850);
+	--color-bg-tertiary: var(--raw-neutral-650);
 	--color-bg-surface: #101018;
 	// --color-bg-surface-hover: #29292f;
 	--color-bg-surface-secondary: #24242a;
@@ -122,6 +126,9 @@ $desktop-2k: 2560px; // Legacy
 	// Border Colors
 	--color-border-primary: #3e4044;
 	--color-border-photo: #2c2c30;
+
+	--color-thumb-primary: var(--raw-neutral-500);
+	--color-thumb-secondary: var(--raw-neutral-600);
 
 	// Shadow
 	--shadow-brand: 7px 6px 23px -6px rgba(72, 92, 144, 0.18);

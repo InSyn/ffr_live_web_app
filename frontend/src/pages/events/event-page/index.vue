@@ -46,13 +46,12 @@
 						<div class="event__header__imageSection">
 							<div class="competitionImage__container">
 								<lazy-image
-									v-if="event['logo_image_url']"
-									:src="getImageUrl(event['logo_image_url'])"
+									:src="getImageUrl(event['logo_image_url']) || ''"
 									alt="Event Logo"
-									img-class="competitionImage img-thumbnail"
 									rounding="var(--radius-md)"
+									entity-type="event"
+									:entity-data="event"
 								/>
-								<competition-image-filler-icon v-else class="competitionImage__imageFiller__icon" />
 							</div>
 
 							<div
@@ -263,7 +262,6 @@ import { formatDate } from '@/utils/data-formaters'
 import LoaderSpinner from '@/components/ui-components/loader-spinner.vue'
 import { apiUrl } from '@/constants'
 import { mdiImage } from '@mdi/js'
-import CompetitionImageFillerIcon from '@/assets/svg/competitionImageFiller-icon.vue'
 import CountryFlag from '@/components/ui-components/country-flag.vue'
 import EventTranslationIcon from '@/components/icons/eventTranslation-icon.vue'
 import InfoIcon from '@/components/icons/info-icon.vue'
@@ -300,7 +298,6 @@ export default {
 		InfoIcon,
 		EventTranslationIcon,
 		CountryFlag,
-		CompetitionImageFillerIcon,
 		LoaderSpinner,
 		ResultsTable,
 		LazyImage
@@ -681,20 +678,8 @@ export default {
 							}
 
 							img {
-								max-width: 100%;
 								max-height: 100%;
-							}
-
-							.competitionImage__imageFiller__icon {
-								height: 100%;
-								width: 100%;
-							}
-
-							@media screen and (max-width: 1200px) {
-								height: 92px;
-							}
-							@media screen and (max-width: 900px) {
-								height: 80px;
+								max-width: 100%;
 							}
 						}
 

@@ -8,16 +8,12 @@
 					<div class="athleteInfo__header">
 						<div class="athletePhoto__wrapper bg-blur">
 							<lazy-image
-								v-if="athlete['photo_url']"
-								:src="getImageUrl(athlete['photo_url'])"
+								:src="getImageUrl(athlete['photo_url']) || ''"
 								:alt="athlete.lastname + ' ' + athlete.name || 'Athlete photo'"
 								rounding="50%"
 								variant="page"
-							/>
-							<athlete-photo-filler-icon
-								v-else
-								class="athletePhotoFiller__icon"
-								:gender="athlete.gender"
+								entity-type="athlete"
+								:entity-data="athlete"
 							/>
 
 							<edit-button class="editAthlete__button" type="athlete" :code="athlete_code" />
@@ -236,7 +232,6 @@
 import axios from 'axios'
 import { apiUrl } from '@/constants'
 import { mdiImage } from '@mdi/js'
-import AthletePhotoFillerIcon from '@/assets/svg/athletePhotoFiller-icon.vue'
 import CountryFlag from '@/components/ui-components/country-flag.vue'
 import AthleteEventItem from '@/pages/athletes/athlete-page/athleteEventItem.vue'
 import { getRegionCode } from '@/store/data/russia-regions'
@@ -261,7 +256,6 @@ export default {
 		SocialsVkIcon,
 		AthleteEventItem,
 		CountryFlag,
-		AthletePhotoFillerIcon,
 		LazyImage
 	},
 	props: ['athlete_code'],
@@ -377,12 +371,6 @@ export default {
 						position: relative;
 						flex: 0 0 auto;
 						aspect-ratio: 1;
-
-						.athletePhotoFiller__icon {
-							height: 100%;
-							aspect-ratio: 1;
-							color: var(--color-text-primary);
-						}
 
 						.editAthlete__button {
 							position: absolute;
@@ -514,10 +502,9 @@ export default {
 								margin-left: auto;
 
 								.athleteTrainer__link {
-									color: var(--color-text-secondary);
+									color: var(--color-text-contrast) !important;
 
 									&:hover {
-										color: var(--color-text-secondary);
 										text-decoration: underline;
 									}
 								}

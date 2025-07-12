@@ -17,13 +17,12 @@
 						>
 							<div class="organizationImage__wrapper">
 								<lazy-image
-									v-if="organization['logo_url']"
-									:src="getImageUrl(organization['logo_url'])"
+									:src="getImageUrl(organization['logo_url']) || ''"
 									:alt="organization.title || 'Organization logo'"
-									img-class="organizationImage"
 									variant="page"
+									entity-type="organization"
+									:entity-data="organization"
 								/>
-								<competition-image-filler-icon v-else class="imageFiller__icon" />
 
 								<edit-button class="editOrganization__button" type="organization" :code="org_id" />
 							</div>
@@ -140,7 +139,6 @@ import CountryFlag from '@/components/ui-components/country-flag.vue'
 import SocialsTelegramIcon from '@/components/icons/socials-telegram-icon.vue'
 import EditButton from '@/components/ui-components/edit-button.vue'
 import { mdiImage } from '@mdi/js'
-import CompetitionImageFillerIcon from '@/assets/svg/competitionImageFiller-icon.vue'
 import BgMountains from '@/assets/riv/bg-mountains.vue'
 import EventsWithRegistrationList from '@/pages/organizations/organization-page/events-with-registration-list.vue'
 import OrganizationTeamList from '@/pages/organizations/organization-page/organization-team-list.vue'
@@ -157,7 +155,6 @@ export default {
 		OrganizationTeamList,
 		EventsWithRegistrationList,
 		BgMountains,
-		CompetitionImageFillerIcon,
 		EditButton,
 		SocialsTelegramIcon,
 		CountryFlag,
@@ -309,11 +306,6 @@ export default {
 					max-width: 100%;
 					max-height: 100%;
 					object-fit: contain;
-				}
-
-				.imageFiller__icon {
-					width: 192px;
-					color: var(--color-text-primary);
 				}
 
 				.editOrganization__button {

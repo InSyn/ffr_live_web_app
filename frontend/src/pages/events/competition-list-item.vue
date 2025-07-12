@@ -6,14 +6,12 @@
 		>
 			<div class="competitionImage__container">
 				<lazy-image
-					v-if="item['logo_image_url']"
-					:src="getImageUrl(item['logo_image_url'])"
+					:src="getImageUrl(item['logo_image_url']) || ''"
 					alt="Event Logo"
-					class="competitionImage__image"
 					variant="list"
+					entity-type="competition"
+					:entity-data="item"
 				/>
-
-				<competition-image-filler-icon v-else class="imageFiller" />
 			</div>
 
 			<div class="competitionInfo__wrapper">
@@ -70,7 +68,6 @@
 </template>
 <script>
 import CountryFlag from '@/components/ui-components/country-flag.vue'
-import CompetitionImageFillerIcon from '@/assets/svg/competitionImageFiller-icon.vue'
 import { concatStringsWithComma, formatDate } from '@/utils/data-formaters'
 import { getCountryCode } from '@/store/data/countries'
 import { getRegionCode } from '@/store/data/russia-regions'
@@ -80,7 +77,7 @@ import LazyImage from '@/components/ui-components/LazyImage.vue'
 
 export default {
 	name: 'CompetitionListItem',
-	components: { LazyImage, CompetitionImageFillerIcon, CountryFlag },
+	components: { LazyImage, CountryFlag },
 	props: {
 		item: { type: Object, required: true },
 		index: Number,
@@ -109,7 +106,7 @@ export default {
 	flex: 0 0 auto;
 	display: flex;
 	flex-wrap: nowrap;
-
+	border-bottom: 1px solid var(--color-border-primary);
 	color: var(--color-text-primary);
 	cursor: pointer;
 	transition: background-color var(--transition-duration-fast);
@@ -137,17 +134,6 @@ export default {
 		height: 100px;
 		aspect-ratio: 1;
 		padding: var(--space-2);
-
-		.competitionImage__image {
-			display: block;
-			max-height: 100%;
-			max-width: 100%;
-		}
-
-		.competitionImage__imageFiller__icon {
-			height: 100%;
-			width: 100%;
-		}
 
 		@media screen and (max-width: 1440px) {
 			height: 85px;

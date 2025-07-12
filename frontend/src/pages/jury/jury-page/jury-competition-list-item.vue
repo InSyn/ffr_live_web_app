@@ -2,13 +2,12 @@
 	<div class="juryEvent__item__wrapper">
 		<div class="event__image__wrapper">
 			<lazy-image
-				v-if="event['logo_image_url']"
-				:src="getImageUrl(event['logo_image_url'])"
+				:src="getImageUrl(event['logo_image_url']) || ''"
 				:alt="event.title || 'Event logo'"
-				img-class="juryEvent__image"
 				variant="list"
+				entity-type="event"
+				:entity-data="event"
 			/>
-			<competition-image-filler-icon v-else />
 			<country-flag
 				class="juryEvent_regionFlag"
 				width="1.5rem"
@@ -57,7 +56,6 @@
 </template>
 
 <script>
-import CompetitionImageFillerIcon from '@/assets/svg/competitionImageFiller-icon.vue'
 import CountryFlag from '@/components/ui-components/country-flag.vue'
 import { getCountryCode } from '@/store/data/countries'
 import { getRegionCode } from '@/store/data/russia-regions'
@@ -67,7 +65,7 @@ import { getImageUrl } from '@/utils/url-helpers'
 
 export default {
 	name: 'JuryCompetitionListItem',
-	components: { CountryFlag, CompetitionImageFillerIcon, LazyImage },
+	components: { CountryFlag, LazyImage },
 	props: {
 		event: { type: Object, default: () => ({}) },
 		item: { type: Object, default: () => ({}) },
@@ -109,13 +107,6 @@ export default {
 		align-items: center;
 		height: 72px;
 		aspect-ratio: 1;
-
-		img {
-			flex: 1 1 0;
-			display: block;
-			max-height: 100%;
-			max-width: 100%;
-		}
 
 		.juryEvent_regionFlag {
 			position: absolute;

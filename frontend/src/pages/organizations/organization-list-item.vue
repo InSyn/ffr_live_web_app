@@ -10,15 +10,12 @@
 		>
 			<div class="organizationImage__wrapper">
 				<lazy-image
-					v-if="item['logo_url']"
-					:src="getImageUrl(item['logo_url'])"
+					:src="getImageUrl(item['logo_url']) || ''"
 					:alt="item.title || 'Organization logo'"
-					img-class="organizationImage"
 					variant="list"
+					entity-type="organization"
+					:entity-data="item"
 				/>
-				<div v-else class="imageFiller">
-					<competition-image-filler-icon class="imageFiller__icon" />
-				</div>
 			</div>
 			<div class="organizationInfo__top">
 				<span class="organizationInfo__title">
@@ -56,13 +53,11 @@
 import CountryFlag from '@/components/ui-components/country-flag.vue'
 import { getRegionCode } from '@/store/data/russia-regions'
 import { getCountryCode } from '@/store/data/countries'
-import CompetitionImageFillerIcon from '@/assets/svg/competitionImageFiller-icon.vue'
 import LazyImage from '@/components/ui-components/LazyImage.vue'
 import { getImageUrl } from '@/utils/url-helpers'
 export default {
 	name: 'OrganizationListItem',
 	components: {
-		CompetitionImageFillerIcon,
 		CountryFlag,
 		LazyImage
 	},
@@ -94,6 +89,7 @@ export default {
 	grid-template-columns: auto 1fr;
 	grid-gap: 0.5rem 1rem;
 	padding: 0.25rem 1.25rem 0.25rem 0.5rem;
+	border-bottom: 1px solid var(--color-border-primary);
 	cursor: pointer;
 
 	&.isEven {
@@ -116,24 +112,6 @@ export default {
 		height: 100px;
 		aspect-ratio: 1;
 		padding: 0.5rem;
-
-		.organizationImage {
-			max-height: 100%;
-			max-width: 100%;
-		}
-
-		.imageFiller {
-			display: flex;
-			justify-content: center;
-			align-items: flex-end;
-			height: 100%;
-			width: 100%;
-			color: var(--color-text-secondary);
-
-			.imageFiller__icon {
-				flex: 1 1 0;
-			}
-		}
 	}
 
 	.organizationInfo__top {

@@ -1,6 +1,6 @@
 <template>
 	<div class="personPhoto__wrapper">
-		<div class="imageBorder bg-blur">
+		<div class="imageBorder">
 			<img
 				v-if="person.photo_url"
 				class="athleteInfo__image"
@@ -76,7 +76,6 @@ export default {
 	isolation: isolate;
 	height: var(--photo-height);
 	width: var(--photo-width);
-	padding: 0.5rem;
 
 	.imageBorder {
 		display: flex;

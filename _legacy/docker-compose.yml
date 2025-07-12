@@ -1,80 +1,130 @@
 version: '3'
 
 services:
+  # Backend Service - Production Ready
   ffr_live_back:
     build:
       context: ./backend
       dockerfile: Dockerfile
+      target: production
+      network: host
     container_name: ffr_live_back
     restart: unless-stopped
     env_file: .env
     environment:
-      - DB_USER=$DB_USER
-      - DB_PWD=$DB_PWD
-      - DB_HOSTNAME=$DB_HOSTNAME
-      - DB_PORT=$DB_PORT
-      - DB=$DB
+      - NODE_ENV=production
+      - DB_USER=${DB_USER}
+      - DB_PWD=${DB_PWD}
+      - DB_HOSTNAME=live_db
+      - DB_PORT=27017
+      - DB=${DB}
+      - JWTS=${JWTS}
+      - PORT=8080
     ports:
-      - "127.0.0.1:8081:8080"
-      - "127.0.0.1:8082:443"
+      - "8081:8080"
+      - "8082:443"
     volumes:
       - /etc/letsencrypt:/etc/letsencrypt
-      - ./backend/uploads:/home/ffr_live_back/uploads
-    links:
-      - live_db
-    networks:
-      - app-network
+      - ./backend/uploads:/app/uploads
+      - ./backend/logs:/app/logs
     depends_on:
       - live_db
+      - live_cache
+    networks:
+      - app-network
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/api/v1/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
-#  certbot:
-#    image: certbot/certbot
-#    container_name: certbot
-#    volumes:
-#      - /etc/letsencrypt:/etc/letsencrypt
-#      - /var/lib/letsencrypt:/var/lib/letsencrypt
-#      - /var/log/letsencrypt:/var/log/letsencrypt
-#    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
-#    networks:
-#      - app-network
-
+  # Frontend Service - Production Ready  
   ffr_live_front:
     build:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        - VUE_APP_BASE_URL=$API_URL
-        - VUE_APP_UPLOADS_URL=$SERVER_URL
-        - VUE_APP_PROJECT_MODE=$PROJECT_MODE
+        - NODE_ENV=production
+        - VUE_APP_BASE_URL=${API_URL}
+        - VUE_APP_UPLOADS_URL=${SERVER_URL}
+        - VUE_APP_PROJECT_MODE=${PROJECT_MODE}
     container_name: ffr_live_front
     restart: unless-stopped
     ports:
       - "8083:80"
+    depends_on:
+      - ffr_live_back
     networks:
       - app-network
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:80/']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
+  # MongoDB Database - Updated to 7.0 for production
   live_db:
-    image: mongo:5.0-focal
-#    command: --repair
+    image: mongo:7.0
     container_name: ffr_live_db
     restart: unless-stopped
     env_file: .env
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=$DB_USER
-      - MONGO_INITDB_ROOT_PASSWORD=$DB_PWD
-      - MONGO_INITDB_DATABASE=$DB
+      - MONGO_INITDB_ROOT_USERNAME=${DB_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${DB_PWD}
+      - MONGO_INITDB_DATABASE=${DB}
     volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
       - /data/db:/data/db
-#      - dbdata:/data/db
       - ./backend/db/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js
     networks:
       - app-network
-    ports:
-      - "27017:27017"
+    # Note: Remove port exposure for production security
+    # ports:
+    #   - "27017:27017"
+    healthcheck:
+      test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    command: ['mongod', '--auth', '--bind_ip_all']
+
+  # Redis Cache - For production performance
+  live_cache:
+    image: redis:7-alpine
+    container_name: ffr_live_cache
+    restart: unless-stopped
+    command: ['redis-server', '--requirepass', '${REDIS_PASSWORD}', '--maxmemory', '256mb', '--maxmemory-policy', 'allkeys-lru']
+    volumes:
+      - redis_data:/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # SSL Certificate Management (uncomment if needed)
+  # certbot:
+  #   image: certbot/certbot
+  #   container_name: certbot
+  #   volumes:
+  #     - /etc/letsencrypt:/etc/letsencrypt
+  #     - /var/lib/letsencrypt:/var/lib/letsencrypt
+  #     - /var/log/letsencrypt:/var/log/letsencrypt
+  #   entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+  #   networks:
+  #     - app-network
 
 networks:
   app-network:
     driver: bridge
 
 volumes:
-  dbdata:
+  mongodb_data:
+  mongodb_config:
+  redis_data: 
